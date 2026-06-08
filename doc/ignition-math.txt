@@ -1,0 +1,662 @@
+*ignition-math.txt*                             Ignition system.math functions
+
+SYSTEM.MATH                                             *ignition-system.math*
+
+  |ignition-system.math.geometricMean|
+  |ignition-system.math.kurtosis|
+  |ignition-system.math.max|
+  |ignition-system.math.mean|
+  |ignition-system.math.meanDifference|
+  |ignition-system.math.median|
+  |ignition-system.math.min|
+  |ignition-system.math.mode|
+  |ignition-system.math.normalize|
+  |ignition-system.math.percentile|
+  |ignition-system.math.populationVariance|
+  |ignition-system.math.product|
+  |ignition-system.math.skewness|
+  |ignition-system.math.standardDeviation|
+  |ignition-system.math.sum|
+  |ignition-system.math.sumDifference|
+  |ignition-system.math.sumLog|
+  |ignition-system.math.sumSquares|
+  |ignition-system.math.variance|
+
+------------------------------------------------------------------------------
+system.math.geometricMean()               *ignition-system.math.geometricMean*
+
+  Calculates the geometric mean. Geometric mean is a type of average which
+  indicates a value in a set of numbers by using the product of values in the
+  set and then taking the nth root, where n is the number of values in the
+  set. This is different than an arithmetic mean, which calculates an average
+  based off the sum of the numbers, and divides it by n number of values.
+  Geometric means can only be positive numbers.
+
+  Syntax: >
+    system.math.geometricMean(values)
+<
+
+  Parameters: ~
+    {values}  (List[Float])  A sequence of numerical values. Accepts both
+                             integers and floats. The sequence may not
+                             contain None type values. However, passing a
+                             None type object instead of a sequence of
+                             numerical values will return NaN.
+
+  Returns: ~
+    Float - The geometric mean, or NaN if the input was empty or null.
+    Because this uses logs to compute the geometric mean, will return NaN if
+    any entries are negative.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Create a List of values.
+    values = [3.5, 5.6, 7.8, 7.4, 3.8]
+    
+    # Prints the resulting value.
+    print system.math.geometricMean(values)
+<
+
+------------------------------------------------------------------------------
+system.math.kurtosis()                         *ignition-system.math.kurtosis*
+
+  Calculates the kurtosis of a sequence of values. Kurtosis measures if data
+  is peaked or flat relative to normal distribution. A set of data with high
+  kurtosis will have distinct peaks near the mean, while a set of data with
+  low kurtosis will have a flat top near the mean. Uniform distribution is
+  typically a flat line.
+
+  Syntax: >
+    system.math.kurtosis(values)
+<
+
+  Parameters: ~
+    {values}  (List[Float])  A sequence of numerical values. Accepts both
+                             integers and floats. The sequence may not
+                             contain None type values. However, passing a
+                             None type object instead of a sequence of
+                             numerical values will return NaN. Requires at
+                             least four items in the list.
+
+  Returns: ~
+    Float - The kurtosis, or NaN if the input was empty or null.
+    Additionally, returns NaN if the values returned fewer than four values.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Create a List of values.
+    values = [3.5, 5.6, 7.8, 7.4, 3.8]
+    
+    # Prints the resulting value.
+    print system.math.kurtosis(values)
+<
+
+------------------------------------------------------------------------------
+system.math.max()                                   *ignition-system.math.max*
+
+  Given a sequence of values, returns the greatest value in the sequence,
+  also known as the "max" value.
+
+  Syntax: >
+    system.math.max(values)
+<
+
+  Parameters: ~
+    {values}  (List[Float])  A sequence of numerical values. Accepts both
+                             integers and floats. The sequence may not
+                             contain None type values. However, passing a
+                             None type object instead of a sequence of
+                             numerical values will return NaN.
+
+  Returns: ~
+    Float - The maximum value contained in the values parameter, or NaN if
+    the input was empty or null.
+
+  Scope: All
+
+  Example: >
+    # Create a List of values.
+    values = [3.5, 5.6, 7.8, 7.4, 3.8]
+    
+    # Prints the resulting value.
+    print system.math.max(values)
+<
+
+------------------------------------------------------------------------------
+system.math.mean()                                 *ignition-system.math.mean*
+
+  Given a sequence of values, calculates the arithmetic mean (average).
+
+  Syntax: >
+    system.math.mean(values)
+<
+
+  Parameters: ~
+    {values}  (Float[])  A sequence of numerical values. Accepts both
+                         integers and floats. The sequence may not contain
+                         None type values. However, passing a None type
+                         object instead of a sequence of numerical values
+                         will return NaN.
+
+  Returns: ~
+    Float - The arithmetic mean, or NaN if the input was empty or None.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Create a list of values.
+    values = [3.5, 5.6, 7.8, 7.4, 3.8]
+    
+    # Prints the resulting value.
+    print system.math.mean(values)
+<
+
+------------------------------------------------------------------------------
+system.math.meanDifference()             *ignition-system.math.meanDifference*
+
+  Given two sequences of values, calculates the mean of the signed difference
+  between both sequences. In other words, returns the absolute difference
+  between the mean values of two different sets of data.
+
+  Syntax: >
+    system.math.meanDifference(values1, values2)
+<
+
+  Parameters: ~
+    {values1}  (List[Float])  A sequence of numerical values. Accepts both
+                              integers and floats. The sequence may not
+                              contain None type values. However, passing a
+                              None type object instead of a sequence of
+                              numerical values will return NaN.
+    {values2}  (List[Float])  A sequence of numerical values. Accepts both
+                              integers and floats. The sequence may not
+                              contain None type values. However, passing a
+                              None type object instead of a sequence of
+                              numerical values will return NaN.
+
+  Returns: ~
+    Float - The mean difference, or NaN if one of the parameters was empty or
+    null.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Create some lists.
+    firstList = [3.5, 5.6, 7.8, 7.4, 3.8]
+    secondList = [3.5, 5.6, -7.8, 7.4, -3.8]
+    
+    # Prints the resulting value.
+    print system.math.meanDifference(firstList, secondList)
+<
+
+------------------------------------------------------------------------------
+system.math.median()                             *ignition-system.math.median*
+
+  Takes a sequence of values, and returns the median. The median represents
+  the middle value in a set of data.
+
+  Syntax: >
+    system.math.median(values)
+<
+
+  Parameters: ~
+    {values}  (List[Float])  A sequence of numerical values. Accepts both
+                             integers and floats. The sequence may not
+                             contain None type values. However, passing a
+                             None type object instead of a sequence of
+                             numerical values will return NaN.
+
+  Returns: ~
+    Float - The median, or NaN if the input was empty or null.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Create a list of values.
+    values = [3.5, 5.6, 7.8, 7.4, 3.8]
+    
+    # Prints the resulting value.
+    print system.math.median(values)
+<
+
+------------------------------------------------------------------------------
+system.math.min()                                   *ignition-system.math.min*
+
+  Given a sequence of numerical values, returns the minimum value, also known
+  as the "min" value.
+
+  Syntax: >
+    system.math.min(values)
+<
+
+  Parameters: ~
+    {values}  (List[Float])  A sequence of numerical values. Accepts both
+                             integers and floats. The sequence may not
+                             contain None type values. However, passing a
+                             None type object instead of a sequence of
+                             numerical values will return NaN.
+
+  Returns: ~
+    Float - The minimum value contained within the 'values' parameter, or NaN
+    if the input was empty or null.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Create a list of values.
+    values = [3.5, 5.6, 7.8, 7.4, 3.8]
+    
+    # Prints the resulting value.
+    print system.math.min(values)
+<
+
+------------------------------------------------------------------------------
+system.math.mode()                                 *ignition-system.math.mode*
+
+  Given a sequence of values, returns the 'mode', or most frequent values.
+
+  Syntax: >
+    system.math.mode(values)
+<
+
+  Parameters: ~
+    {values}  (List[Float])  A sequence of numerical values. Accepts both
+                             integers and floats. The sequence may not
+                             contain None type values.
+
+  Returns: ~
+    List[Float] - A Java Array (functionally similar to a Python List) of
+    floats representing the most frequent value(s) in the values parameter.
+    If the values parameter was empty, then an empty list will be returned
+    instead.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Create a list of values.
+    values = [3.5, 5.6, 7.8, 7.4, 7.8]
+    
+    # Return the most common values.
+    modes = system.math.mode(values)
+    
+    # Print the first item in the result.
+    print modes[0]
+    
+    # Iterate over the results.
+    for number in modes:
+        print number
+<
+
+------------------------------------------------------------------------------
+system.math.normalize()                       *ignition-system.math.normalize*
+
+  Given a sequence of values, normalizes the values. Normalizing data refers
+  to adjusting values measured on different scales and brings them into
+  alignment to allow the comparison of corresponding normalized values. This
+  creates uniformity of values by eliminating the different units of
+  measurement, and to more easily compare data from different places.
+
+  Syntax: >
+    system.math.normalize(values)
+<
+
+  Parameters: ~
+    {values}  (List[Float])  A sequence of numerical values. Accepts both
+                             integers and floats. The sequence may not
+                             contain None type values.
+
+  Returns: ~
+    List[Float] - A Java array (functionally similar to a Python list) of
+    floats representing normalized input, with a mean of 0 and a standard
+    deviation of 1. Returns an empty array if the input was empty or None. If
+    the standard deviation is 0, will return an array of float NaN (Not a
+    Number).
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Create a list of values.
+    values = [3.5, 5.6, 7.8, 7.4, 7.8]
+    
+    # Return the most common values.
+    normalized = system.math.normalize(values)
+    
+    # Print the first item in the result.
+    print normalized[0]
+    
+    # Iterate over the results.
+    for number in normalized:
+        print number
+<
+
+------------------------------------------------------------------------------
+system.math.percentile()                     *ignition-system.math.percentile*
+
+  Given a sequence of numerical values, estimates the percentile of input.
+
+  Syntax: >
+    system.math.percentile(values, percentile)
+<
+
+  Parameters: ~
+    {values}      (List[Float])  A sequence of numerical values. Accepts both
+                                 integers and floats. The sequence may not
+                                 contain None type values. However, passing a
+                                 None type object instead of a sequence of
+                                 numerical values will return NaN.
+    {percentile}  (Float)        The percentile to compute. A float greater
+                                 than 0 and less than or equal to 100. Will
+                                 throw an exception if the percentile is out
+                                 of bounds.
+
+  Returns: ~
+    Float - A value from the given list using the requested percentile of the
+    input, or NaN if the input was empty or null.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Create a list of values.
+    values = [3.5, 5.6, 7.4, 3.8]
+    
+    # Print the 75th percentile.
+    print system.math.percentile(values, 75)
+<
+
+------------------------------------------------------------------------------
+system.math.populationVariance()     *ignition-system.math.populationVariance*
+
+  Given a sequence of values, returns the population variance. Population
+  variance calculates how values in a dataset are spread out from their
+  average value.
+
+  Syntax: >
+    system.math.populationVariance(values)
+<
+
+  Parameters: ~
+    {values}  (List[Float])  A sequence of numerical values. Accepts both
+                             integers and floats. The sequence may not
+                             contain None type values. However, passing a
+                             None type object instead of a sequence of
+                             numerical values will return NaN.
+
+  Returns: ~
+    Float - The population variance, or NaN if the input was empty or null.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Create a list of values.
+    values = [3.5, 5.6, 7.8, 7.4, 3.8]
+    
+    # Print the resulting value.
+    print system.math.populationVariance(values)
+<
+
+------------------------------------------------------------------------------
+system.math.product()                           *ignition-system.math.product*
+
+  Given a sequence of values, calculates the product of the sequence: the
+  result of multiplying of all values in the sequence together.
+
+  Syntax: >
+    system.math.product(values)
+<
+
+  Parameters: ~
+    {values}  (List[Float])  A sequence of numerical values. Accepts both
+                             integers and floats. The sequence may not
+                             contain None type values. However, passing a
+                             None type object instead of a sequence of
+                             numerical values will return NaN.
+
+  Returns: ~
+    Float - The product of all values in the values parameter, or NaN if the
+    input was empty or null.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Create a list of values.
+    values = [3.5, 5.6, 7.8, 7.4, 3.8]
+    
+    # Print the resulting value.
+    print system.math.product(values)
+<
+
+------------------------------------------------------------------------------
+system.math.skewness()                         *ignition-system.math.skewness*
+
+  Given a sequence of values, calculates the skewness (third central moment).
+  Skewness is a measure of the degree of asymmetry of a distribution of the
+  mean. If skewed to the left, the distribution has a long tail in the
+  negative direction. If skewed to the right, the tail will be skewed in the
+  positive direction. Skewness values greater than 1 or less than -1 indicate
+  a highly skewed distribution, while skewness values between 0.5 and 1 or
+  -0.5 and -1 indicate a moderately skewed distribution. Finally, skewness
+  values between -0.5 and 0.5 indicate a more symmetrical distribution.
+
+  Syntax: >
+    system.math.skewness(values)
+<
+
+  Parameters: ~
+    {values}  (List[Float])  A sequence of numerical values. Accepts both
+                             integers and floats. The sequence may not
+                             contain None type values. However, passing a
+                             None type object instead of a sequence of
+                             numerical values will return NaN.
+
+  Returns: ~
+    Float - The skewness of the values parameter, or NaN if values was empty
+    or null.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Create a list of values.
+    values = [3.5, 5.6, 7.8, 7.4, 3.8]
+    
+    # Print the resulting value.
+    print system.math.skewness(values)
+<
+
+------------------------------------------------------------------------------
+system.math.standardDeviation()       *ignition-system.math.standardDeviation*
+
+  Given a sequence of numerical values, calculates the simple standard
+  deviation. Standard deviation is a calculated number for how close, or how
+  far the values of that dataset are in relation to the mean.
+
+  Syntax: >
+    system.math.standardDeviation(values)
+<
+
+  Parameters: ~
+    {values}  (List[Float])  A sequence of numerical values. Accepts both
+                             integers and floats. The sequence may not
+                             contain None type values. However, passing a
+                             None type object instead of a sequence of
+                             numerical values will return NaN.
+
+  Returns: ~
+    Float - The standard deviation of the values parameter, or NaN if the
+    values was empty or null.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Create a list of values.
+    values = [3.5, 5.6, 7.8, 7.4, 3.8]
+    
+    # Print the resulting value.
+    print system.math.standardDeviation(values)
+<
+
+------------------------------------------------------------------------------
+system.math.sum()                                   *ignition-system.math.sum*
+
+  Given a sequence of values, calculates the sum of all values. The sum is
+  the number returned by addition.
+
+  Syntax: >
+    system.math.sum(values)
+<
+
+  Parameters: ~
+    {values}  (List[Float])  A sequence of numerical values. Accepts both
+                             integers and floats. The sequence may not
+                             contain None type values. However, passing a
+                             None type object instead of a Sequence of
+                             numerical values will return NaN.
+
+  Returns: ~
+    Float - The sum of all values in the values parameter, or NaN if values
+    was empty or null.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Create a list of values.
+    values = [3.5, 5.6, 7.8, 7.4, 3.8]
+    
+    # Print the resulting value.
+    print system.math.sum(values)
+<
+
+------------------------------------------------------------------------------
+system.math.sumDifference()               *ignition-system.math.sumDifference*
+
+  Given two sequences of values, calculates the sum of each sequence and
+  finds the difference between them. In other words, the difference between
+  sums from two sets of numbers.
+
+  Syntax: >
+    system.math.sumDifference(values1, values2)
+<
+
+  Parameters: ~
+    {values1}  (List[Float])  A sequence of numerical values. Accepts both
+                              integers and floats. The sequence may not
+                              contain None type values. However, passing a
+                              None type object instead of a sequence of
+                              numerical values will return NaN.
+    {values2}  (List[Float])  A sequence of numerical values. Accepts both
+                              integers and floats. The sequence may not
+                              contain None type values. However, passing a
+                              None type object instead of a sequence of
+                              numerical values will return NaN.
+
+  Returns: ~
+    Float - The sum difference, or NaN if one of the parameters was empty or
+    null.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Create some lists.
+    firstList = [3.5, 5.6, 7.8, 7.4, 3.8]
+    secondList = [3.5, 5.6, -7.8, 7.4, -3.8]
+    
+    # Print the resulting value.
+    print system.math.sumDifference(firstList, secondList)
+<
+
+------------------------------------------------------------------------------
+system.math.sumLog()                             *ignition-system.math.sumLog*
+
+  Given a sequence of values, calculates the sum of the natural logs (ln).
+
+  Syntax: >
+    system.math.sumLog(values)
+<
+
+  Parameters: ~
+    {values}  (List[Float])  A sequence of numerical values. Accepts both
+                             integers and floats. The sequence may not
+                             contain None type values. However, passing a
+                             None type object instead of a sequence of
+                             numerical values will return NaN.
+
+  Returns: ~
+    Float - The sum of the natural logs of the input values, or NaN if the
+    input was empty, None, or contains negative numbers.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Create a list of values.
+    values = [3.5, 5.6, 7.8, 7.4, 3.8]
+    
+    # Print the resulting value.
+    print system.math.sumLog(values)
+<
+
+------------------------------------------------------------------------------
+system.math.sumSquares()                     *ignition-system.math.sumSquares*
+
+  Given a sequence of values, calculates the sum of the squares of all
+  values. Sum squares measures how far individual values are from the mean by
+  calculating how much variation there is in a set of values.
+
+  Syntax: >
+    system.math.sumSquares(values)
+<
+
+  Parameters: ~
+    {values}  (List[Float])  A sequence of numerical values. Accepts both
+                             integers and floats. The sequence may not
+                             contain None type values. However, passing a
+                             None type object instead of a sequence of
+                             numerical values will return NaN.
+
+  Returns: ~
+    Float - The sum of all squares of the 'values' parameter, or NaN if the
+    input was empty or null.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Create a list of values.
+    values = [3.5, 5.6, 7.8, 7.4, 3.8]
+    
+    # Print the resulting value.
+    print system.math.sumSquares(values)
+<
+
+------------------------------------------------------------------------------
+system.math.variance()                         *ignition-system.math.variance*
+
+  Given a sequence of values, calculates the variance of all values. Variance
+  measures how far values in a set are spread out from their mean value.
+
+  Syntax: >
+    system.math.variance(values)
+<
+
+  Parameters: ~
+    {values}  (List[Float])  A sequence of numerical values. Accepts both
+                             integers and floats. The sequence may not
+                             contain None type values. However, passing a
+                             None type object instead of a sequence of
+                             numerical values will return NaN.
+
+  Returns: ~
+    Float - The variance of all values in the values parameter, or NaN if the
+    input was empty or null.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Create a list of values.
+    values = [3.5, 5.6, 7.8, 7.4, 3.8]
+    
+    # Print the resulting value.
+    print system.math.variance(values)
+<
+
+
+vim:tw=78:ft=help:norl:

@@ -1,0 +1,128 @@
+*ignition-opcua.txt*                           Ignition system.opcua functions
+
+SYSTEM.OPCUA                                           *ignition-system.opcua*
+
+  |ignition-system.opcua.addConnection|
+  |ignition-system.opcua.callMethod|
+  |ignition-system.opcua.removeConnection|
+
+------------------------------------------------------------------------------
+system.opcua.addConnection()             *ignition-system.opcua.addConnection*
+
+  Adds a new OPC UA connection.
+
+  Syntax: >
+    system.opcua.addConnection(name, description, discoveryUrl, endpointUrl, securityPolicy, securityMode, settings)
+<
+
+  Parameters: ~
+    {name}            (String)                   Name to assign to the new
+                                                 connection.
+    {description}     (String)                   Description assigned to the
+                                                 new OPC UA connection.
+    {discoveryUrl}    (String)                   Endpoint URL to use for
+                                                 discovery services.
+    {endpointUrl}     (String)                   Endpoint URL to use for
+                                                 session services.
+    {securityPolicy}  (String)                   The name of the
+                                                 SecurityPolicy to use. See
+                                                 the Security Policy table
+                                                 below for possible values.
+    {securityMode}    (String)                   The name of the
+                                                 MessageSecurityMode to use.
+                                                 See the Message Security
+                                                 Mode table below for
+                                                 possible values.
+    {settings}        (Dictionary[String, Any])  A dictionary of additional
+                                                 settings to apply to the
+                                                 connection. See the Settings
+                                                 table for a table of
+                                                 possible keys.
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    # The following could be used to connect to Ignition's OPC UA server.
+    system.opcua.addConnection(
+        "test",
+        "test desc",
+        "opc.tcp://localhost:62541/discovery",
+        "opc.tcp://localhost:62541",
+        "Basic256Sha256",
+        "SignAndEncrypt",
+        {
+        "username":"opcuauser",
+        "password":"password"
+        }
+    )
+<
+
+------------------------------------------------------------------------------
+system.opcua.callMethod()                   *ignition-system.opcua.callMethod*
+
+  Calls a method in an OPC UA server. To make the most of this function,
+  you'll need to be familiar with methods in the OPC UA server .
+
+  Syntax: >
+    system.opcua.callMethod(connectionName, objectId, methodId, inputs)
+<
+
+  Parameters: ~
+    {connectionName}  (String)  The name of the OPC UA connection to the
+                                server that the method resides in.
+    {objectId}        (String)  The NodeId of the Object Node the Method is a
+                                member of.
+    {methodId}        (String)  The NodeId of the Method Node to call.
+    {inputs}          (List)    A list of input values expected by the
+                                method.
+
+  Returns: ~
+    Tuple - A tuple containing the following:
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    # Call the Server object's GetMonitoredItems method.
+    result = system.opcua.callMethod(
+            "Ignition OPC UA Server",
+            "ns=0;i=2253",
+            "ns=0;i=11492",
+            [1]
+        )
+    
+    # Below we print the various elements in the results. The print statements could easily be replaced by something more useful.
+    
+    # Prints the StatusCode for the call.
+    print result[0]
+    
+    # Prints the list of StatusCodes, one for each input argument passed to system.opcua.callMethod.
+    print result[1]
+    
+    # Prints the output values from the call.
+    print result[2]
+<
+
+------------------------------------------------------------------------------
+system.opcua.removeConnection()       *ignition-system.opcua.removeConnection*
+
+  Removes an OPC UA Connection.
+
+  Syntax: >
+    system.opcua.removeConnection(name)
+<
+
+  Parameters: ~
+    {name}  (String)  The name of the OPC UA connection to remove.
+
+  Returns: ~
+    Boolean - A boolean value representing whether the function was able to
+    remove the connection. Returns True if the connection was successfully
+    removed. Returns False if the connection was not removed.
+
+  Scope: Gateway, Perspective Session
+
+
+vim:tw=78:ft=help:norl:

@@ -1,0 +1,2621 @@
+*ignition-vision.txt*                         Ignition system.vision functions
+
+SYSTEM.VISION                                         *ignition-system.vision*
+
+  |ignition-system.vision.beep|
+  |ignition-system.vision.centerWindow|
+  |ignition-system.vision.closeDesktop|
+  |ignition-system.vision.closeParentWindow|
+  |ignition-system.vision.closeWindow|
+  |ignition-system.vision.color|
+  |ignition-system.vision.createImage|
+  |ignition-system.vision.createPopupMenu|
+  |ignition-system.vision.createPrintJob|
+  |ignition-system.vision.desktop|
+  |ignition-system.vision.exit|
+  |ignition-system.vision.exportCSV|
+  |ignition-system.vision.exportExcel|
+  |ignition-system.vision.exportHTML|
+  |ignition-system.vision.findWindow|
+  |ignition-system.vision.getAvailableLocales|
+  |ignition-system.vision.getAvailableTerms|
+  |ignition-system.vision.getClientId|
+  |ignition-system.vision.getConnectionMode|
+  |ignition-system.vision.getConnectTimeout|
+  |ignition-system.vision.getCurrentDesktop|
+  |ignition-system.vision.getCurrentWindow|
+  |ignition-system.vision.getDesktopHandles|
+  |ignition-system.vision.getEdition|
+  |ignition-system.vision.getExternalIpAddress|
+  |ignition-system.vision.getGatewayAddress|
+  |ignition-system.vision.getInactivitySeconds|
+  |ignition-system.vision.getKeyboardLayouts|
+  |ignition-system.vision.getLocale|
+  |ignition-system.vision.getOpenedWindowNames|
+  |ignition-system.vision.getOpenedWindows|
+  |ignition-system.vision.getParentWindow|
+  |ignition-system.vision.getReadTimeout|
+  |ignition-system.vision.getRoles|
+  |ignition-system.vision.getScreenIndex|
+  |ignition-system.vision.getScreens|
+  |ignition-system.vision.getSibling|
+  |ignition-system.vision.getSystemFlags|
+  |ignition-system.vision.getUsername|
+  |ignition-system.vision.getWindow|
+  |ignition-system.vision.getWindowNames|
+  |ignition-system.vision.goBack|
+  |ignition-system.vision.goForward|
+  |ignition-system.vision.goHome|
+  |ignition-system.vision.invokeLater|
+  |ignition-system.vision.isOverlaysEnabled|
+  |ignition-system.vision.isScreenLocked|
+  |ignition-system.vision.isTouchscreenMode|
+  |ignition-system.vision.lockScreen|
+  |ignition-system.vision.logout|
+  |ignition-system.vision.openDesktop|
+  |ignition-system.vision.openFile|
+  |ignition-system.vision.openFiles|
+  |ignition-system.vision.openURL|
+  |ignition-system.vision.openWindow|
+  |ignition-system.vision.openWindowInstance|
+  |ignition-system.vision.playSoundClip|
+  |ignition-system.vision.printToImage|
+  |ignition-system.vision.refresh|
+  |ignition-system.vision.retarget|
+  |ignition-system.vision.saveFile|
+  |ignition-system.vision.setConnectionMode|
+  |ignition-system.vision.setConnectTimeout|
+  |ignition-system.vision.setLocale|
+  |ignition-system.vision.setOverlaysEnabled|
+  |ignition-system.vision.setReadTimeout|
+  |ignition-system.vision.setScreenIndex|
+  |ignition-system.vision.setTouchscreenMode|
+  |ignition-system.vision.showColorInput|
+  |ignition-system.vision.showConfirm|
+  |ignition-system.vision.showDiagnostics|
+  |ignition-system.vision.showError|
+  |ignition-system.vision.showInput|
+  |ignition-system.vision.showMessage|
+  |ignition-system.vision.showNumericKeypad|
+  |ignition-system.vision.showPasswordInput|
+  |ignition-system.vision.showTouchscreenKeyboard|
+  |ignition-system.vision.showWarning|
+  |ignition-system.vision.swapTo|
+  |ignition-system.vision.swapWindow|
+  |ignition-system.vision.switchUser|
+  |ignition-system.vision.transform|
+  |ignition-system.vision.unlockScreen|
+  |ignition-system.vision.updateProject|
+
+------------------------------------------------------------------------------
+system.vision.beep()                             *ignition-system.vision.beep*
+
+  Tells the computer where the script is running to make a "beep" sound. The
+  computer must have a way of producing sound.
+
+  Syntax: >
+    system.vision.beep()
+<
+
+  Returns: ~
+    Nothing
+
+  Scope: Vision Client
+
+  Example: >
+    # This will simply cause the system where the script is being executed to emit a beep sound.
+    # That system must have a way to produce sound, such as speakers or headphones.
+    
+    system.vision.beep()
+<
+
+------------------------------------------------------------------------------
+system.vision.centerWindow()             *ignition-system.vision.centerWindow*
+
+  Given a window path, or a reference to a window itself, it will center the
+  window. The window should be floating an non-maximized. If the window can't
+  be found, this function will do nothing.
+
+  Syntax: >
+    system.vision.centerWindow(windowPath)
+<
+
+  Parameters: ~
+    {windowPath}  (String)  The path of the window to center.
+
+  Returns: ~
+    Nothing
+
+  Syntax: >
+    system.vision.centerWindow(window)
+<
+
+  Parameters: ~
+    {window}  (FPMIWindow)  A reference to the window to center.
+
+  Returns: ~
+    Nothing
+
+  Scope: Vision Client
+
+  Example: >
+    # This example centers the window named 'Overview'.
+    system.vision.centerWindow('Overview')
+<
+
+------------------------------------------------------------------------------
+system.vision.closeDesktop()             *ignition-system.vision.closeDesktop*
+
+  Allows you to close any of the open desktops associated with the current
+  client. See the Multi-Monitor Clients page for more details about using
+  multiple monitors.
+
+  Syntax: >
+    system.vision.closeDesktop(handle)
+<
+
+  Parameters: ~
+    {handle}  (String)  The handle for the desktop to close. The screen index
+                        cast as a string may be used instead of the handle.
+                        If omitted, this will default to the primary desktop.
+                        Alternatively, the handle "primary" can be used to
+                        refer to the primary desktop.
+
+  Returns: ~
+    Nothing
+
+  Scope: Vision Client
+
+  Example: >
+    # The following example will close this desktop
+    system.vision.closeDesktop()
+<
+
+------------------------------------------------------------------------------
+system.vision.closeParentWindow()   *ignition-system.vision.closeParentWindow*
+
+  Closes the parent window given a component event object.
+
+  Syntax: >
+    system.vision.closeParentWindow(event)
+<
+
+  Parameters: ~
+    {event}  (EventObject)  A component event object. The enclosing window
+                            for the component will be closed. Refer to
+                            EventObject .
+
+  Returns: ~
+    Nothing
+
+  Scope: Vision Client
+
+  Example: >
+    # This code would be placed in the actionPerformed event of a button,
+    # and would close the window that contained the button.
+    system.vision.closeParentWindow(event)
+<
+
+------------------------------------------------------------------------------
+system.vision.closeWindow()               *ignition-system.vision.closeWindow*
+
+  Given a window path, or a reference to a window itself, it will close the
+  window. If the window can't be found, this function will do nothing.
+
+  Syntax: >
+    system.vision.closeWindow(window)
+<
+
+  Parameters: ~
+    {window}  (FPMIWindow)  A reference to the window to close.
+
+  Returns: ~
+    Nothing
+
+  Syntax: >
+    system.vision.closeWindow(windowPath)
+<
+
+  Parameters: ~
+    {windowPath}  (String)  The path of a window to close.
+
+  Returns: ~
+    Nothing
+
+  Scope: Vision Client
+
+  Example: >
+    # This example gets the window named 'Overview' and then closes it.
+    # If the window isn't open, a warning is shown.
+    try:
+       window = system.vision.getWindow('Overview')
+       system.vision.closeWindow(window)
+    except ValueError:
+       system.vision.showWarning("The Overview window isn't open")
+<
+
+------------------------------------------------------------------------------
+system.vision.color()                           *ignition-system.vision.color*
+
+  Creates a new color object, either by parsing a string or by having the
+  RGB[A] channels specified explicitly. See toColor to see a list of
+  available color names.
+
+  Syntax: >
+    system.vision.color(color)
+<
+
+  Parameters: ~
+    {color}  (String)  A string that will be coerced into a color. Can accept
+                       many formats, such as "red" or "#FF0000" or "255,0,0".
+
+  Returns: ~
+    Color - The newly created color.
+
+  Syntax: >
+    system.vision.color(red, green, blue, [alpha])
+<
+
+  Parameters: ~
+    {red}    (Integer)  The red component of the color, an integer 0-255.
+    {green}  (Integer)  The green component of the color, an integer 0-255.
+    {blue}   (Integer)  The blue component of the color, an integer 0-255.
+    {alpha}  (Integer)  The alpha component of the color, an integer 0-255.
+                        [optional]
+
+  Returns: ~
+    Color - The newly created color.
+
+  Scope: Vision Client
+
+  Example: >
+    # This example changes the background color of a component to red.
+    
+    myComponent = event.source
+    myComponent.background = system.vision.color(255,0,0)
+<
+
+------------------------------------------------------------------------------
+system.vision.createImage()               *ignition-system.vision.createImage*
+
+  Takes a snapshot of a component and creates a Java BufferedImage out of it.
+  You can use javax.imageio.ImageIO to turn this into bytes that can be saved
+  to a file or a BLOB field in a database.
+
+  Syntax: >
+    system.vision.createImage(component)
+<
+
+  Parameters: ~
+    {component}  (Component)  The component to render.
+
+  Returns: ~
+    BufferedImage - A java.awt.image.BufferedImage representing the
+    component.
+
+  Scope: Vision Client
+
+  Example: >
+    from java.io import File
+    from javax.imageio import ImageIO
+    
+    component = event.source.parent.getComponent('TestPieChart')
+    bufferedImage = system.vision.createImage(component)
+    
+    rawPath = system.util.getProperty("user.home") + system.util.getProperty("file.separator") +"chart_createImage.jpg"
+    formattedPath = File(rawPath)
+    
+    ImageIO.write(bufferedImage , "jpg", formattedPath)
+<
+
+------------------------------------------------------------------------------
+system.vision.createPopupMenu()       *ignition-system.vision.createPopupMenu*
+
+  Creates a new popup menu, which can then be shown over a component on a
+  mouse event. To use this function, first create a Python sequence whose
+  entries are strings, and another sequence whose entries are function
+  objects. The strings will be the items that are displayed in your popup
+  menu, and when an item is clicked, its corresponding function will be run.
+  Your functions must accept an event object as an argument. See also:
+  Functions .
+
+  Syntax: >
+    system.vision.createPopupMenu(itemNames, itemFunctions)
+<
+
+  Parameters: ~
+    {itemNames}      (List[String])  A list of names to create popup menu
+                                     items with.
+    {itemFunctions}  (List[String])  A list of functions to match up with the
+                                     names. Passing in a None object will
+                                     cause a separator line to appear in the
+                                     popup menu, and the corresponding string
+                                     will not be displayed (note that a
+                                     corresponding string must be supplied,
+                                     since the number of elements in the
+                                     itemFunctions parameter must always
+                                     match the number of elements in the
+                                     itemNames parameter).
+
+  Returns: ~
+    JPopupMenu - The javax.swing.JPopupMenu that was created.
+
+  Scope: Vision Client
+
+  Example: >
+    # This first example demonstrates the fundamentals of making a popup menu. Put the following script in the mouseReleased event of a component.
+    # This will only work on Windows - continue on for cross-platform instructions.
+    # Right click on the component to see the resulting pop-up menu that is created with this code.
+    
+    def sayHello(event):
+       system.vision.showMessage("Hello World")
+    menu = system.vision.createPopupMenu(["Click Me"], [sayHello])
+    menu.show(event)
+<
+
+------------------------------------------------------------------------------
+system.vision.createPrintJob()         *ignition-system.vision.createPrintJob*
+
+  Provides a general printing facility for printing the contents of a window
+  or component to a printer. The general workflow for this function is to
+  create the print job, set the options you'd like, and then call print() on
+  the job. For printing reports or tables, use the component dedicated
+  print() functions.
+
+  Syntax: >
+    system.vision.createPrintJob(component)
+<
+
+  Parameters: ~
+    {component}  (Component)  The component that you'd like to print.
+
+  Returns: ~
+    JythonPrintJob - A print job that can then be customized and started. To
+    start the print job, use .print(). Refer to JythonPrintJob objects.
+
+  Scope: Vision Client
+
+  Example: >
+    # Put this code on a button to print out an image of the container the button is in.
+    # A print dialog box will be displayed, allowing the user to specify various aspects of the print job.
+    job = system.vision.createPrintJob(event.source.parent)
+    job.print()
+<
+
+------------------------------------------------------------------------------
+system.vision.desktop()                       *ignition-system.vision.desktop*
+
+  Allows for invoking system.vision functions on a specific desktop.
+
+  Syntax: >
+    system.vision.desktop(handle)
+<
+
+  Parameters: ~
+    {handle}  (String)  The handle for the desktop to use. The screen index
+                        cast as a string may be used instead of the handle.
+                        If omitted, this will default to the primary desktop.
+                        Alternatively, the handle "primary" can be used to
+                        refer to the primary desktop.
+
+  Returns: ~
+    WindowUtilities - A copy of system.vision ( WindowUtilities ) that will
+    be relative to the desktop named by the given handle.
+
+  Scope: Vision Client
+
+  Example: >
+    # Attempts to swap to a window at path "Main Windows/Main Window" on a specific Desktop.
+    # This example assumes a desktop with the handle "2nd Desktop" is already open.
+    system.vision.desktop("2nd Desktop").swapTo("Main Windows/Main Window")
+<
+
+------------------------------------------------------------------------------
+system.vision.exit()                             *ignition-system.vision.exit*
+
+  Exits the running Client, as long as the shutdown intercept script doesn't
+  cancel the shutdown event. Set force to true to not give the shutdown
+  intercept script a chance to cancel the exit. Note that this will quit the
+  Client completely. You can use system.vision.logout() to return to the
+  login screen.
+
+  Syntax: >
+    system.vision.exit([force])
+<
+
+  Parameters: ~
+    {force}  (Boolean)  If true (1), the shutdown-intercept script will be
+                        skipped. Default is false (0). [optional]
+
+  Returns: ~
+    Nothing
+
+  Scope: Vision Client
+
+  Example: >
+    # This code would exit the Client after confirming with the user.
+    if system.vision.showConfirm("Are you sure you want to exit?"):
+       system.vision.exit()
+<
+
+------------------------------------------------------------------------------
+system.vision.exportCSV()                   *ignition-system.vision.exportCSV*
+
+  Exports the contents of a dataset as a CSV file, prompting the user to save
+  the file to disk. To write silently to a file, you cannot use the
+  vision.export* functions. Instead, use the toCSV() function.
+
+  Syntax: >
+    system.vision.exportCSV(filename, showHeaders, dataset)
+<
+
+  Parameters: ~
+    {filename}     (String)   A suggested filename to save as.
+    {showHeaders}  (Boolean)  If true, the CSV file will include a header
+                              row.
+    {dataset}      (Dataset)  The dataset to export.
+
+  Returns: ~
+    String - The path to the saved file, or None if the action was canceled
+    by the user.
+
+  Scope: Vision Client
+
+  Example: >
+    # This snippet would prompt the user to save the data currently displayed in a Table component to a CSV file,
+    # and would open the file (in an external program, presumably Excel) after a successful save.
+    
+    table = event.source.parent.getComponent("Table")
+    filePath = system.vision.exportCSV("data.csv", 1, table.data)
+    if filePath != None:
+        system.net.openURL("file:///"+filePath.replace('\\','/'))
+<
+
+------------------------------------------------------------------------------
+system.vision.exportExcel()               *ignition-system.vision.exportExcel*
+
+  Exports the contents of a dataset as an Excel spreadsheet, prompting the
+  user to save the file to disk. To write silently to a file, you cannot use
+  the vision.export* functions. Instead, use the system.dataset.toExcel
+  function.
+
+  Syntax: >
+    system.vision.exportExcel(filename, showHeaders, dataset, [nullsEmpty])
+<
+
+  Parameters: ~
+    {filename}     (String)                   A suggested filename to save
+                                              as.
+    {showHeaders}  (Boolean)                  If true, the spreadsheet will
+                                              include a header row.
+    {dataset}      (Dataset \ List[Dataset])  Either a single dataset, or a
+                                              list of datasets. When passing
+                                              a list, each element represents
+                                              a single sheet in the resulting
+                                              workbook.
+    {nullsEmpty}   (Boolean)                  If True, the spreadsheet will
+                                              leave cells with NULL values
+                                              empty, instead of allowing
+                                              Excel to provide a default
+                                              value like 0. Defaults to
+                                              False. [optional]
+
+  Returns: ~
+    String - The path to the saved file, or None if the action was canceled
+    by the user.
+
+  Scope: Vision Client
+
+  Example: >
+    # This snippet prompts the user to save the data currently displayed in a Table component
+    # to an Excel-compatible spreadsheet file. It opens the file after a successful save.
+    
+    table = event.source.parent.getComponent("Table")
+    filePath = system.vision.exportExcel("data.xlsx", 1, table.data)
+    if filePath != None:
+       system.net.openURL("file://"+filePath)
+<
+
+------------------------------------------------------------------------------
+system.vision.exportHTML()                 *ignition-system.vision.exportHTML*
+
+  Exports the contents of a dataset to an HTML page. Prompts the user to save
+  the file to disk.
+
+  Syntax: >
+    system.vision.exportHTML(filename, showHeaders, dataset, title)
+<
+
+  Parameters: ~
+    {filename}     (String)               A suggested filename to save as.
+    {showHeaders}  (Boolean)              If true, the HTML table will
+                                          include a header row.
+    {dataset}      (Dataset / PyDataset)  The dataset to export.
+    {title}        (String)               The title for the HTML page.
+
+  Returns: ~
+    String - The path to the saved file, or None if the action was canceled
+    by the user.
+
+  Scope: Vision Client
+
+  Example: >
+    # This snippet prompts the user to save the data currently displayed in a Vision Table component to an HTML
+    # file, and opens the file in the default web  browser after a successful save.
+    
+    table = event.source.parent.getComponent("Table")
+    filePath = system.vision.exportHTML("data.html", 1, table.data, "Production Report")
+    if filePath != None:
+       system.vision.openURL("file://"+filePath)
+<
+
+------------------------------------------------------------------------------
+system.vision.findWindow()                 *ignition-system.vision.findWindow*
+
+  Finds and returns a list of windows with the given path. If the window is
+  not open, an empty list will be returned. Useful for finding all instances
+  of an open window that were opened with system.vision.openWindowInstance .
+
+  Syntax: >
+    system.vision.findWindow(path)
+<
+
+  Parameters: ~
+    {path}  (String)  The path of the window to search for.
+
+  Returns: ~
+    List - A list of window objects . May be empty if window is not open, or
+    have more than one entry if multiple windows are open.
+
+  Scope: Vision Client
+
+  Example: >
+    # This example finds all open instances of the window named "Popup" and closes them all.
+    
+    allInstances = system.vision.findWindow("Popup")
+    for window in allInstances:
+        system.vision.closeWindow(window)
+<
+
+------------------------------------------------------------------------------
+system.vision.getAvailableLocales() *ignition-system.vision.getAvailableLocales*
+
+  Returns a collection of the locales defined on the system, as strings. Note
+  that these are only the locales that are defined in the translation system.
+
+  Syntax: >
+    system.vision.getAvailableLocales()
+<
+
+  Returns: ~
+    List - A list of Java Locale objects.
+
+  Scope: Vision Client
+
+  Example: >
+    # This example simply lists the available locales for the system.
+    
+    system.vision.getAvailableLocales()
+<
+
+------------------------------------------------------------------------------
+system.vision.getAvailableTerms()   *ignition-system.vision.getAvailableTerms*
+
+  Returns a collection of available terms defined in the translation system.
+
+  Syntax: >
+    system.vision.getAvailableTerms()
+<
+
+  Returns: ~
+    List - A list of all of the terms available from the translation manager,
+    as strings.
+
+  Scope: Vision Client
+
+  Example: >
+    # This code will print out a list of all of the available terms to the console.
+    
+    collection = system.vision.getAvailableTerms()
+    for term in collection:
+        print term
+<
+
+------------------------------------------------------------------------------
+system.vision.getClientId()               *ignition-system.vision.getClientId*
+
+  Returns a hex-string that represents a number unique to the running
+  Client's session. You are guaranteed that this number is unique between all
+  running Clients.
+
+  Syntax: >
+    system.vision.getClientId()
+<
+
+  Returns: ~
+    String - A special code representing the Client's session in a unique
+    way.
+
+  Scope: Vision Client
+
+  Example: >
+    # This code prints the current Client's id to the debug console.
+    id = system.vision.getClientId()
+    print id
+<
+
+------------------------------------------------------------------------------
+system.vision.getConnectionMode()   *ignition-system.vision.getConnectionMode*
+
+  Retrieves this Client session's current connection mode. Possible
+  connection modes are:
+
+  Syntax: >
+    system.vision.getConnectionMode()
+<
+
+  Returns: ~
+    Integer - The current connection mode for the Client.
+
+  Scope: Vision Client
+
+  Example: >
+    # This code will set a Client to read-only after a timeout of 30 seconds.
+    # Add this code to a Client timer script
+    
+    mode = system.vision.getConnectionMode()
+    if mode == 3 and system.vision.getInactivitySeconds() > 30:
+        system.vision.setConnectionMode(2)
+<
+
+------------------------------------------------------------------------------
+system.vision.getConnectTimeout()   *ignition-system.vision.getConnectTimeout*
+
+  Returns the connect timeout in milliseconds for all Client-to-Gateway
+  communication. This is the maximum amount of time that communication
+  operations to the Gateway will be given to connect. The default is 10,000ms
+  (10 seconds).
+
+  Syntax: >
+    system.vision.getConnectTimeout()
+<
+
+  Returns: ~
+    Integer - The current connect timeout, in milliseconds. Default is 10,000
+    (ten seconds)
+
+  Scope: Vision Client
+
+  Example: >
+    # This code would print out the current connect timeout
+    print system.vision.getConnectTimeout()
+<
+
+------------------------------------------------------------------------------
+system.vision.getCurrentDesktop()   *ignition-system.vision.getCurrentDesktop*
+
+  Returns the handle of the desktop this function was called from. Commonly
+  used with the system.vision.desktop function.
+
+  Syntax: >
+    system.vision.getCurrentDesktop()
+<
+
+  Returns: ~
+    String - The handle of the current desktop.
+
+  Scope: Vision Client
+
+  Example: >
+    # Shows the desktop's handle in a message box.
+    system.vision.showMessage("This desktop's handle is: %s" % system.vision.getCurrentDesktop())
+<
+
+------------------------------------------------------------------------------
+system.vision.getCurrentWindow()     *ignition-system.vision.getCurrentWindow*
+
+  Returns the path of the current "main screen" window, which is defined as
+  the maximized window. With the Typical Navigation Strategy , there is only
+  ever one maximized window at a time.
+
+  Syntax: >
+    system.vision.getCurrentWindow()
+<
+
+  Returns: ~
+    String - The path of the current "main screen" window - the maximized
+    window.
+
+  Scope: Vision Client
+
+  Example: >
+    # This code could run in a global timer script.
+    # After a 5-minute timeout, navigate back to the home screen.
+    if system.vision.getInactivitySeconds()>300 and system.vision.getCurrentWindow()!="Home":
+       system.vision.swapTo("Home")
+<
+
+------------------------------------------------------------------------------
+system.vision.getDesktopHandles()   *ignition-system.vision.getDesktopHandles*
+
+  Gets a list of all secondary handles of the open desktops associated with
+  the current client. In this case, secondary means any desktop frame opened
+  by the original client frame.
+
+  Syntax: >
+    system.vision.getDesktopHandles()
+<
+
+  Returns: ~
+    List[Any] - A Python list of unicode strings, representing the handle of
+    all secondary desktop frames.
+
+  Scope: Vision Client
+
+  Example: >
+    # The following example list all handles (except the main client)
+    # in the client console (Help -> Diagnostics -> Console)
+    
+    print system.vision.getDesktopHandles()
+<
+
+------------------------------------------------------------------------------
+system.vision.getEdition()                 *ignition-system.vision.getEdition*
+
+  Returns the edition of the Vision Client:
+
+  Syntax: >
+    system.vision.getEdition()
+<
+
+  Returns: ~
+    String - The edition of the Vision module that is running the Client.
+
+  Scope: Vision Client
+
+  Example: >
+    # This code will write the Vision module edition to a text field on the same page.
+    
+    event.source.parent.getComponent('Text Field').text = system.vision.getEdition()
+<
+
+------------------------------------------------------------------------------
+system.vision.getExternalIpAddress() *ignition-system.vision.getExternalIpAddress*
+
+  Returns the Client's IP address, as it is detected by the Gateway. This
+  means that this call will communicate with the Gateway, and the Gateway
+  will tell the Client what IP address its incoming traffic is coming from.
+  If you have a client behind a Network Address Translation (NAT) router,
+  then this address will be the Wide Area Network (WAN) address of the router
+  instead of the Local Area Network (LAN) address of the Client, which is
+  what you'd get with system.net.getIpAddress .
+
+  Syntax: >
+    system.vision.getExternalIpAddress()
+<
+
+  Returns: ~
+    String - A text representation of the client's IP address, as detected by
+    the Gateway
+
+  Scope: Vision Client
+
+  Example: >
+    # Put this script on a navigation button to restrict users from opening a specific page.
+    
+    ip = system.vision.getExternalIpAddress()
+    # check if this matches the CEO's IP address
+    if ip == "66.102.7.104":
+       system.vision.swapTo("CEO Dashboard")
+    else:
+       system.vision.swapTo("Manager Dashboard")
+<
+
+------------------------------------------------------------------------------
+system.vision.getGatewayAddress()   *ignition-system.vision.getGatewayAddress*
+
+  Returns the address of the Gateway with which the Client is currently
+  communicating.
+
+  Syntax: >
+    system.vision.getGatewayAddress()
+<
+
+  Returns: ~
+    String - The address of the Gateway with which the Client is
+    communicating.
+
+  Scope: Vision Client
+
+  Example: >
+    # This code would open up the gateway config page.
+    address = system.vision.getGatewayAddress()
+    system.vision.openURL("%s/web/config/" % address)
+<
+
+------------------------------------------------------------------------------
+system.vision.getInactivitySeconds() *ignition-system.vision.getInactivitySeconds*
+
+  Returns the number of seconds since any keyboard or mouse activity.
+
+  Syntax: >
+    system.vision.getInactivitySeconds()
+<
+
+  Returns: ~
+    Integer - The number of seconds the mouse and keyboard have been inactive
+    for this client.
+
+  Scope: Vision Client
+
+  Example: >
+    # This code could run in a global timer script.
+    # After a 5-minute timeout, navigate back to the home screen
+    if system.vision.getInactivitySeconds()>300 and system.vision.getCurrentWindow()!="Home":
+       system.vision.swapTo("Home")
+<
+
+------------------------------------------------------------------------------
+system.vision.getKeyboardLayouts() *ignition-system.vision.getKeyboardLayouts*
+
+  Returns a list of keyboard layouts available on this system.
+
+  Syntax: >
+    system.vision.getKeyboardLayouts()
+<
+
+  Returns: ~
+    None
+
+  Scope: Vision Client
+
+  Example: >
+    # list all keyboard layouts that support English
+    for layout in system.vision.getKeyboardLayouts():
+        if "en" in layout.supportedLanguages:
+            print layout.name
+<
+
+------------------------------------------------------------------------------
+system.vision.getLocale()                   *ignition-system.vision.getLocale*
+
+  Returns the current string representing the user's Locale, such as 'en' for
+  English.
+
+  Syntax: >
+    system.vision.getLocale()
+<
+
+  Returns: ~
+    String - String representing the user's Locale, such as 'en' for English.
+
+  Scope: Vision Client
+
+  Example: >
+    # print a test if they are using English
+    locale = system.vision.getLocale()
+    if locale == "en":
+        print "Using English"
+<
+
+------------------------------------------------------------------------------
+system.vision.getOpenedWindowNames() *ignition-system.vision.getOpenedWindowNames*
+
+  Finds all of the currently open windows and returns a tuple of their paths.
+
+  Syntax: >
+    system.vision.getOpenedWindowNames()
+<
+
+  Returns: ~
+    Tuple - A tuple of strings, representing the path of each window that is
+    open. Printing the return value will display results in the Vision Client
+    console if not writing to a component property.
+
+  Scope: Vision Client
+
+  Example: >
+    # This example prints out into the console the full path for each opened window.
+    
+    windows = system.vision.getOpenedWindowNames()
+    print 'There are %d windows open' % len(windows)
+    for path in windows:
+        print path
+<
+
+------------------------------------------------------------------------------
+system.vision.getOpenedWindows()     *ignition-system.vision.getOpenedWindows*
+
+  Finds all of the currently open windows and returns a tuple of references
+  to them.
+
+  Syntax: >
+    system.vision.getOpenedWindows()
+<
+
+  Returns: ~
+    Tuple - A tuple of the opened windows, not their names, but the actual
+    window objects themselves. Printing the return value will display results
+    in the Vision Client console if not writing to a component property.
+
+  Scope: Vision Client
+
+  Example: >
+    # This example prints out the path of each currently opened window to the console.
+    
+    windows = system.vision.getOpenedWindows()
+    print 'There are %d windows open' % len(windows)
+    for window in windows:
+        print window.getPath()
+<
+
+------------------------------------------------------------------------------
+system.vision.getParentWindow()       *ignition-system.vision.getParentWindow*
+
+  Finds the parent (enclosing) window for the component that fired an event
+  and returns a reference to it.
+
+  Syntax: >
+    system.vision.getParentWindow(event)
+<
+
+  Parameters: ~
+    {event}  (EventObject)  A component event object.
+
+  Returns: ~
+    FPMIWindow - The window that contains the component that fired the event.
+
+  Scope: Vision Client
+
+  Example: >
+    # Use this in an event script to change the window's title.
+    
+    window = system.vision.getParentWindow(event)
+    window.title='This is a new title'
+<
+
+------------------------------------------------------------------------------
+system.vision.getReadTimeout()         *ignition-system.vision.getReadTimeout*
+
+  Returns the read timeout in milliseconds for all client-to-gateway
+  communication. This is the maximum amount of time allowed for a
+  communication operation to complete. The default is 60,000ms (1 minute).
+
+  Syntax: >
+    system.vision.getReadTimeout()
+<
+
+  Returns: ~
+    Integer - The current read timeout, in milliseconds. Default is 60,000
+    (one minute)
+
+  Scope: Vision Client
+
+  Example: >
+    # This code will find the current read timeout and write it to a numeric text field on the same page.
+    
+    event.source.parent.getComponent('Numeric Text Field').intValue = system.vision.getReadTimeout()
+<
+
+------------------------------------------------------------------------------
+system.vision.getRoles()                     *ignition-system.vision.getRoles*
+
+  Finds the roles that the currently logged in user has, returns them as a
+  Python tuple of strings.
+
+  Syntax: >
+    system.vision.getRoles()
+<
+
+  Returns: ~
+    Tuple - A list of the roles (strings) that are assigned to the current
+    user.
+
+  Scope: Vision Client
+
+  Example: >
+    # This would run on a button to prevent certain users from opening a window
+    
+    if "Supervisor" in system.vision.getRoles():
+       system.vision.openWindow("ManagementOnly")
+    else:
+       system.vision.showError("You don't have sufficient privileges to continue")
+<
+
+------------------------------------------------------------------------------
+system.vision.getScreenIndex()         *ignition-system.vision.getScreenIndex*
+
+  Returns an integer value representing the current screen index based on the
+  screen from which this function was called.
+
+  Syntax: >
+    system.vision.getScreenIndex()
+<
+
+  Returns: ~
+    Integer - The screen from which the function was called.
+
+  Scope: Vision Client
+
+  Example: >
+    # Prints an integer representing the screen from which the function was called.
+    print system.vision.getScreenIndex()
+<
+
+------------------------------------------------------------------------------
+system.vision.getScreens()                 *ignition-system.vision.getScreens*
+
+  Get a list of all the monitors on the computer this client is open on. Use
+  with system.vision.setScreenIndex() to move the client.
+
+  Syntax: >
+    system.vision.getScreens()
+<
+
+  Returns: ~
+    List[Tuple[String, Integer, Integer]] - A sequence of tuples of the form
+    (index, width, height) for each screen device (monitor) available.
+
+  Scope: Vision Client
+
+  Example: >
+    # This example fetches monitor data and pushes it to a table in the same container.
+    
+    screens = system.vision.getScreens()
+    pyData = []
+    for screen in screens:
+        pyData.append([screen[0], screen[1], screen[2]])
+    
+    # Push data to 'Table'.
+    event.source.parent.getComponent('Table').data = system.dataset.toDataSet(["screen","width","height"], pyData)
+<
+
+------------------------------------------------------------------------------
+system.vision.getSibling()                 *ignition-system.vision.getSibling*
+
+  Given a component event object, looks up a sibling component. Shortcut for
+  event.source.parent.getComponent("siblingName") . If no such sibling is
+  found, the special value None is returned.
+
+  Syntax: >
+    system.vision.getSibling(event, name)
+<
+
+  Parameters: ~
+    {event}  (EventObject)  A component event object.
+    {name}   (String)       The name of the sibling component.
+
+  Returns: ~
+    VisionComponent - Returns reference to the sibling component. See
+    VisionComponent .
+
+  Scope: Vision Client
+
+  Example: >
+    # This example gets its sibling Text Field's text, and uses it.
+    
+    textField = system.vision.getSibling(event, 'TextField (1)')
+    if textField is None:
+       system.vision.showError("There is no text field!")
+    else:
+       system.vision.showMessage("You typed: %s" % textField.text)
+<
+
+------------------------------------------------------------------------------
+system.vision.getSystemFlags()         *ignition-system.vision.getSystemFlags*
+
+  Returns an integer that represents a bit field containing information about
+  the currently running system. Each bit corresponds to a specific flag as
+  defined in the bitmask below. The integer return will be a total of all of
+  the bits that are currently active. See the example for tips on how to
+  extract the information in this bit field. Note that the tag
+  [System]Client/System/SystemFlags contains the same value.
+
+  Syntax: >
+    system.vision.getSystemFlags()
+<
+
+  Returns: ~
+    Integer - A total of all the bits that are currently active. A
+    full-screen Client launched from the Gateway webpage with no SSL will
+    have a value of 44 (Fullscreen flag + Webstart Flag + Client Flag).
+
+  Scope: Vision Client
+
+  Example: >
+    # The first part of the script will take the integer representing the system flags, convert it to bits, and place it in a list and then print it out.
+    # The second part of the script will take the list of bits, and place it in a table showing what each of the bits represent.
+    
+    myList = []
+    flags = system.vision.getSystemFlags()
+    for i in range(8,-1,-1):
+        myList.insert(0, flags >> i & 1)
+    print myList
+    
+    headers = ["Designer Flag", "Preview Flag", "Client Flag", "Webstart Flag", "Applet Flag", "Fullscreen Flag", "SSL Flag", "Mobile Flag", "Staging Flag"]
+    data = system.dataset.toDataSet(headers, [myList])
+    table = event.source.parent.getComponent("Table")
+    table.data = data
+<
+
+------------------------------------------------------------------------------
+system.vision.getUsername()               *ignition-system.vision.getUsername*
+
+  Returns the current username logged in.
+
+  Syntax: >
+    system.vision.getUsername()
+<
+
+  Returns: ~
+    String - The current username.
+
+  Scope: Vision Client
+
+  Example: >
+    # This code would run on a startup script based on who was logging in.
+    name = system.vision.getUsername()
+    if name == 'Bob':
+       system.vision.openWindow("BobsHomepage")
+    else:
+       system.vision.openWindow("NormalHomepage")
+<
+
+------------------------------------------------------------------------------
+system.vision.getWindow()                   *ignition-system.vision.getWindow*
+
+  Finds a reference to an open window with the given name. Throws a
+  ValueError if the named window is not open or not found.
+
+  Syntax: >
+    system.vision.getWindow(name)
+<
+
+  Parameters: ~
+    {name}  (String)  The path to the window to field.
+
+  Returns: ~
+    Window - A reference to the window object, if it was open.
+
+  Scope: Vision Client
+
+  Example: >
+    # This example will get the window named 'Overview' and then close it.
+    
+    try:
+       window = system.vision.getWindow('Overview')
+       system.vision.closeWindow(window)
+    
+    except ValueError:
+       system.vision.showWarning("The Overview window isn't open")
+<
+
+------------------------------------------------------------------------------
+system.vision.getWindowNames()         *ignition-system.vision.getWindowNames*
+
+  Returns a list of the paths of all windows in the current project, sorted
+  alphabetically.
+
+  Syntax: >
+    system.vision.getWindowNames()
+<
+
+  Returns: ~
+    Tuple - A tuple of strings, representing the path of each window defined
+    in the current project.
+
+  Scope: Vision Client
+
+  Example: >
+    # This example would open windows that begin with "Motor" and pass in the currently selected motor number.
+    
+    motor = event.source.parent.number
+    windows = system.vision.getWindowNames()
+    for path in windows:
+        if path[:5] == "Motor":
+            system.vision.openWindow(path, {"motorNumber": motor})
+<
+
+------------------------------------------------------------------------------
+system.vision.goBack()                         *ignition-system.vision.goBack*
+
+  When using the Typical Navigation Strategy , this function will navigate
+  back to the previous main screen window.
+
+  Syntax: >
+    system.vision.goBack()
+<
+
+  Returns: ~
+    Window - A reference to window that was navigated to. Refer to the list
+    of window objects.
+
+  Scope: Vision Client
+
+  Example: >
+    # This code would go in a button to move to the previous screen.
+    system.vision.goBack()
+<
+
+------------------------------------------------------------------------------
+system.vision.goForward()                   *ignition-system.vision.goForward*
+
+  When using the typical navigation strategy , this function will navigate
+  "forward" to the last main-screen window the user was on when they executed
+  a system.vision.goBack() .
+
+  Syntax: >
+    system.vision.goForward()
+<
+
+  Returns: ~
+    Window - A reference to window that was navigated to. Refer to the list
+    of window objects.
+
+  Scope: Vision Client
+
+  Example: >
+    # This code would go in a button to move to the last screen that used system.vision.goBack().
+    system.vision.goForward()
+<
+
+------------------------------------------------------------------------------
+system.vision.goHome()                         *ignition-system.vision.goHome*
+
+  When using the typical navigation strategy , this function will navigate to
+  the "home" window. This is automatically detected as the first main-screen
+  window shown in a project. If you are using this system function with
+  system.vision.openWindow() , your home window should be closed before
+  navigating to it, or system.vision.goHome() may not work.
+
+  Syntax: >
+    system.vision.goHome()
+<
+
+  Returns: ~
+    Window - A reference to window that was navigated to. Refer to the list
+    of window objects.
+
+  Scope: Vision Client
+
+  Example: >
+    # This code would go in a button to move to the Home screen.
+    system.vision.goHome()
+<
+
+------------------------------------------------------------------------------
+system.vision.invokeLater()               *ignition-system.vision.invokeLater*
+
+  Invokes (calls) the given Python function object after all of the currently
+  processing and pending events are done being processed, or after a
+  specified delay. The function will be executed on the GUI, or event
+  dispatch, thread. This is useful for events like propertyChange events,
+  where the script is called before any bindings are evaluated.
+
+  Syntax: >
+    system.vision.invokeLater(function, [delay])
+<
+
+  Parameters: ~
+    {function}  (Callable)  A Python function object that will be invoked
+                            later, on the GUI, or event-dispatch, thread with
+                            no arguments.
+    {delay}     (Integer)   A delay, in milliseconds, to wait before the
+                            function is invoked. The default is 0, which
+                            means it will be invoked after all currently
+                            pending events are processed. [optional]
+
+  Returns: ~
+    Nothing
+
+  Scope: Vision Client
+
+  Example: >
+    # The code in the update/refresh button uses the 'date' property on the two
+    # calendar components, which are bound to the current_timestamp property on their
+    # parent. We want to simulate a button press when the window opens, but only
+    # after the date properties' bindings have been evaluated.
+    
+    if event.propertyName == 'current_timestamp':
+       # Define a function to click the button
+       def clickButton(button = event.source.parent.getComponent('Refresh')):
+          button.doClick()
+          system.vision.showMessage("Button has been clicked!")
+    
+       # Tell the system to invoke the function after
+       # the current event has been processed
+       system.vision.invokeLater(clickButton)
+<
+
+------------------------------------------------------------------------------
+system.vision.isOverlaysEnabled()   *ignition-system.vision.isOverlaysEnabled*
+
+  Returns whether or not the current client's quality overlay system is
+  currently enabled.
+
+  Syntax: >
+    system.vision.isOverlaysEnabled()
+<
+
+  Returns: ~
+    Boolean - True if overlays are currently enabled.
+
+  Scope: Vision Client
+
+  Example: >
+    # This code will return whether or not overlays are currently enabled.
+    print system.vision.isOverlaysEnabled()
+<
+
+------------------------------------------------------------------------------
+system.vision.isScreenLocked()         *ignition-system.vision.isScreenLocked*
+
+  Returns whether or not the screen is currently locked.
+
+  Syntax: >
+    system.vision.isScreenLocked()
+<
+
+  Returns: ~
+    Boolean - A flag indicating whether or not the screen is currently
+    locked.
+
+  Scope: Vision Client
+
+  Example: >
+    # This would run in a timer script to lock the screen after 15 seconds of inactivity,
+    # and then log the user out after 30 seconds of inactivity.
+    
+    if system.vision.getInactivitySeconds() > 15 and not system.vision.isScreenLocked():
+       system.vision.lockScreen()
+    elif system.vision.getInactivitySeconds() > 30:
+       system.vision.logout()
+<
+
+------------------------------------------------------------------------------
+system.vision.isTouchscreenMode()   *ignition-system.vision.isTouchscreenMode*
+
+  Checks whether or not the running Client's Touch Screen mode is currently
+  enabled.
+
+  Syntax: >
+    system.vision.isTouchscreenMode()
+<
+
+  Returns: ~
+    Boolean - True if the Client currently has Touch Screen mode activated.
+
+  Scope: Vision Client
+
+  Example: >
+    # This example is used in the Client Startup script to check if this Client is being run on a touch screen computer (judged by an IP address) and set Touch Screen mode.
+    
+    ipAddress = system.net.getIpAddress()
+    query = "SELECT COUNT(*) FROM touchscreen_computer_ips WHERE ip_address = ?"
+    isTouchscreen = system.db.runScalarPrepQuery(query, [ipAddress])
+    
+    if isTouchscreen and not system.vision.isTouchscreenMode():
+        system.vision.isTouchscreenMode(1)
+<
+
+------------------------------------------------------------------------------
+system.vision.lockScreen()                 *ignition-system.vision.lockScreen*
+
+  Used to put a running client in lock-screen mode. The screen can be
+  unlocked by the user with the proper credentials, or by scripting via the
+  system.vision.unlockScreen() function.
+
+  Syntax: >
+    system.vision.lockScreen([obscure])
+<
+
+  Parameters: ~
+    {obscure}  (Boolean)  If true(1), the locked screen will be opaque,
+                          otherwise it will be partially visible. [optional]
+
+  Returns: ~
+    Nothing
+
+  Scope: Vision Client
+
+  Example: >
+    # This would run in a timer script to lock the screen after 15 seconds of inactivity, and then log the user out after 30 seconds of inactivity.
+    
+    if system.vision.getInactivitySeconds() > 15 and not system.vision.isScreenLocked():
+       system.vision.lockScreen()
+    elif system.vision.getInactivitySeconds() > 30:
+       system.vision.logout()
+<
+
+------------------------------------------------------------------------------
+system.vision.logout()                         *ignition-system.vision.logout*
+
+  Logs out of the Client for the current user and brings the Client to the
+  login screen.
+
+  Syntax: >
+    system.vision.logout()
+<
+
+  Returns: ~
+    Nothing
+
+  Scope: All
+
+  Example: >
+    # This would run in a timer script to log the user out after 30 seconds of inactivity.
+    if system.vision.getInactivitySeconds() > 30:
+       system.vision.logout()
+<
+
+------------------------------------------------------------------------------
+system.vision.openDesktop()               *ignition-system.vision.openDesktop*
+
+  Creates an additional Desktop in a new frame. For more details, see the
+  Multi-Monitor Clients page.
+
+  Syntax: >
+    system.vision.openDesktop ([screen], [handle], [title], [width], [height], [x], [y], [windows])
+<
+
+  Parameters: ~
+    {screen}   (Integer)     The screen index of which screen to place the
+                             new frame on. If omitted, screen 0 will be used.
+                             [optional]
+    {handle}   (String)      A name for the desktop. If omitted, the screen
+                             index will be used. [optional]
+    {title}    (String)      The title for the new frame. If omitted, the
+                             index handle will be used. If the handle and
+                             title are omitted, the screen index will be
+                             used. [optional]
+    {width}    (Integer)     The width for the new desktop's frame. If
+                             omitted, frame will become maximized on the
+                             specified monitor. [optional]
+    {height}   (Integer)     The height for the new desktop's frame. If
+                             omitted, frame will become maximized on the
+                             specified monitor. [optional]
+    {x}        (Integer)     The x coordinate for the new desktop's frame.
+                             Only used if both width and height are
+                             specified. If omitted, defaults to 0. [optional]
+    {y}        (Integer)     The y coordinate for the new desktop's frame.
+                             Only used if both width and height are
+                             specified. If omitted, defaults to 0. [optional]
+    {windows}  (PySequence)  A list of window paths to open in the new
+                             Desktop frame. If omitted, the desktop will open
+                             without any opened windows. [optional]
+
+  Returns: ~
+    JFrame - A reference to the new Desktop frame object.
+
+  Scope: Vision Client
+
+  Example: >
+    # Create a list of window paths to open in the new desktop.
+    windowsToOpen = ["Main Windows/Main Window", "Navigation"]
+    
+    # Creates a new desktop. The desktop will open the windows listed above.
+    system.vision.openDesktop(windows=windowsToOpen)
+<
+
+------------------------------------------------------------------------------
+system.vision.openFile()                     *ignition-system.vision.openFile*
+
+  Shows an Open File dialog box, prompting the user to choose a file to open.
+  Returns the path to the file that the user chose, or None if the user
+  canceled the dialog box. An extension can optionally be passed in that sets
+  the filetype filter to that extension.
+
+  Syntax: >
+    system.vision.openFile([extension], [defaultLocation])
+<
+
+  Parameters: ~
+    {extension}        (String)  A file extension, such as "pdf", to try to
+                                 open. [optional]
+    {defaultLocation}  (String)  A folder location, such as "C:\MyFiles", to
+                                 use as the default folder to store in.
+                                 [optional]
+
+  Returns: ~
+    String - The path to the selected file, or Nothing if canceled.
+
+  Scope: Vision Client
+
+  Example: >
+    # This code would prompt the user to open a file of type 'gif'.
+    # If None is returned, it means the user canceled the open dialog box.
+    
+    path = system.vision.openFile('gif')
+    if path != None:
+       # do something with the file
+<
+
+------------------------------------------------------------------------------
+system.vision.openFiles()                   *ignition-system.vision.openFiles*
+
+  Shows an Open File dialog box, prompting the user to choose a file or files
+  to open. Returns the paths to the files that the user chooses, or None if
+  the user canceled the dialog box. An extension can optionally be passed in
+  that sets the filetype filter to that extension.
+
+  Syntax: >
+    system.vision.openFiles([extension], [defaultLocation])
+<
+
+  Parameters: ~
+    {extension}        (String)  A file extension, such as "pdf", to try to
+                                 open. [optional]
+    {defaultLocation}  (String)  A folder location, such as "C:\MyFiles", to
+                                 use as the default folder to store in.
+                                 [optional]
+
+  Returns: ~
+    List - The paths to the selected files, or None if canceled.
+
+  Scope: Vision Client
+
+  Example: >
+    # This code would prompt the user to open files of type 'gif'.
+    # If None is returned, it means the user canceled the open dialog box.
+    
+    paths = system.vision.openFiles('gif')
+    if paths != None:
+       # do something with the file
+<
+
+------------------------------------------------------------------------------
+system.vision.openURL()                       *ignition-system.vision.openURL*
+
+  Opens the given URL or URI scheme outside of the currently running Client
+  in the application the host operating system deems appropriate. For
+  example, the URL "http://www.google.com" will open in the default web
+  browser, whereas "file://C:\\Report.pdf" will open in Adobe Acrobat. The
+  Windows network-share style path like
+  "\\\\Fileserver\\resources\\machine_manual.pdf" will work in Windows as
+  well.
+
+  Syntax: >
+    system.vision.openURL(url)
+<
+
+  Parameters: ~
+    {url}  (String)  The URL to open in a web browser or other appropriate
+                     application.
+
+  Returns: ~
+    Nothing
+
+  Scope: Vision Client
+
+  Example: >
+    # This code will open a web page
+    
+    system.vision.openURL("http://www.google.com")
+<
+
+------------------------------------------------------------------------------
+system.vision.openWindow()                 *ignition-system.vision.openWindow*
+
+  Opens the window with the given path. If the window is already open, brings
+  it to the front. The optional params dictionary contains key :value pairs
+  which will be used to set the target window's root container's dynamic
+  variables.
+
+  Syntax: >
+    system.vision.openWindow(path, [params])
+<
+
+  Parameters: ~
+    {path}    (String)                   The path to the window to open.
+    {params}  (Dictionary[String, Any])  A dictionary of parameters to pass
+                                         into the window. The keys in the
+                                         dictionary must match dynamic
+                                         property names on the target
+                                         window's root container. The values
+                                         for each key will be used to set
+                                         those properties. [optional]
+
+  Returns: ~
+    Window - A reference to window that was navigated to. Refer to the list
+    of window objects.
+
+  Scope: Vision Client
+
+  Example: >
+    # This is the simplest form of openWindow.
+    system.vision.openWindow("SomeWindowName")
+<
+
+------------------------------------------------------------------------------
+system.vision.openWindowInstance() *ignition-system.vision.openWindowInstance*
+
+  When called in a Vision Client, it operates exactly like
+  system.vision.openWindow() , except that if the named window is already
+  open, then an additional instance of the window will be opened. There is no
+  limit to the number of additional instances of a window that you can open.
+
+  Syntax: >
+    system.vision.openWindowInstance(path, [params])
+<
+
+  Parameters: ~
+    {path}    (String)                   The path to the window to open.
+    {params}  (Dictionary[String, Any])  A dictionary of parameters to pass
+                                         into the window. The keys in the
+                                         dictionary must match dynamic
+                                         property names on the target
+                                         window's root container. The values
+                                         for each key will be used to set
+                                         those properties. [optional]
+
+  Returns: ~
+    Window - A reference to window that was navigated to. Refer to the list
+    of window objects.
+
+  Scope: Vision Client
+
+  Example: >
+    # This example would open three copies of a single HOA popup screen.
+    
+    system.vision.openWindowInstance("HOA", {machineNum:3})
+    system.vision.openWindowInstance("HOA", {machineNum:4})
+    system.vision.openWindowInstance("HOA", {machineNum:5})
+<
+
+------------------------------------------------------------------------------
+system.vision.playSoundClip()           *ignition-system.vision.playSoundClip*
+
+  Plays a sound clip from a .wav file to the system's default audio device.
+  The .wav file can be specified as a filepath, a URL, or directly as a raw
+  List[Byte].
+
+  Syntax: >
+    system.vision.playSoundClip(wavBytes, [volume], [wait])
+<
+
+  Parameters: ~
+    {wavBytes}  (List[Byte])  A byte list of a wav file.
+    {volume}    (Float)       The clip's volume, represented as a floating
+                              point number between 0.0 and 1.0. [optional]
+    {wait}      (Boolean)     A boolean flag indicating whether or not the
+                              call to playSoundClip should block further
+                              script execution within the triggering event
+                              until the clip finishes. Useful in cases where
+                              code on lines after the playSoundClip call
+                              should wait until the sound clip finishes
+                              playing. [optional]
+
+  Returns: ~
+    Nothing
+
+  Syntax: >
+    system.vision.playSoundClip(wavFile [, volume] [, wait])
+<
+
+  Parameters: ~
+    {wavFile}  (String)   A filepath or URL that represents a wav file.
+    {volume}   (Float)    The clip's volume, represented as a floating point
+                          number between 0.0 and 1.0. [optional]
+    {wait}     (Boolean)  A boolean flag indicating whether or not the call
+                          to playSoundClip should block further script
+                          execution within the triggering event until the
+                          clip finishes. Useful in cases where code on lines
+                          after the playSoundClip call should wait until the
+                          sound clip finishes playing. [optional]
+
+  Returns: ~
+    Nothing
+
+  Scope: Vision Client
+
+  Example: >
+    # This code would play a sound clip at full volume that was located on the current
+    # host's filesystem. It will not return until the clip in finished playing.
+    system.vision.playSoundClip("C:\\sounds\\siren.wav")
+<
+
+------------------------------------------------------------------------------
+system.vision.printToImage()             *ignition-system.vision.printToImage*
+
+  This function prints the given component (such as a graph, container,
+  entire window, etc) to an image file, and saves the file where ever the
+  operating system deems appropriate. A filename and path may be provided to
+  determine the name and location of the saved file.
+
+  Syntax: >
+    system.vision.printToImage(component [, filename])
+<
+
+  Parameters: ~
+    {component}  (Component)  The component to render.
+    {filename}   (String)     A filename to save the image as. [optional]
+
+  Returns: ~
+    Nothing
+
+  Scope: Vision Client
+
+  Example: >
+    # This code would go on a button and save an image of the container that it is in.
+    system.vision.printToImage(event.source.parent, "C:\\temp\\Screen.jpg")
+<
+
+------------------------------------------------------------------------------
+system.vision.refresh()                       *ignition-system.vision.refresh*
+
+  This function will cause a Vision component binding to execute immediately.
+  This is most often used for bindings that are set to Polling - Off. In this
+  way, you cause a binding to execute on demand, when you know that the
+  results of its query will return a new result. To use it, you simply
+  specify the component and name of the property on whose binding you'd like
+  to refresh.
+
+  Syntax: >
+    system.vision.refreshBinding(component, propertyName)
+<
+
+  Parameters: ~
+    {component}     (JComponent)  The component whose property you want to
+                                  refresh.
+    {propertyName}  (String)      The name of the property that has a SQL
+                                  Query binding that needs to be refreshed.
+
+  Returns: ~
+    Boolean - True if the property was found and refreshed successfully.
+
+  Scope: Vision Client
+
+  Example: >
+    # This example could be placed in the actionPerformed event of a Button,
+    # to be used to refresh the data of a Table.
+    # Remember to use the scripting name of the property that you're trying to refresh,
+    # and that the property names are case-sensitive.
+    
+    table = event.source.parent.getComponent("Table")
+    system.vision.refreshBinding(table, "data")
+<
+
+------------------------------------------------------------------------------
+system.vision.retarget()                     *ignition-system.vision.retarget*
+
+  This function allows you to programmatically 'retarget' a Vision Client to
+  a different project and/or different Gateway. You can have it switch to
+  another project on the same Gateway, or another Gateway entirely, even
+  across a WAN. This feature makes the vision of a seamless, enterprise-wide
+  SCADA application a reality.
+
+  Syntax: >
+    system.vision.retarget(project, [addresses], [params], [windows])
+<
+
+  Parameters: ~
+    {project}    (String)                   The name of the project to
+                                            retarget to.
+    {addresses}  (String or List)           The address of the Gateway that
+                                            the project resides on. If
+                                            omitted, the current Gateway will
+                                            be used. Format is host:port when
+                                            not using SSL/TLS, or
+                                            https://host:port when SSL/TLS is
+                                            enabled on the target gateway.
+                                            This can be a list of strings.
+                                            When using a list, the function
+                                            will try each address in order,
+                                            waiting for the timeout period
+                                            between each address attempt.
+                                            [optional]
+    {params}     (Dictionary[String, Any])  A dictionary of parameters that
+                                            will be passed to the new
+                                            project. They will be set as
+                                            global variables in the new
+                                            project's Python scripting
+                                            environment. [optional]
+    {windows}    (List[String])             A list of window paths to use as
+                                            the startup windows. If omitted,
+                                            the project's normal startup
+                                            windows will be opened. If
+                                            specified, the project's normal
+                                            startup windows will be ignored,
+                                            and this list will be used
+                                            instead. [optional]
+
+  Returns: ~
+    Nothing
+
+  Scope: Vision Client
+
+  Example: >
+    # This code would switch to a project named 'TankControl' on the same Gateway
+    # as the currently running project
+    system.vision.retarget("TankControl")
+<
+
+------------------------------------------------------------------------------
+system.vision.saveFile()                     *ignition-system.vision.saveFile*
+
+  Prompts the user to save a new file named filename. The optional extension
+  and typeDesc arguments will be used for a file type filter, if any. If the
+  user accepts the save, the path to that file will be returned. If the user
+  cancels the save, None will be returned.
+
+  Syntax: >
+    system.vision.saveFile(filename)
+<
+
+  Parameters: ~
+    {filename}  (String)  A file name to suggest to the user.
+
+  Returns: ~
+    String - The path to the file that the user decided to save to, or None
+    if they canceled.
+
+  Syntax: >
+    system.vision.saveFile(filename, [extension], [typeDesc])
+<
+
+  Parameters: ~
+    {filename}   (String)  A file name to suggest to the user.
+    {extension}  (String)  The appropriate file extension, like "jpeg", for
+                           the file. [optional]
+    {typeDesc}   (String)  A description of the extension, like "JPEG Image".
+                           [optional]
+
+  Returns: ~
+    String - The path to the file that the user decided to save to, or None
+    if they canceled.
+
+  Scope: Vision Client
+
+  Example: >
+    # This code would prompt the user to save the text in a text area to a file.
+    
+    path = system.vision.saveFile("myfile.txt")
+    if path is not None:
+       system.file.writeFile(path, event.source.parent.getComponent("Text Area").text)
+<
+
+------------------------------------------------------------------------------
+system.vision.setConnectionMode()   *ignition-system.vision.setConnectionMode*
+
+  Sets the connection mode for the Client session. Normally a Client runs in
+  mode 3, which is read-write. You may wish to change this to mode 2, which
+  is read-only, which will only allow reading and subscribing to tags, and
+  running SELECT queries. Tag writes and INSERT/UPDATE/DELETE queries will
+  not function. You can also set the connection mode to mode 1, which is
+  disconnected, all tag and query features will not work.
+
+  Syntax: >
+    system.vision.setConnectionMode(mode)
+<
+
+  Parameters: ~
+    {mode}  (Integer)  The new connection mode. 1 = Disconnected, 2 =
+                       Read-only, 3 = Read/Write.
+
+  Returns: ~
+    Nothing
+
+  Scope: Vision Client
+
+  Example: >
+    # This example, which could go in a project's startup script, would check the current username
+    # and set the connection mode to read-only if it is the "guest" user.
+    
+    username = system.vision.getUsername()
+    if "guest" == username.lower():
+       # Set "guest" user to read-only mode
+       system.vision.setConnectionMode(2)
+    else:
+       system.vision.setConnectionMode(3)
+<
+
+------------------------------------------------------------------------------
+system.vision.setConnectTimeout()   *ignition-system.vision.setConnectTimeout*
+
+  Sets the connect timeout for Client-to-Gateway communication. Specified in
+  milliseconds.
+
+  Syntax: >
+    system.vision.setConnectTimeout(connectTimeout)
+<
+
+  Parameters: ~
+    {connectTimeout}  (Integer)  The new connect timeout, specified in
+                                 milliseconds.
+
+  Returns: ~
+    Nothing
+
+  Scope: Vision Client
+
+  Example: >
+    # This code would set the current connect timeout to 30 seconds
+    system.vision.setConnectTimeout(30000)
+<
+
+------------------------------------------------------------------------------
+system.vision.setLocale()                   *ignition-system.vision.setLocale*
+
+  Sets the user's current Locale. Any valid Java locale code
+  (case-insensitive) can be used as a parameter, including ones that have not
+  yet been added to the Translation Manager. An invalid locale code will
+  cause an Illegal Argument Exception.
+
+  Syntax: >
+    system.vision.setLocale(locale)
+<
+
+  Parameters: ~
+    {locale}  (Object)  A locale code, such as "en_US" for US English, or a
+                        java.util.Locale object.
+
+  Returns: ~
+    Nothing
+
+  Scope: Vision Client
+
+  Example: >
+    # This script will set the client locale to Arabic.
+    
+    system.vision.setLocale('ar')
+<
+
+------------------------------------------------------------------------------
+system.vision.setOverlaysEnabled() *ignition-system.vision.setOverlaysEnabled*
+
+  Enables or disables the component quality overlay system.
+
+  Syntax: >
+    system.vision.setOverlaysEnabled(enabled)
+<
+
+  Parameters: ~
+    {enabled}  (Boolean)  True to turn on tag overlays; false to turn them
+                          off.
+
+  Returns: ~
+    Nothing
+
+  Scope: Vision Client
+
+  Example: >
+    # This example will turn tag overlays on.
+    system.vision.setOverlaysEnabled(True)
+<
+
+------------------------------------------------------------------------------
+system.vision.setReadTimeout()         *ignition-system.vision.setReadTimeout*
+
+  Sets the read timeout for Client-to-Gateway communication. Specified in
+  milliseconds.
+
+  Syntax: >
+    system.vision.setReadTimeout(readTimeout)
+<
+
+  Parameters: ~
+    {readTimeout}  (Integer)  The new read timeout, specified in
+                              milliseconds.
+
+  Returns: ~
+    Nothing
+
+  Scope: Vision Client
+
+  Example: >
+    # This script will set the read timeout to 20 seconds.
+    
+    system.vision.setReadTimeout(20000)
+<
+
+------------------------------------------------------------------------------
+system.vision.setScreenIndex()         *ignition-system.vision.setScreenIndex*
+
+  Moves an open client to a specific monitor. Use with
+  system.vision.getScreens() to identify monitors before moving.
+
+  Syntax: >
+    system.vision.setScreenIndex(index)
+<
+
+  Parameters: ~
+    {index}  (Integer)  The new monitor index for this client to move to. 0
+                        based.
+
+  Returns: ~
+    Nothing
+
+  Scope: Vision Client
+
+  Example: >
+    # This example could be used on a startup script to move the client to a 2nd monitor.
+    
+    system.vision.setScreenIndex(1)
+<
+
+------------------------------------------------------------------------------
+system.vision.setTouchscreenMode() *ignition-system.vision.setTouchscreenMode*
+
+  Alters a running Client's Touch Screen mode on the fly.
+
+  Syntax: >
+    system.vision.setTouchscreenMode(enabled)
+<
+
+  Parameters: ~
+    {enabled}  (Boolean)  The new value for Touch Screen mode being enabled.
+
+  Returns: ~
+    Nothing
+
+  Scope: Vision Client
+
+  Example: >
+    # This example could be used on an input heavy window's internalFrameActivated event
+    # to remove Touch Screen mode.
+    
+    if system.vision.isTouchscreenMode():
+       system.vision.setTouchscreenMode(False)
+<
+
+------------------------------------------------------------------------------
+system.vision.showColorInput()         *ignition-system.vision.showColorInput*
+
+  Prompts the user to pick a color using the default color-chooser dialog
+  box.
+
+  Syntax: >
+    system.vision.showColorInput(initialColor, [dialogTitle])
+<
+
+  Parameters: ~
+    {initialColor}  (Color)   A color to use as a starting point in the color
+                              choosing popup.
+    {dialogTitle}   (String)  The title for the color choosing popup.
+                              Defaults to "Choose Color". [optional]
+
+  Returns: ~
+    Color - The new color chosen by the user.
+
+  Scope: Vision Client
+
+  Example: >
+    # This code would be placed in the actionPerformed event of a button
+    # and would change the background color of the container the button was placed in.
+    
+    parent = event.source.parent
+    newColor = system.vision.showColorInput(parent.background)
+    parent.background = newColor
+<
+
+------------------------------------------------------------------------------
+system.vision.showConfirm()               *ignition-system.vision.showConfirm*
+
+  Displays a confirmation dialog box to the user with Yes and No options, and
+  a custom message.
+
+  Syntax: >
+    system.vision.showConfirm(message, [title], [allowCancel])
+<
+
+  Parameters: ~
+    {message}      (String)   The message to show in the confirmation dialog.
+    {title}        (String)   The title for the confirmation dialog.
+                              [optional]
+    {allowCancel}  (Boolean)  Show a cancel button in the dialog. [optional]
+
+  Returns: ~
+    Boolean - True if the user selected Yes ; false if the user selected No .
+    None if the user selected Cancel .
+
+  Scope: Vision Client
+
+  Example: >
+    # By using the confirm function in an if statement, we can let the user confirm an action.
+    # In this case, we shut down the plant if the user confirms it; otherwise, we don't do anything.
+    
+    if system.vision.showConfirm("Are you sure you want to shutdown the plant?", "Really Shutdown?"):
+        system.db.runPrepUpdate(
+            "UPDATE ControlTable SET Shutdown = ?",
+            [1]
+        )
+<
+
+------------------------------------------------------------------------------
+system.vision.showDiagnostics()       *ignition-system.vision.showDiagnostics*
+
+  Opens the Client runtime Diagnostics window, which provides information
+  regarding performance, logging, active threads, connection status, and the
+  console. This provides an opportunity to open the Diagnostics window in
+  situations where the menu bar in the client is hidden, and the keyboard
+  shortcut ( Ctrl + Shift + F7 ) can not be used.
+
+  Syntax: >
+    system.vision.showDiagnostics()
+<
+
+  Returns: ~
+    Nothing
+
+  Scope: Vision Client
+
+  Example: >
+    # Opens the diagnostics window in a running client
+    system.vision.showDiagnostics()
+<
+
+------------------------------------------------------------------------------
+system.vision.showError()                   *ignition-system.vision.showError*
+
+  Displays an error-style message box to the user.
+
+  Syntax: >
+    system.vision.showError(message, [title])
+<
+
+  Parameters: ~
+    {message}  (String)  The message to display in an error box. Will accept
+                         HTML formatting.
+    {title}    (String)  The title for the error box. [optional]
+
+  Returns: ~
+    Nothing
+
+  Scope: Vision Client
+
+  Example: >
+    # Turn on compressor #12, but only if the user has the right credentials.
+    
+    if 'Supervisor' in system.vision.getRoles():
+        updateQuery = "UPDATE CompressorControl SET running=1 WHERE compNum = 12"
+        system.db.runUpdateQuery(updateQuery)
+    else:
+        errorMessage = "Unable to turn on Compressor 12."
+        errorMessage += " You don't have proper security privileges."
+        system.vision.showError(errorMessage)
+<
+
+------------------------------------------------------------------------------
+system.vision.showInput()                   *ignition-system.vision.showInput*
+
+  Opens up a popup input dialog box. This dialog box will show a prompt
+  message and allow the user to type in a string. When the user is done, they
+  can click OK or Cancel . If OK is pressed, this function will return with
+  the value that they typed in. If Cancel is pressed, this function will
+  return the value None.
+
+  Syntax: >
+    system.vision.showInput(message, defaultText)
+<
+
+  Parameters: ~
+    {message}      (String)  The message to display for the input box. Will
+                             accept HTML formatting.
+    {defaultText}  (String)  The default text to initialize the input box
+                             with.
+
+  Returns: ~
+    String - The string value that was entered in the input box.
+
+  Scope: Vision Client
+
+  Example: >
+    # In the mouseClicked event of a label, this allows the user to change the label's text.
+    
+    txt = system.vision.showInput("Enter text:", event.source.text)
+    if txt != None:
+       event.source.text = txt
+<
+
+------------------------------------------------------------------------------
+system.vision.showMessage()               *ignition-system.vision.showMessage*
+
+  Displays an informational-style message popup box to the user.
+
+  Syntax: >
+    system.vision.showMessage(message, title)
+<
+
+  Parameters: ~
+    {message}  (String)  The message to display. Will accept HTML formatting.
+    {title}    (String)  A title for the message box. [optional]
+
+  Returns: ~
+    Nothing
+
+  Scope: Vision Client
+
+  Example: >
+    # Display the message Hello World! in a message box.
+    system.vision.showMessage("Hello World!")
+<
+
+------------------------------------------------------------------------------
+system.vision.showNumericKeypad()   *ignition-system.vision.showNumericKeypad*
+
+  Displays a modal on-screen numeric keypad, allowing for arbitrary numeric
+  entry using the mouse, or a finger on a touch screen monitor. Returns the
+  number that the user entered.
+
+  Syntax: >
+    system.vision.showNumericKeypad(initialValue, [fontSize], [usePasswordMode])
+<
+
+  Parameters: ~
+    {initialValue}     (Number)   The value to start the on-screen keypad
+                                  with.
+    {fontSize}         (Integer)  The font size to display in the keypad.
+                                  [optional]
+    {usePasswordMode}  (Boolean)  If True, display a * for each digit.
+                                  [optional]
+
+  Returns: ~
+    Number - The value that was entered in the keypad.
+
+  Scope: Vision Client
+
+  Example: >
+    # This function is a holdover for backwards compatibility. Input components now know when the Client is in Touch Screen mode and respond accordingly.
+    # This script would go in the MouseClicked or MousePressed action of a Text field or Numeric Text field.
+    
+    # For Integer Numeric Text field:
+    if system.vision.isTouchscreenMode():
+       event.source.intValue = system.vision.showNumericKeypad(event.source.intValue)
+    
+    # For Double Numeric Text field:
+    if system.vision.isTouchscreenMode():
+       event.source.doubleValue = system.vision.showNumericKeypad(event.source.doubleValue)
+    
+    # For Text field:
+    # Notice the str() and int() functions used to convert the text to a number and
+    # vice versa.
+    # str() and int() are built-in Jython functions
+    if system.vision.isTouchscreenMode():
+       event.source.text = str(system.vision.showNumericKeypad(int(event.source.text)))
+<
+
+------------------------------------------------------------------------------
+system.vision.showPasswordInput()   *ignition-system.vision.showPasswordInput*
+
+  Pops up a special input box that uses a password field, so the text isn't
+  echoed back in clear-text to the user. Returns the text they entered, or
+  None if they canceled the dialog box.
+
+  Syntax: >
+    system.vision.showPasswordInput(message, [title], [echoChar])
+<
+
+  Parameters: ~
+    {message}   (String)  The message for the password prompt. Will accept
+                          HTML formatting.
+    {title}     (String)  A title for the password prompt. [optional]
+    {echoChar}  (String)  A custom echo character. Defaults to: * [optional]
+
+  Returns: ~
+    String - The password that was entered, or None if the prompt was
+    canceled.
+
+  Scope: Vision Client
+
+  Example: >
+    # This example prompts a user for a password before opening the 'Admin' screen.
+    
+    password = system.vision.showPasswordInput("Please enter the password.")
+    if password == "open sesame":
+       system.vision.openWindow("Admin")
+<
+
+------------------------------------------------------------------------------
+system.vision.showTouchscreenKeyboard() *ignition-system.vision.showTouchscreenKeyboard*
+
+  Displays a modal on-screen keyboard, allowing for arbitrary text entry
+  using the mouse, or a finger on a touchscreen monitor. Returns the text
+  that the user entered.
+
+  Syntax: >
+    system.vision.showTouchscreenKeyboard(initialText, [fontSize], [passwordMode])
+<
+
+  Parameters: ~
+    {initialText}   (String)   The text to start the on-screen keyboard with.
+    {fontSize}      (Integer)  The font size to display in the keyboard.
+                               [optional]
+    {passwordMode}  (Boolean)  A True value will activate password mode,
+                               where the text entered is not echoed back in
+                               cleartext. [optional]
+
+  Returns: ~
+    String - The text that was entered in the on-screen keyboard.
+
+  Scope: Vision Client
+
+  Example: >
+    # This function is a holdover for backwards compatibility. Input components now know when the client
+    # is in Touch Screen mode and respond accordingly.
+    # This would go in the MouseClicked or MousePressed action of a Text Field or similar component.
+    
+    if system.vision.isTouchscreenMode():
+       event.source.text = system.vision.showTouchscreenKeyboard(event.source.text)
+<
+
+------------------------------------------------------------------------------
+system.vision.showWarning()               *ignition-system.vision.showWarning*
+
+  Displays a message to the user in a warning style popup dialog.
+
+  Syntax: >
+    system.vision.showWarning(message, [title])
+<
+
+  Parameters: ~
+    {message}  (String)  The message to display in the warning. Will accept
+                         HTML formatting if the message parameter is
+                         encapsulated in an <html> tag.
+    {title}    (String)  The title for the warning. [optional]
+
+  Returns: ~
+    Nothing
+
+  Scope: Vision Client
+
+  Example: >
+    # This code shows a yellow popup box similar to the system.gui.messageBox function.
+    # Start the motor, or, warn the user if in wrong mode.
+    runMode = event.source.parent.getPropertyValue('RunMode')
+    
+    # Cannot start the motor in mode #1
+    if runMode == 1:
+       system.vision.showWarning("Cannot start the motor, current mode is <B>VIEW MODE</B>")
+    else:
+       system.db.runUpdateQuery("UPDATE MotorControl SET MotorRun=1")
+<
+
+------------------------------------------------------------------------------
+system.vision.swapTo()                         *ignition-system.vision.swapTo*
+
+  Performs a window swap from the current main screen window to the window
+  specified. Swapping means that the opened window will take the place of the
+  closing window - in this case it will be maximized. See also: Navigation
+  Strategies .
+
+  Syntax: >
+    system.vision.swapTo(path, [params])
+<
+
+  Parameters: ~
+    {path}    (String)                   The path of a window to swap to.
+    {params}  (Dictionary[String, Any])  A dictionary of parameters to pass
+                                         into the window. The keys in the
+                                         dictionary must match dynamic
+                                         property names on the target
+                                         window's root container. The values
+                                         for each key will be used to set
+                                         those properties. [optional]
+
+  Returns: ~
+    Window - A reference to window that was navigated to. Refer to the list
+    of window objects.
+
+  Scope: Vision Client
+
+  Example: >
+    # This code would go in a button's ActionPerformed event to swap out of the current window and into a window named MyWindow
+    system.vision.swapTo("MyWindow")
+<
+
+------------------------------------------------------------------------------
+system.vision.swapWindow()                 *ignition-system.vision.swapWindow*
+
+  Performs a window swap. This means that one window is closed, and another
+  is opened and takes its place - assuming its size, floating state, and
+  maximization state. This gives a seamless transition - one window seems to
+  simply turn into another.
+
+  Syntax: >
+    system.vision.swapWindow(swapFromPath, swapToPath, [params])
+<
+
+  Parameters: ~
+    {swapFromPath}  (String)                   The path of the window to swap
+                                               from. Must be a currently open
+                                               window, otherwise this will
+                                               act like an openWindow.
+    {swapToPath}    (String)                   The name of the window to swap
+                                               to.
+    {params}        (Dictionary[String, Any])  A dictionary of parameters to
+                                               pass into the window. The keys
+                                               in the dictionary must match
+                                               dynamic property names on the
+                                               target window's root
+                                               container. The values for each
+                                               key will be used to set those
+                                               properties. [optional]
+
+  Returns: ~
+    Window - A reference to the swapped-to window.
+
+  Syntax: >
+    system.vision.swapWindow(event, swapToPath, [params])
+<
+
+  Parameters: ~
+    {event}       (EventObject)              A component event whose
+                                             enclosing window will be used as
+                                             the "swap-from" window.
+    {swapToPath}  (String)                   The name of the window to swap
+                                             to.
+    {params}      (Dictionary[String, Any])  A dictionary of parameters to
+                                             pass into the window. The keys
+                                             in the dictionary must match
+                                             dynamic property names on the
+                                             target window's root container.
+                                             The values for each key will be
+                                             used to set those properties.
+                                             [optional]
+
+  Returns: ~
+    Window - A reference to window that was navigated to. Refer to the list
+    of window objects.
+
+  Scope: Vision Client
+
+  Example: >
+    # This code would go in a button's ActionPerformed event to swap out of the
+    # window containing the button and into a window named MyWindow.
+    system.vision.swapWindow(event, "MyWindow")
+<
+
+------------------------------------------------------------------------------
+system.vision.switchUser()                 *ignition-system.vision.switchUser*
+
+  Attempts to switch the current user on the fly. If the given username and
+  password fail, this function will return false. If it succeeds, then all
+  currently opened windows are closed, the user is switched, and windows are
+  then re-opened in the states that they were in.
+
+  Syntax: >
+    system.vision.switchUser(username, password, [event], [hideError])
+<
+
+  Parameters: ~
+    {username}   (String)       The username to try and switch to.
+    {password}   (String)       The password to authenticate with.
+    {event}      (EventObject)  If specified, the enclosing window for this
+                                event's component will be closed in the
+                                switch user process. Refer to the list of
+                                Event objects. [optional]
+    {hideError}  (Boolean)      If true (1), no error will be shown if the
+                                switch user function fails. Default is False.
+                                [optional]
+
+  Returns: ~
+    Boolean - False if the switch user operation failed, True otherwise.
+
+  Scope: Vision Client
+
+  Example: >
+    # This script would go on a button in a popup window used to switch users without logging out of the client.
+    
+    # Pull the username and password from the input components
+    uname = event.source.parent.getComponent("Username").text
+    pwd = event.source.parent.getComponent("Password").text
+    
+    # Call switchUser. The event object is passed to this
+    # function so that if the username and password work,
+    # this window will be closed before the switch occurs.
+    success= system.vision.switchUser(uname,pwd,event)
+    
+    # If the login didn't work, give input focus back to the
+    # username component, so that the user can try again
+    if not success:
+       event.source.parent.getComponent("Username").requestFocusInWindow()
+<
+
+------------------------------------------------------------------------------
+system.vision.transform()                   *ignition-system.vision.transform*
+
+  Sets a component's position and size at runtime. Additional arguments for
+  the duration, framesPerSecond, and acceleration of the operation exist for
+  animation. An optional callback argument will be executed when the
+  transformation is complete.
+
+  Syntax: >
+    system.vision.transform(component, [newX], [newY], [newWidth], [newHeight], [duration], [callback], [framesPerSecond], [acceleration], [coordSpace])
+<
+
+  Parameters: ~
+    {component}        (JComponent)  The component to move or resize.
+    {newX}             (Integer)     An x-coordinate to move to, relative to
+                                     the upper-left corner of the component's
+                                     parent container. [optional]
+    {newY}             (Integer)     A y-coordinate to move to, relative to
+                                     the upper-left corner of the component's
+                                     parent container. [optional]
+    {newWidth}         (Integer)     A width for the component. [optional]
+    {newHeight}        (Integer)     A height for the component. [optional]
+    {duration}         (Integer)     A duration over which the transformation
+                                     will take place. If omitted or 0, the
+                                     transform will take place immediately.
+                                     [optional]
+    {callback}         (Callable)    Function to be called when the
+                                     transformation is complete. [optional]
+    {framesPerSecond}  (Integer)     Frame rate argument which dictates how
+                                     often the transformation updates over
+                                     the given duration. The default is 60
+                                     frames per second. [optional]
+    {acceleration}     (Integer)     An optional modifier to the acceleration
+                                     of the transformation over the given
+                                     duration. See system.vision constants
+                                     for valid arguments. [optional]
+    {coordSpace}       (Integer)     The coordinate space to use. When the
+                                     default screen coordinates are used, the
+                                     given size and position are absolute, as
+                                     they appear in the Client at runtime.
+                                     When Designer Coordinates are used, the
+                                     given size and position are pre-runtime
+                                     adjusted values, as they would appear in
+                                     the Designer. See system.vision
+                                     constants for valid arguments.
+                                     [optional]
+
+  Returns: ~
+    Animator animation - An object that contains pause(), resume(), and
+    cancel() methods, allowing for a script to interrupt the animation. See
+    Animator .
+
+  Scope: Vision Client
+
+  Example: >
+    # This example changes the size the a component to 100x100.
+    # Run this script from the component that will be changed (i.e., on the mouseEntered event).
+    
+    system.vision.transform(component=event.source, newWidth=100, newHeight=100)
+<
+
+------------------------------------------------------------------------------
+system.vision.unlockScreen()             *ignition-system.vision.unlockScreen*
+
+  Unlocks the client, if it is currently in lock-screen mode.
+
+  Syntax: >
+    system.vision.unlockScreen()
+<
+
+  Returns: ~
+    Nothing
+
+  Scope: Vision Client
+
+  Example: >
+    # This code would go in a global script to automatically unlock the screen on a specific computer
+    
+    comp = system.net.getHostName()
+    if comp == 'Line 1':
+       system.vision.unlockScreen()
+<
+
+------------------------------------------------------------------------------
+system.vision.updateProject()           *ignition-system.vision.updateProject*
+
+  Updates the Vision Client project with saved changes. This function is
+  intended to be used in conjunction with the "None" option of Vision Project
+  update modes in the Project Properties, and the Vision Client System Tag
+  ProjectUpdateAvailable .
+
+  Syntax: >
+    system.vision.updateProject()
+<
+
+  Returns: ~
+    None
+
+  Scope: Vision Client
+
+  Example: >
+    # This script is intended to go on a Button component.
+    # Upon clicking, the Vision Client project will update with the latest changes.
+    system.vision.updateProject()
+<
+
+
+vim:tw=78:ft=help:norl:

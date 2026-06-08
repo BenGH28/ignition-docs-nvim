@@ -1,0 +1,1371 @@
+*ignition-perspective.txt*               Ignition system.perspective functions
+
+SYSTEM.PERSPECTIVE                               *ignition-system.perspective*
+
+  |ignition-system.perspective.alterDock|
+  |ignition-system.perspective.alterLogging|
+  |ignition-system.perspective.authenticationChallenge|
+  |ignition-system.perspective.closeDock|
+  |ignition-system.perspective.closePage|
+  |ignition-system.perspective.closePopup|
+  |ignition-system.perspective.closeSession|
+  |ignition-system.perspective.download|
+  |ignition-system.perspective.getProjectInfo|
+  |ignition-system.perspective.getSessionInfo|
+  |ignition-system.perspective.isAuthorized|
+  |ignition-system.perspective.login|
+  |ignition-system.perspective.logout|
+  |ignition-system.perspective.navigate|
+  |ignition-system.perspective.navigateBack|
+  |ignition-system.perspective.navigateForward|
+  |ignition-system.perspective.openDock|
+  |ignition-system.perspective.openPopup|
+  |ignition-system.perspective.print|
+  |ignition-system.perspective.refresh|
+  |ignition-system.perspective.sendMessage|
+  |ignition-system.perspective.setTheme|
+  |ignition-system.perspective.toggleDock|
+  |ignition-system.perspective.togglePopup|
+  |ignition-system.perspective.vibrateDevice|
+  |ignition-system.perspective.workstation|
+  |ignition-system.perspective.workstation/system-perspective-workstation-exit|
+  |ignition-system.perspective.workstation/system-perspective-workstation-toKiosk|
+  |ignition-system.perspective.workstation/system-perspective-workstation-toWindowed|
+
+------------------------------------------------------------------------------
+system.perspective.alterDock()         *ignition-system.perspective.alterDock*
+
+  Changes configuration of a specified dock on a Perspective page.
+
+  Syntax: >
+    system.perspective.alterDock(dockId, [config], [sessionId], [pageId])
+<
+
+  Parameters: ~
+    {dockId}     (String)      The unique identifier of the dock to be
+                               modified. If no dock with the specified ID
+                               exists on the current page, a warning will be
+                               logged to the console.
+    {config}     (Dictionary)  A dictionary containing the dock configuration
+                               to be applied when the script is run. If
+                               omitted, the dock configuration remains
+                               unchanged. [optional] The following properties
+                               can included in the config object: view : The
+                               view to be displayed in the dock. viewParams :
+                               A dictionary of name and value pairs to be
+                               passed as parameters to the view. display :
+                               The display state of the dock. Accepted values
+                               are: visible onDemand auto resizable : The
+                               resizable status of the dock. modal : The
+                               modal status of the dock. content : How the
+                               dock should interact with the main content.
+                               Accepted values are: push cover auto size :
+                               The width or height of the dock, depending on
+                               orientation. autoBreakpoint : The minimum page
+                               width at which a dock with "display = auto"
+                               remains visible. If the session width is
+                               smaller than this value, the dock is hidden
+                               and can be displayed on demand. anchor :
+                               Determines whether the docked view remains
+                               visible while scrolling. Only available for
+                               North-docked views. Accepted values are: fixed
+                               scrollable handle : Controls the visibility of
+                               a handle that allows users to expand or
+                               collapse the dock. Accepted values are: show
+                               hide autoHide handleIcon : The path to an icon
+                               used to represent the dock when it is hidden.
+    {sessionId}  (String)      The ID of the session in which the dock
+                               modification is applied. If omitted, the
+                               modification applies to the current session.
+                               [optional]
+    {pageId}     (String)      The ID of the page where the dock is located.
+                               If omitted, the modification applies to the
+                               current page. [optional]
+
+  Returns: ~
+    Nothing
+
+  Scope: Perspective Session
+
+  Example: >
+    # Change the size of a dock with the id 'my-dock-id'
+    system.perspective.alterDock('my-dock-id', { 'size': 500 } )
+<
+
+------------------------------------------------------------------------------
+system.perspective.alterLogging()   *ignition-system.perspective.alterLogging*
+
+  Changes Perspective Session logging attributes and levels. All parameters
+  are optional, with the caveat that at least one of them needs to be used.
+
+  Syntax: >
+    system.perspective.alterLogging([remoteLoggingEnabled], [level], [remoteLoggingLevel], [sessionId], [pageId])
+<
+
+  Parameters: ~
+    {remoteLoggingEnabled}  (Boolean)  Will enable remote logging if True.
+                                       Remote logging will send log events
+                                       from the Session to the Gateway under
+                                       the perspective.client logger if they
+                                       meet the remoteLevel logging level
+                                       requirement. [optional]
+    {level}                 (String)   The desired Session logging level.
+                                       Possible values are: all, trace,
+                                       debug, info, warn, error, fatal, or
+                                       off. The default is info. [optional]
+    {remoteLoggingLevel}    (String)   The desired remote logging level.
+                                       Possible values are: all, trace,
+                                       debug, info, warn, error, fatal, off.
+                                       The default is warn. [optional]
+    {sessionId}             (String)   Identifier of the Session to target.
+                                       If omitted, the current Session will
+                                       be used automatically. When targeting
+                                       a different session, then the pageId
+                                       parameter must be included in the
+                                       call. [optional]
+    {pageId}                (String)   Identifier of the page to target. If
+                                       omitted, the current Page will be used
+                                       automatically. [optional]
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    
+    # Alter the logging level to trace.
+    system.perspective.alterLogging(level = 'trace')
+<
+
+------------------------------------------------------------------------------
+system.perspective.authenticationChallenge() *ignition-system.perspective.authenticationChallenge*
+
+  Triggers an authentication challenge action.
+
+  Syntax: >
+    system.perspective.authenticationChallenge([sessionId], [pageId], [idp], [forceAuth], [timeout], [payload], [framing])
+<
+
+  Parameters: ~
+    {sessionId}  (String)   Identifier of the Session to target. If omitted,
+                            the current Session will be used automatically.
+                            When targeting a different session, then the
+                            pageId parameter must be included in the call.
+                            [optional]
+    {pageId}     (String)   Identifier of the page to target. If omitted, the
+                            current page will be used. [optional]
+    {idp}        (String)   The name of the IdP to use for this
+                            authentication challenge. If omitted, the Project
+                            default IdP will be used. [optional]
+    {forceAuth}  (Boolean)  True if Ignition should ask the IdP to
+                            re-authenticate the user, even if the user is
+                            already signed into the IdP. False if Ignition
+                            should not ask the IdP to re-authenticate the
+                            user. If the IdP supports this option, the IdP
+                            will ask the user to re-enter their credentials,
+                            even if the user is already signed into the IdP.
+                            If omitted, the default value for this argument
+                            will fall back to the value in the Project
+                            Properties. [optional]
+    {timeout}    (Integer)  the number of minutes the system will wait in
+                            between the authentication request and the
+                            authentication response before timing out the
+                            request. If set to any number <= zero, the
+                            request is rejected. If omitted, the default of
+                            two minutes will be used as the timeout.
+                            [optional]
+    {payload}    (Any)      An opaque payload object that may contain any
+                            information. This object will be passed to the
+                            onAuthenticationChallengeCompleted session event
+                            script. The payload should be a JSON-encodable
+                            data structure. [optional]
+    {framing}    (String)   A string representing the type of framing that
+                            should be used. A value of âselfâ indicates
+                            that the same window should be used. A value of
+                            ânewâ indicates that a new tab should be
+                            used. A value of âembeddedâ indicates that an
+                            embedded iframe should be used. If omitted, the
+                            default value of âselfâ (same window) is
+                            used. [optional] Note: Mobile and workstation
+                            clients do not support "new" and will fall back
+                            to "self". Mobile clients do not support
+                            "embedded" and will fall back to "self".
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    # Opens an authentication challenge in a new tab that will time out in three minutes.
+    system.perspective.authenticationChallenge(idp = "administrators", timeout = 3, payload = {"isAction":"true"}, framing = "new")
+<
+
+------------------------------------------------------------------------------
+system.perspective.closeDock()         *ignition-system.perspective.closeDock*
+
+  Closes a docked view.
+
+  Syntax: >
+    system.perspective.closeDock(id, [sessionId], [pageId])
+<
+
+  Parameters: ~
+    {id}         (String)  The unique, preconfigured dock ID for the docked
+                           view. Is specified when a view is assigned as
+                           docked for a particular page (in Page
+                           Configuration).
+    {sessionId}  (String)  Identifier of the Session to target. If omitted,
+                           the current Session will be used automatically.
+                           When targeting a different session, then the
+                           pageId parameter must be included in the call.
+                           [optional]
+    {pageId}     (String)  Identifier of the page to target. If omitted, the
+                           current page will be used automatically.
+                           [optional]
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    # Closes a docked view with the given dock id.
+    system.perspective.closeDock('myDockID')
+<
+
+------------------------------------------------------------------------------
+system.perspective.closePage()         *ignition-system.perspective.closePage*
+
+  Closes the page with the given page id or the current page if no page id is
+  provided. If a message is provided, it is displayed on the page when the
+  page closes. Otherwise the default message (set in the Project properties )
+  is displayed.
+
+  Syntax: >
+    system.perspective.closePage([message], [sessionId], [pageID])
+<
+
+  Parameters: ~
+    {message}    (String)  The message to display when the page closes. If
+                           omitted, the default message (set in the Project
+                           Properties) is shown. [optional]
+    {sessionId}  (String)  Identifier of the Session to target. If omitted,
+                           the current Session will be used automatically.
+                           When targeting a different Session, the pageId
+                           parameter must be included in the call. [optional]
+    {pageId}     (String)  Identifier of the page to be closed. If omitted,
+                           the current pageId is used. [optional]
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    # Closes the page with the given pageId.
+    system.perspective.closePage('Your page has been closed.')
+<
+
+------------------------------------------------------------------------------
+system.perspective.closePopup()       *ignition-system.perspective.closePopup*
+
+  Closes a popup view.
+
+  Syntax: >
+    system.perspective.closePopup(id, [sessionId], [pageId])
+<
+
+  Parameters: ~
+    {id}         (String)  The unique identifier for the popup, given to the
+                           popup when first opened. If given an empty string,
+                           then the most recently focused popup will be
+                           closed.
+    {sessionId}  (String)  Identifier of the Session to target. If omitted,
+                           the current Session will be used automatically.
+                           When targeting a different session, then the
+                           pageId parameter must be included in the call.
+                           [optional]
+    {pageId}     (String)  Identifier of the page to target. If omitted, the
+                           current Page will be used automatically.
+                           [optional]
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    # Closes the popup with the given id.
+    system.perspective.closePopup('popup 4')
+<
+
+------------------------------------------------------------------------------
+system.perspective.closeSession()   *ignition-system.perspective.closeSession*
+
+  Closes the Perspective Session with the given sessionID or the current
+  Session if no ID is provided. If a message is provided, it is displayed on
+  the page when the Session closes. Otherwise the default message (set in the
+  Project properties ) is displayed.
+
+  Syntax: >
+    system.perspective.closeSession([message], [sessionId])
+<
+
+  Parameters: ~
+    {message}    (String)  The message to display when the Session closes. If
+                           omitted, the default message (set in the Project
+                           properties ) is shown. [optional]
+    {sessionId}  (String)  Identifier of the Session to be closed. If
+                           omitted, the current sessionId is used. [optional]
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    # Closes the Session with the given sessionId.
+    system.perspective.closeSession('Your Session has ended.','2e1c98a8-182e-43ce-84e8-a71d441c2cce')
+<
+
+------------------------------------------------------------------------------
+system.perspective.download()           *ignition-system.perspective.download*
+
+  Downloads data from the Gateway to a device running a Session. When calling
+  from the Gateway scope, the call must include a sessionId.
+
+  Syntax: >
+    system.perspective.download(filename, data, [contentType], sessionId, [pageId])
+<
+
+  Parameters: ~
+    {filename}     (String)  Suggested name for the downloaded file.
+    {data}         (String)  The data to be downloaded. May be a string, a
+                             byte[], or an InputStream. Strings will be
+                             written in UTF-8 encoding.
+    {contentType}  (String)  Value for the "Content-Type" header, for
+                             example: "text/plain; charset=utf-8". [optional]
+    {sessionId}    (String)  Identifier of the Session to target. If omitted,
+                             the current Session will be used automatically.
+                             When targeting a different session, then the
+                             pageId parameter must be included in the call.
+    {pageId}       (String)  Identifier of the page to target. If omitted,
+                             the current page will be used automatically.
+                             [optional]
+
+  Returns: ~
+    Nothing
+
+  Syntax: >
+    system.perspective.download(filename, data, [contentType], [sessionId], [pageId])
+<
+
+  Parameters: ~
+    {filename}     (String)  Suggested name for the downloaded file.
+    {data}         (String)  The data to be downloaded. May be a string, a
+                             byte[], or an InputStream. Strings will be
+                             written in UTF-8 encoding.
+    {contentType}  (String)  Value for the "Content-Type" header, for
+                             example: "text/plain; charset=utf-8". [optional]
+    {sessionId}    (String)  Identifier of the Session to target. If omitted,
+                             the current Session will be used automatically.
+                             When targeting a different session, then the
+                             pageId parameter must be included in the call.
+                             [optional]
+    {pageId}       (String)  Identifier of the page to target. If omitted,
+                             the current page will be used automatically.
+                             [optional]
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    
+    # Downloads the file "myFile.pdf" (located on the Gateway) to the user running the current Session.
+    
+    filename = 'myFile.pdf'
+    data = system.file.readFileAsBytes('C:\\'+filename)
+    system.perspective.download(filename, data)
+<
+
+------------------------------------------------------------------------------
+system.perspective.getProjectInfo() *ignition-system.perspective.getProjectInfo*
+
+  Returns a dictionary of meta data from a Perspective Project. Exact fields
+  are as follows:
+
+  Syntax: >
+    system.perspective.getProjectInfo()
+<
+
+  Returns: ~
+    Dictionary [String, Any] - A dictionary of project meta data. See the
+    table in the description for a listing of keys.
+
+  Scope: Perspective Session
+
+  Example: >
+    # This example will print out attributes of a project in the browser console.
+    system.perspective.print(system.perspective.getProjectInfo())
+<
+
+------------------------------------------------------------------------------
+system.perspective.getSessionInfo() *ignition-system.perspective.getSessionInfo*
+
+  Returns information about one or more Perspective Sessions. The information
+  returned by this function is a combination of information available on the
+  Perspective Sessions page on the Gateway, and some Session props (id and
+  userAgent). Exact fields are as follows:
+
+  Syntax: >
+    system.perspective.getSessionInfo([usernameFilter], [projectFilter])
+<
+
+  Parameters: ~
+    {usernameFilter}  (String)  A filter based on logged in user. [optional]
+    {projectFilter}   (String)  A filter based on the project name.
+                                [optional]
+
+  Returns: ~
+    List - A list of objects ( PyJsonObjectAdapter ).
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    # This code counts the number of times a user named "billy" is logged in.
+    sessions = system.perspective.getSessionInfo("billy")
+    print "Billy has %d sessions" % len(sessions)
+<
+
+------------------------------------------------------------------------------
+system.perspective.isAuthorized()   *ignition-system.perspective.isAuthorized*
+
+  Checks if the user in the current Session is authorized against a target
+  collection of security levels.
+
+  Syntax: >
+    system.perspective.isAuthorized(isAllOf, securityLevels, [sessionID])
+<
+
+  Parameters: ~
+    {isAllOf}         (Boolean)       True if the current user must have all
+                                      of the given security levels to be
+                                      authorized. False if the current user
+                                      must have at least one of the given
+                                      security levels to be authorized.
+    {securityLevels}  (List[String])  An array of string paths to a security
+                                      level node in the form of
+                                      "Path/To/Node". Each level in the tree
+                                      is delimited by a forward slash
+                                      character. The public node is never a
+                                      part of the path.
+    {sessionId}       (String)        Identifier of the Session to target. If
+                                      omitted, the current Session will be
+                                      used automatically. [optional]
+
+  Returns: ~
+    True if the user logged into the specified session is authorized, false
+    otherwise.
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    # Returns true if the current user has either Administrator or Baz.
+    # Returns false if they have neither.
+    path1 = "Authenticated/Roles/Administrator"
+    path2 = "Foo/Bar/Baz"
+    isAuthorized = system.perspective.isAuthorized(False, [path1, path2])
+<
+
+------------------------------------------------------------------------------
+system.perspective.login()                 *ignition-system.perspective.login*
+
+  Triggers a login event that will allow the user to log in with the
+  project's configured Identity Provider (IdP). For this function to work, an
+  IdP must be set in Perspective Project properties . This is particularly
+  useful when you want it to be possible to start a session without
+  authentication and sign in to access certain restricted features.
+
+  Syntax: >
+    system.perspective.login([sessionId], [pageId], [forceAuth])
+<
+
+  Parameters: ~
+    {sessionId}  (String)   Identifier of the Session to target. If omitted,
+                            the current Session will be used automatically.
+                            When targeting a different session, then the
+                            pageId parameter must be included in the call.
+                            [optional]
+    {pageId}     (String)   Identifier of the Page to target. If omitted, the
+                            current Page will be used automatically.
+                            [optional]
+    {forceAuth}  (Boolean)  Determines if Ignition should ask the IdP to
+                            re-authenticate the user, even if the user is
+                            already signed into the IdP. If set to true, then
+                            the IdP will ask the user to re-enter their
+                            credentials. If set to false, then the Gateway
+                            will request that the IdP use the last provided
+                            credentials for the Session, potentially allowing
+                            re-authentication without requiring the user to
+                            re-type their credentials. Note that support for
+                            this argument is determined by the IdP; the IdP
+                            may choose to ignore this request. If this
+                            parameter is omitted, then the function will use
+                            the re-authentication setting defined under
+                            Project properties . [optional]
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    # When forceAuth is True, the user will always be required to type in their credentials, even if they're already logged in.
+    system.perspective.login(forceAuth=True)
+<
+
+------------------------------------------------------------------------------
+system.perspective.logout()               *ignition-system.perspective.logout*
+
+  Triggers a logout event, which will log the user out. For this function to
+  work, an Identity Provider (IdP) must be set in the Perspective Project
+  properties .
+
+  Syntax: >
+    system.perspective.logout([sessionId], [pageId], [message])
+<
+
+  Parameters: ~
+    {sessionId}  (String)  Identifier of the Session to target. If omitted,
+                           the current Session will be used automatically.
+                           When targeting a different Session, then the
+                           pageId parameter must be included in the call.
+                           [optional]
+    {pageId}     (String)  Identifier of the Page to target. If omitted, the
+                           current Page will be used automatically.
+                           [optional]
+    {message}    (String)  The message to display when the user logs out of
+                           their session. This message is only shown when the
+                           project requires authentication. If omitted, the
+                           default message (set in Project Properties ) is
+                           shown. [Optional]
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    # This example is a script on a Button component and will log the current user out.
+    system.perspective.logout()
+<
+
+------------------------------------------------------------------------------
+system.perspective.navigate()           *ignition-system.perspective.navigate*
+
+  Navigate the session to a specified view or mounted page.
+
+  Syntax: >
+    system.perspective.navigate(page, [url], [view], [params], [sessionId], [pageId], [newTab])
+<
+
+  Parameters: ~
+    {page}       (String)                      The URL of a Perspective page
+                                               to navigate to. The path can
+                                               include an optional leading
+                                               slash: "new-page" and
+                                               "/new-page" both result cause
+                                               the session to navigate to the
+                                               "new-page" page. See Page URLs
+                                               .
+    {url}        (String)                      The URL of a web address to
+                                               navigate to. If the page or
+                                               view parameters are specified,
+                                               then this parameter is
+                                               ignored. [optional]
+    {view}       (String)                      If specified, will navigate to
+                                               a specific view. Navigating to
+                                               a view with this parameter
+                                               does not change the address in
+                                               the web browser. Thus the web
+                                               browser's back button will not
+                                               be able to return the user to
+                                               the previous view. If the page
+                                               parameter is specified, then
+                                               this parameter is ignored.
+                                               [optional]
+    {params}     (Dictionary[String, String])  Used only in conjunction with
+                                               the view parameter, Dictionary
+                                               of values to pass to any
+                                               parameters on the view.
+                                               [optional]
+    {sessionId}  (String)                      Identifier of the Session to
+                                               target. If omitted, the
+                                               current Session will be used
+                                               automatically. When targeting
+                                               a different session, then the
+                                               pageId parameter must be
+                                               included in the call.
+                                               [optional]
+    {pageId}     (String)                      Identifier of the page to
+                                               target. If omitted, the
+                                               current page will be used
+                                               automatically. [optional]
+    {newTab}     (Boolean)                     If True, opens the contents in
+                                               a new tab. [optional]
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    # Navigating to a perspective page. The 'page' parameter doesn't require the use of a keyword argument.
+    system.perspective.navigate('/new-page')
+<
+
+------------------------------------------------------------------------------
+system.perspective.navigateBack()   *ignition-system.perspective.navigateBack*
+
+  Navigate the session to a specified view or mounted page. This is similar
+  to a browser's "back" function.
+
+  Syntax: >
+    system.perspective.navigateBack([sessionId], [pageId])
+<
+
+  Parameters: ~
+    {sessionId}  (String)  Identifier of the Session to target. If omitted,
+                           the current Session will be used automatically.
+                           [optional]
+    {pageId}     (String)  Identifier of the page to target. If omitted, the
+                           current page will be used automatically.
+                           [optional]
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    system.perspective.navigateBack()
+<
+
+------------------------------------------------------------------------------
+system.perspective.navigateForward() *ignition-system.perspective.navigateForward*
+
+  Navigate the session to a specified view or mounted page. This is similar
+  to a browser's "forward" function.
+
+  Syntax: >
+    system.perspective.navigateForward([sessionId], [pageId])
+<
+
+  Parameters: ~
+    {sessionId}  (String)  Identifier of the Session to target. If omitted,
+                           the current Session will be used automatically.
+                           When targeting a different session, then the
+                           pageId parameter must be included in the call.
+                           [optional]
+    {pageId}     (String)  Identifier of the page to target. If omitted, the
+                           current page will be used automatically.
+                           [optional]
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    
+    system.perspective.navigateForward()
+<
+
+------------------------------------------------------------------------------
+system.perspective.openDock()           *ignition-system.perspective.openDock*
+
+  Opens a docked View. Requires the preconfigured dock ID for the view.
+
+  Syntax: >
+    system.perspective.openDock(id, [sessionId], [pageId])
+<
+
+  Parameters: ~
+    {id}         (String)                      The unique, preconfigured dock
+                                               ID for the docked View. Is
+                                               specified when a View is
+                                               assigned as docked for a
+                                               particular Page (in Page
+                                               Configuration).
+    {sessionId}  (String)                      Identifier of the Session to
+                                               target. If omitted, the
+                                               current Session will be used
+                                               automatically. When targeting
+                                               a different Session, then the
+                                               pageId parameter must be
+                                               included in the call.
+                                               [optional]
+    {pageId}     (String)                      Identifier of the Page to
+                                               target. If omitted, the
+                                               current Page will be used
+                                               automatically. [optional]
+    {params}     (Dictionary[String, String])  Parameters that can be passed
+                                               into the docked view. Must
+                                               match the docked views View
+                                               Parameters. [optional]
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    # Opens a docked view with a dock ID of "myDockID" on the current page and Session.
+    system.perspective.openDock("myDockID", params = {"stationNum":2})
+<
+
+------------------------------------------------------------------------------
+system.perspective.openPopup()         *ignition-system.perspective.openPopup*
+
+  Open a popup view over the given page.
+
+  Syntax: >
+    system.perspective.openPopup(id, view, [params], [title], [position], [showCloseIcon], [draggable], [resizable], [modal], [overlayDismiss], [sessionId], [pageId], [viewportBound])
+<
+
+  Parameters: ~
+    {id}              (String)                       A unique popup string.
+                                                     Will be used to close
+                                                     the popup from other
+                                                     popup or script actions.
+    {view}            (String)                       The path to the View to
+                                                     use in the popup.
+    {params}          (Dictionary[String, Any])      Dictionary of key-value
+                                                     pairs to use as input
+                                                     parameters to the View.
+                                                     [optional]
+    {title}           (String)                       Text to display in the
+                                                     title bar. Defaults to
+                                                     an empty string.
+                                                     [optional]
+    {position}        (Dictionary[String, Integer])  Dictionary of key-value
+                                                     pairs to use for
+                                                     position. Possible
+                                                     position keys are: left,
+                                                     top, right, bottom,
+                                                     width, height. Defaults
+                                                     to the center of the
+                                                     window. [optional]
+    {showCloseIcon}   (Boolean)                      Shows the close icon if
+                                                     True. Defaults to True.
+                                                     [optional]
+    {draggable}       (Boolean)                      Allows the popup to be
+                                                     dragged if True.
+                                                     Defaults to True.
+                                                     [optional]
+    {resizable}       (Boolean)                      Allows the popup to be
+                                                     resized if True.
+                                                     Defaults to False.
+                                                     [optional]
+    {modal}           (Boolean)                      Makes the popup modal if
+                                                     True. A modal popup is
+                                                     the only view the user
+                                                     can interact with.
+                                                     Defaults to False.
+                                                     [optional]
+    {overlayDismiss}  (Boolean)                      Allows the user to
+                                                     dismiss and close a
+                                                     modal popup by clicking
+                                                     outside of it if True.
+                                                     Defaults to
+                                                     False.[optional]
+    {sessionId}       (String)                       Identifier of the
+                                                     Session to target. If
+                                                     omitted, the current
+                                                     Session will be used
+                                                     automatically.
+                                                     [optional]
+    {pageId}          (String)                       Identifier of the Page
+                                                     to target. If omitted,
+                                                     the current Page will be
+                                                     used automatically. When
+                                                     targeting a different
+                                                     session, then this
+                                                     parameter must be
+                                                     included in the call.
+                                                     [optional]
+    {viewportBound}   (Boolean)                      If True, popups will be
+                                                     "shifted" to always open
+                                                     within the bounds of the
+                                                     viewport. If the popup
+                                                     would be larger than the
+                                                     viewport, then it will
+                                                     be resized to fit within
+                                                     the bounds. Default is
+                                                     False. [optional]
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    # Opens a popup view. We are passing in two parameters, called "myParam" and "myParam2". We also set some additional properties of the popup.
+    system.perspective.openPopup("myPopupId",'folder/myView', params = {'myParam':1,'myParam2':'Test'}, showCloseIcon = False, resizable = True)
+<
+
+------------------------------------------------------------------------------
+system.perspective.print()                 *ignition-system.perspective.print*
+
+  Prints the supplied message to the local console (or the gateway logs, as
+  appropriate) - by default, this means the Output Console when in the
+  Designer, and the browser's console when in a live session.
+
+  Syntax: >
+    system.perspective.print([message], [sessionId], [pageId], [destination])
+<
+
+  Parameters: ~
+    {message}      (String)  The print statement that will be displayed on
+                             the console. [optional]
+    {sessionId}    (String)  Identifier of the Session to target. If omitted,
+                             the current Session will be used automatically.
+                             When targeting a different session, then the
+                             pageId parameter must be included in the call.
+                             [optional]
+    {pageId}       (String)  Identifier of the page to target. If omitted,
+                             the current Page will be used automatically.
+                             [optional]
+    {destination}  (String)  Where the message should be printed. If
+                             specified, must be "client", "gateway", or
+                             "all". Default is "client". [optional]
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    
+    # Sends print statement to the gateway logs.
+    system.perspective.print(message="Hello World", destination="gateway")
+<
+
+------------------------------------------------------------------------------
+system.perspective.refresh()             *ignition-system.perspective.refresh*
+
+  Triggers a refresh of the page.
+
+  Parameters: ~
+    {sessionId}  (String)  Identifier of the Session to target. If omitted,
+                           the current Session will be used automatically.
+                           When targeting a different session, then the
+                           pageId parameter must be included in the call.
+                           [optional]
+    {pageId}     (String)  Identifier of the page to target. If omitted, the
+                           current Page will be used automatically.
+                           [optional]
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    # This example will refresh the current Perspective page.
+    system.perspective.refresh()
+<
+
+------------------------------------------------------------------------------
+system.perspective.sendMessage()     *ignition-system.perspective.sendMessage*
+
+  Send a message to a component message handler within the same session. This
+  function cannot interact with Session Message Handlers configured in
+  Session Events, even if the scope of session is specified.
+
+  Syntax: >
+    system.perspective.sendMessage(messageType, payload, [scope], [sessionId], [pageId])
+<
+
+  Parameters: ~
+    {messageType}  (String)                      The message type that will
+                                                 be invoked. Message handlers
+                                                 configured within the
+                                                 project are listening for
+                                                 messages of a specific
+                                                 messageType.
+    {payload}      (Dictionary[String, String])  A Python dictionary
+                                                 representing any parameters
+                                                 that will be passed to the
+                                                 message handler.
+    {scope}        (String)                      The scope that the message
+                                                 should be delivered to.
+                                                 Valid values are "session",
+                                                 "page", or "view". If
+                                                 omitted, "page" will be
+                                                 used. [optional]
+    {sessionId}    (String)                      Identifier of the Session to
+                                                 target. If omitted, the
+                                                 current Session will be used
+                                                 automatically. When
+                                                 targeting a different
+                                                 session, then the pageId
+                                                 parameter must be included
+                                                 in the call. [optional]
+    {pageId}       (String)                      Identifier of the page to
+                                                 target. If omitted, the
+                                                 current page will be used.
+                                                 [optional]
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    
+    # Sends a message to all Message Handlers configured on the current view, indicating that a new item has been added to a list.
+    system.perspective.sendMessage("NewItem", payload = {"itemName":"banana","itemQuantity":6}, scope = "view")
+<
+
+------------------------------------------------------------------------------
+system.perspective.setTheme()           *ignition-system.perspective.setTheme*
+
+  Changes the theme in a page to the specified theme.
+
+  Syntax: >
+    system.perspective.setTheme(name, [sessionId], [pageId])
+<
+
+  Parameters: ~
+    {name}       (String)  The theme name to switch to. Possible values are
+                           "dark" or "light".
+    {sessionId}  (String)  Identifier of the Session to target. If omitted,
+                           the current Session will be used automatically.
+                           When targeting a different session, then the
+                           pageId parameter must be included in the call.
+                           [optional]
+    {pageId}     (String)  Identifier of the page to target. If omitted, the
+                           current page will be used automatically.
+                           [optional]
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    
+    # Change the current page's theme to the dark theme.
+    system.perspective.setTheme("dark")
+<
+
+------------------------------------------------------------------------------
+system.perspective.toggleDock()       *ignition-system.perspective.toggleDock*
+
+  Toggles a docked view.
+
+  Syntax: >
+    system.perspective.toggleDock(id, [sessionId], [pageId])
+<
+
+  Parameters: ~
+    {id}         (String)                      The unique, preconfigured
+                                               'Dock ID' for the docked view.
+                                               Is specified when a view is
+                                               assigned as docked for a
+                                               particular page (in Page
+                                               Configuration).
+    {sessionId}  (String)                      Identifier of the Session to
+                                               target. If omitted, the
+                                               current Session will be used
+                                               automatically. When targeting
+                                               a different session, then the
+                                               pageId parameter must be
+                                               included in the call.
+                                               [optional]
+    {pageId}     (String)                      Identifier of the Page to
+                                               target. If omitted, the
+                                               current Page will be used
+                                               automatically. [optional]
+    {params}     (Dictionary[String, String])  Parameters that can be passed
+                                               into the docked view. Must
+                                               match the docked views View
+                                               Parameters. [optional]
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    # Toggles a docked view with ID "myDockID". We are passing in two parameters, called "myParam" and "myParam2".
+    system.perspective.toggleDock('myDockID', params = {'myParam':1,'myParam2':'Test'})
+<
+
+------------------------------------------------------------------------------
+system.perspective.togglePopup()     *ignition-system.perspective.togglePopup*
+
+  Toggles a popup view . Will open up the popup if it has not been opened
+  yet. Otherwise, it will close the currently opened popup.
+
+  Syntax: >
+    system.perspective.togglePopup(id, view, [params], [title], [position], [showCloseIcon], [draggable], [resizable], [modal], [overlayDismiss], [sessionId], [pageId], [viewportBound])
+<
+
+  Parameters: ~
+    {id}                                                                                        (String)                       
+                                                                                                                               A
+                                                                                                                               unique
+                                                                                                                               popup
+                                                                                                                               string.
+                                                                                                                               Will
+                                                                                                                               be
+                                                                                                                               used
+                                                                                                                               to
+                                                                                                                               close
+                                                                                                                               the
+                                                                                                                               popup
+                                                                                                                               from
+                                                                                                                               other
+                                                                                                                               popup
+                                                                                                                               or
+                                                                                                                               script
+                                                                                                                               actions.
+    {view}                                                                                      (String)                       
+                                                                                                                               The
+                                                                                                                               path
+                                                                                                                               to
+                                                                                                                               the
+                                                                                                                               view
+                                                                                                                               to
+                                                                                                                               use
+                                                                                                                               in
+                                                                                                                               the
+                                                                                                                               popup.
+    {params - Dictionary of key-value pairs to us as input parameters to the View. [optional]}  (Dictionary[String, Any])      
+    {title}                                                                                     (String)                       
+                                                                                                                               Text
+                                                                                                                               to
+                                                                                                                               display
+                                                                                                                               in
+                                                                                                                               the
+                                                                                                                               title
+                                                                                                                               bar.
+                                                                                                                               Defaults
+                                                                                                                               to
+                                                                                                                               an
+                                                                                                                               empty
+                                                                                                                               string.
+                                                                                                                               [optional]
+    {position}                                                                                  (Dictionary[String, Integer])  
+                                                                                                                               Dictionary
+                                                                                                                               of
+                                                                                                                               key-value
+                                                                                                                               pairs
+                                                                                                                               to
+                                                                                                                               use
+                                                                                                                               for
+                                                                                                                               position.
+                                                                                                                               Possible
+                                                                                                                               position
+                                                                                                                               keys
+                                                                                                                               are:
+                                                                                                                               left,
+                                                                                                                               top,
+                                                                                                                               right,
+                                                                                                                               bottom,
+                                                                                                                               width,
+                                                                                                                               height.
+                                                                                                                               Defaults
+                                                                                                                               to
+                                                                                                                               the
+                                                                                                                               center
+                                                                                                                               of
+                                                                                                                               the
+                                                                                                                               window.
+                                                                                                                               [optional]
+    {showCloseIcon}                                                                             (Boolean)                      
+                                                                                                                               Will
+                                                                                                                               show
+                                                                                                                               the
+                                                                                                                               close
+                                                                                                                               icon
+                                                                                                                               if
+                                                                                                                               True.
+                                                                                                                               Defaults
+                                                                                                                               to
+                                                                                                                               True.
+                                                                                                                               [optional]
+    {draggable}                                                                                 (Boolean)                      
+                                                                                                                               Will
+                                                                                                                               allow
+                                                                                                                               the
+                                                                                                                               popup
+                                                                                                                               to
+                                                                                                                               be
+                                                                                                                               dragged
+                                                                                                                               if
+                                                                                                                               True.
+                                                                                                                               Defaults
+                                                                                                                               to
+                                                                                                                               True.
+                                                                                                                               [optional]
+    {resizable}                                                                                 (Boolean)                      
+                                                                                                                               Will
+                                                                                                                               allow
+                                                                                                                               the
+                                                                                                                               popup
+                                                                                                                               to
+                                                                                                                               be
+                                                                                                                               resized
+                                                                                                                               if
+                                                                                                                               True.
+                                                                                                                               Defaults
+                                                                                                                               to
+                                                                                                                               False.
+                                                                                                                               [optional]
+    {modal}                                                                                     (Boolean)                      
+                                                                                                                               Will
+                                                                                                                               make
+                                                                                                                               the
+                                                                                                                               popup
+                                                                                                                               modal
+                                                                                                                               if
+                                                                                                                               True.
+                                                                                                                               A
+                                                                                                                               modal
+                                                                                                                               popup
+                                                                                                                               is
+                                                                                                                               the
+                                                                                                                               only
+                                                                                                                               view
+                                                                                                                               the
+                                                                                                                               user
+                                                                                                                               can
+                                                                                                                               interact
+                                                                                                                               with.
+                                                                                                                               Defaults
+                                                                                                                               to
+                                                                                                                               False.
+                                                                                                                               [optional]
+    {overlayDismiss}                                                                            (Boolean)                      
+                                                                                                                               Will
+                                                                                                                               allow
+                                                                                                                               the
+                                                                                                                               user
+                                                                                                                               to
+                                                                                                                               dismiss
+                                                                                                                               and
+                                                                                                                               close
+                                                                                                                               a
+                                                                                                                               modal
+                                                                                                                               popup
+                                                                                                                               by
+                                                                                                                               clicking
+                                                                                                                               outside
+                                                                                                                               of
+                                                                                                                               it
+                                                                                                                               if
+                                                                                                                               True.
+                                                                                                                               Defaults
+                                                                                                                               to
+                                                                                                                               False.
+                                                                                                                               [optional]
+    {sessionId}                                                                                 (String)                       
+                                                                                                                               Identifier
+                                                                                                                               of
+                                                                                                                               the
+                                                                                                                               Session
+                                                                                                                               to
+                                                                                                                               target.
+                                                                                                                               If
+                                                                                                                               omitted,
+                                                                                                                               the
+                                                                                                                               current
+                                                                                                                               Session
+                                                                                                                               will
+                                                                                                                               be
+                                                                                                                               used
+                                                                                                                               automatically.
+                                                                                                                               When
+                                                                                                                               targeting
+                                                                                                                               a
+                                                                                                                               different
+                                                                                                                               session,
+                                                                                                                               then
+                                                                                                                               the
+                                                                                                                               pageId
+                                                                                                                               parameter
+                                                                                                                               must
+                                                                                                                               be
+                                                                                                                               included
+                                                                                                                               in
+                                                                                                                               the
+                                                                                                                               call.
+                                                                                                                               [optional]
+    {pageId}                                                                                    (String)                       
+                                                                                                                               Identifier
+                                                                                                                               of
+                                                                                                                               the
+                                                                                                                               page
+                                                                                                                               to
+                                                                                                                               target.
+                                                                                                                               If
+                                                                                                                               omitted,
+                                                                                                                               the
+                                                                                                                               current
+                                                                                                                               Page
+                                                                                                                               will
+                                                                                                                               be
+                                                                                                                               used
+                                                                                                                               automatically.
+                                                                                                                               [optional]
+    {viewportBound}                                                                             (Boolean)                      
+                                                                                                                               If
+                                                                                                                               True,
+                                                                                                                               popups
+                                                                                                                               will
+                                                                                                                               be
+                                                                                                                               "shifted"
+                                                                                                                               to
+                                                                                                                               open
+                                                                                                                               within
+                                                                                                                               the
+                                                                                                                               bounds
+                                                                                                                               of
+                                                                                                                               the
+                                                                                                                               viewport.
+                                                                                                                               If
+                                                                                                                               the
+                                                                                                                               popup
+                                                                                                                               would
+                                                                                                                               be
+                                                                                                                               larger
+                                                                                                                               than
+                                                                                                                               the
+                                                                                                                               viewport,
+                                                                                                                               then
+                                                                                                                               it
+                                                                                                                               will
+                                                                                                                               be
+                                                                                                                               resized
+                                                                                                                               to
+                                                                                                                               fit
+                                                                                                                               within
+                                                                                                                               the
+                                                                                                                               bounds.
+                                                                                                                               Default
+                                                                                                                               is
+                                                                                                                               False.
+                                                                                                                               [optional]
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    # Toggles a popup view. We are passing in two parameters, called "myParam" and "myParam2".
+    system.perspective.togglePopup("myPopupId",'folder/myView', params = {"myParam":1,"myParam2":"Test"})
+<
+
+------------------------------------------------------------------------------
+system.perspective.vibrateDevice() *ignition-system.perspective.vibrateDevice*
+
+  When called from the Perspective App , will cause the device to vibrate for
+  the specified number of milliseconds.
+
+  Syntax: >
+    system.perspective.vibrateDevice(integer, [sessionId])
+<
+
+  Parameters: ~
+    {duration}   (String)  The duration in milliseconds to vibrate the
+                           device. Note: iOS vibration duration is fixed.
+                           Thus, this parameter will not impact the vibration
+                           duration on devices running iOS.
+    {sessionId}  (String)  Identifier of the Session to target. If omitted,
+                           the current Session will be used automatically.
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    # Vibrates the device for 1/2 second (500 milliseconds).
+    system.perspective.vibrateDevice(500)
+<
+
+------------------------------------------------------------------------------
+system.perspective.workstation()     *ignition-system.perspective.workstation*
+
+------------------------------------------------------------------------------
+system.perspective.workstation/system-perspective-workstation-exit() *ignition-system.perspective.workstation/system-perspective-workstation-exit*
+
+  When called from a session running in Workstation, this function will close
+  Workstation.
+
+  Syntax: >
+    system.perspective.workstation.exit()
+<
+
+  Returns: ~
+    Nothing
+
+  Scope: Perspective Session
+
+  Example: >
+    # This example will close the current Perspective Workstation Session.
+    system.perspective.workstation.exit()
+<
+
+------------------------------------------------------------------------------
+system.perspective.workstation/system-perspective-workstation-toKiosk() *ignition-system.perspective.workstation/system-perspective-workstation-toKiosk*
+
+  When called from a session running in Perspective Workstation , attempts to
+  put Workstation into Kiosk mode.
+
+  Syntax: >
+    system.perspective.workstation.toKiosk()
+<
+
+  Returns: ~
+    Nothing
+
+  Scope: Perspective Session
+
+  Example: >
+    
+    # This example will set a Perspective Workstation Session into Kiosk mode.
+    system.perspective.workstation.toKiosk()
+<
+
+------------------------------------------------------------------------------
+system.perspective.workstation/system-perspective-workstation-toWindowed() *ignition-system.perspective.workstation/system-perspective-workstation-toWindowed*
+
+  When called from a Session running in Perspective Workstation , attempts to
+  put Workstation into windowed mode.
+
+  Syntax: >
+    system.perspective.workstation.toWindowed()
+<
+
+  Returns: ~
+    Nothing
+
+  Scope: Perspective Session
+
+  Example: >
+    
+    # This example will set the Perspective Workstation Session to windowed mode.
+    system.perspective.workstation.toWindowed()
+<
+
+
+vim:tw=78:ft=help:norl:

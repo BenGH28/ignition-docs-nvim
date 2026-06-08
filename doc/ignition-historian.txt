@@ -1,0 +1,536 @@
+*ignition-historian.txt*                   Ignition system.historian functions
+
+SYSTEM.HISTORIAN                                   *ignition-system.historian*
+
+  |ignition-system.historian.browse|
+  |ignition-system.historian.deleteAnnotations|
+  |ignition-system.historian.queryAggregatedPoints|
+  |ignition-system.historian.queryAnnotations|
+  |ignition-system.historian.queryMetadata|
+  |ignition-system.historian.queryRawPoints|
+  |ignition-system.historian.storeAnnotations|
+  |ignition-system.historian.storeDataPoints|
+  |ignition-system.historian.storeMetadata|
+  |ignition-system.historian.updateRegisteredNodePath|
+
+------------------------------------------------------------------------------
+system.historian.browse()                   *ignition-system.historian.browse*
+
+  Returns a list of browse results for the specified historian.
+
+  Syntax: >
+    system.historian.browse(rootPath, [snapshotTime], [nameFilters], [maxSize], [recursive], [continuationPoint], [includeMetadata])
+<
+
+  Parameters: ~
+    {rootPath}           (String)   The root path to start browsing from.
+    {snapshotTime}       (Date)     The snapshot time to browse at. When
+                                    specified, the browse returns node
+                                    definitions that were active at that
+                                    historical timestamp, including tags that
+                                    have since been retired. When
+                                    omitted/null, the current tag structure
+                                    will be returned. This parameter is only
+                                    functional for the Core Historian.
+                                    [optional]
+    {nameFilters}        (List)     A list of name filters to apply to the
+                                    browse results. [optional]
+    {maxSize}            (Integer)  The maximum number of results to return.
+                                    [optional]
+    {recursive}          (Boolean)  Whether to browse recursively. Accepted
+                                    values are True and False. The value is
+                                    False by default, meaning that the browse
+                                    will only return data directly inside the
+                                    root path. When set to True, only valid
+                                    leaf nodes are returned. [optional]
+    {continuationPoint}  (String)   The continuation point to continue
+                                    browsing from when browsing large result
+                                    sets. The string value for this is
+                                    provided in the Results object when
+                                    maxSize limits results and more are
+                                    available. This string can then be passed
+                                    into a subsequent browse() call to
+                                    retrieve the next page of results. This
+                                    is similar to system.tag.query
+                                    continuation parameter. [optional]
+    {includeMetadata}    (Boolean)  Whether to include metadata in the browse
+                                    results. [optional]
+
+  Returns: ~
+    Results - A Results object that contains a list of browse results.
+
+  Syntax: >
+    system.historian.browse(rootPath, BrowseFilter)
+<
+
+  Parameters: ~
+    {rootPath}      (String)                   The root path to start
+                                               browsing from.
+    {browseFilter}  (Dictionary[String, Any])  A dictionary of browse filter
+                                               keys. Refer to the Filter Keys
+                                               section below for a full list
+                                               of options.
+
+  Returns: ~
+    Results - A Results object that contains a list of browse results.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Browse a specified historical simulator tag path and display the results
+    # within the last 10 seconds, up to 10 results.
+    
+    rootPath = "histprov:HISTORIAN:/sys:gw1:/prov:default:/tag:FOLDER/"
+    snapshotTime = system.date.addSeconds(system.date.now(), -10)
+    nameFilters = ['']
+    maxSize = 10
+    recursive = False
+    includeMetadata = True
+    
+    result = system.historian.browse(rootPath, snapshotTime, maxSize, recursive, includeMetadata)
+    
+    system.util.getLogger('HistorianTest: browse').info(str(result))
+<
+
+------------------------------------------------------------------------------
+system.historian.deleteAnnotations() *ignition-system.historian.deleteAnnotations*
+
+  Deletes desired annotations from the specified historian.
+
+  Syntax: >
+    system.historian.deleteAnnotations(paths, storageIds)
+<
+
+  Parameters: ~
+    {paths}       (List)  A list of historical paths associated with the
+                          annotations.
+    {storageIds}  (List)  A list of annotation storage IDs to be used for
+                          deleting.
+
+  Returns: ~
+    List - A list of QualityCode objects. The quality code will indicate
+    success or failure, and if successful, the storage ID of the annotation
+    will have been deleted.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Delete a previously stored annotation and log an info level formatted message.
+    
+    paths = ["histprov:MySQL:/sys:gw1:/prov:default:/tag:history_200"]
+    storageIds = ["1f001108-5689-4b2a-b995d360250a"]
+    result = system.historian.deleteAnnotations(paths, storageIds)
+    
+    system.util.getLogger('HistorianTest: deleteAnnotations').info(str(result))
+<
+
+------------------------------------------------------------------------------
+system.historian.queryAggregatedPoints() *ignition-system.historian.queryAggregatedPoints*
+
+  Queries aggregated data points for the specified historian.
+
+  Syntax: >
+    system.historian.queryAggregatedPoints(paths, startTime, endTime, [aggregates], [fillModes], [columnNames], [returnFormat], [returnSize], [includeBounds], [excludeObservations])
+<
+
+  Parameters: ~
+    {paths}                (List)     A list of historical paths to query
+                                      aggregated data points for.
+    {startTime}            (Date)     A start time to query aggregated data
+                                      points for.
+    {endTime}              (Date)     An end time to query aggregated data
+                                      points for.
+    {aggregates}           (List)     A list of aggregate functions to apply
+                                      to the query. [Optional] Available
+                                      aggregates include: Average :
+                                      Time-weighted average SimpleAverage :
+                                      Sum/count Sum : Sum of values Minimum :
+                                      Minimum value Maximum : Maximum value
+                                      MinMax : Both min and max LastValue :
+                                      Value at window boundary Range : Max
+                                      minus min Count : Count of good,
+                                      non-interpolated values CountOn :
+                                      Transitions to true CountOff :
+                                      Transitions to false DurationOn :
+                                      Seconds value was true DurationOff :
+                                      Seconds value was false Variance :
+                                      Statistical variance StdDev : Standard
+                                      deviation PctGood : Percentage time
+                                      good quality PctBad : Percentage time
+                                      bad quality
+    {fillModes}            (List)     A list of fill modes to apply to the
+                                      query. The fill mode will override the
+                                      tag's stored interpolation mode at
+                                      query time. For example, if a tag
+                                      stores with analog mode (linear), but
+                                      you want to query as discrete (prev),
+                                      specify fillModes=['PREV']. This
+                                      parameter is only functional with the
+                                      Core Historian and the Internal
+                                      Historian. [Optional] Available options
+                                      include: DERIVED : Use tag's stored
+                                      interpolation mode (linear for analog,
+                                      prev for discrete) LINEAR : Linear PREV
+                                      : Repeat last known value NULL : Fill
+                                      with nulls NONE : Exclude missing
+                                      windows
+    {columnNames}          (List)     A list of alias column names for the
+                                      returned dataset. [Optional]
+    {returnFormat}         (String)   The desired return format for the
+                                      query. [Optional] Available options
+                                      include: WIDE : One value per path per
+                                      row: [path1_val, path2_val, ...,
+                                      timestamp] (default) TALL : One value
+                                      per row: [path, value, quality,
+                                      timestamp] CALCULATION : Calculated
+                                      result per path aggregate
+    {returnSize}           (Integer)  The maximum number of results to
+                                      return. [Optional]
+    {includeBounds}        (Boolean)  Whether to include the bounds in the
+                                      query results. [Optional]
+    {excludeObservations}  (Boolean)  Whether to exclude observed aggregated
+                                      data points in the query results. When
+                                      applied, observed values, such as
+                                      periodic samples from Tag Group
+                                      evaluations will be filtered out, while
+                                      source values, such as tag changes from
+                                      devices will remain in the returned
+                                      dataset. [Optional]
+
+  Returns: ~
+    Dataset - A dataset representing the aggregated values for the specified
+    historical paths.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Query a specified historical simulator tag path and display aggregated data from within the past minute.
+    
+    end = system.date.now()
+    start = system.date.addMinutes(end, -1)
+    
+    myDataset = system.historian.queryAggregatedPoints(["[default]_Simulator_/Random/RandomInteger1"], start, end)
+    
+    for row in myDataset:
+        print row[0], row[1]
+<
+
+------------------------------------------------------------------------------
+system.historian.queryAnnotations() *ignition-system.historian.queryAnnotations*
+
+  Queries annotations for the specified historian.
+
+  Syntax: >
+    system.historian.queryAnnotations(paths, startDate, [endDate], [allowedTypes])
+<
+
+  Parameters: ~
+    {paths}         (List)  A list of historical paths to query annotations
+                            for.
+    {startDate}     (Date)  A start time to query annotations for.
+    {endDate}       (Date)  An end time to query annotations for. [optional]
+    {allowedTypes}  (List)  A list of string types to query annotations for.
+                            [optional] Available options include: note:
+                            User-stored text note marker: Point-in-time
+                            marker range: Date range indicator, requires an
+                            endTime value trace: X-trace marker
+
+  Returns: ~
+    Results - A Results object that contains a list of query results.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Query for a specified tag's annotations and display the result.
+    
+    paths = "histprov:QuestDB_Historian:/sys:Historian-gw1:/prov:default:/tag:MetaFolder/MetaTag1"
+    endDate = system.date.now()
+    startDate = system.date.addHours(endDate, -5)
+    
+    results = system.historian.queryAnnotations(paths, startDate, endDate)
+    
+    for result in results.getResults():
+      print result
+<
+
+------------------------------------------------------------------------------
+system.historian.queryMetadata()     *ignition-system.historian.queryMetadata*
+
+  Queries metadata for the specified historian. This function applies to the
+  Core Historian and Internal Historian only.
+
+  Syntax: >
+    system.historian.queryMetadata(paths, [startDate], [endDate])
+<
+
+  Parameters: ~
+    {paths}      (String)  A list of historical paths to query metadata for.
+    {startDate}  (Date)    A start time to query metadata for. This parameter
+                           is optional, unless an end time is specified.
+                           [optional]
+    {endDate}    (Date)    An end time to query metadata for. If specifying
+                           an end time, a start time must be provided.
+                           [optional]
+
+  Returns: ~
+    Results - A Results object that contains a list of query results.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Query for a specified tag's metadata and display the result.
+    
+    paths = "histprov:Historian:/sys:gw1:/prov:default:/tag:metafolder/metatag1"
+    endDate = system.date.now()
+    startDate = system.date.addDays(endDate, -5)
+    
+    results = system.historian.queryMetadata(paths, startDate, endDate)
+    print results
+<
+
+------------------------------------------------------------------------------
+system.historian.queryRawPoints()   *ignition-system.historian.queryRawPoints*
+
+  Queries raw data points for the specified historian.
+
+  Syntax: >
+    system.historian.queryRawPoints(paths, startTime, endTime, [columnNames], [returnFormat], [returnSize], includeBounds, [excludeObservations])
+<
+
+  Parameters: ~
+    {paths}                (List)     A list of historical paths to query
+                                      aggregated data points for.
+    {startTime}            (Date)     A start time to query aggregated data
+                                      points for.
+    {endTime}              (Date)     An end time to query aggregated data
+                                      points for.
+    {columnNames}          (List)     A list of alias column names for the
+                                      returned dataset. [Optional]
+    {returnFormat}         (String)   The desired return format for the
+                                      query. [Optional] Available options
+                                      include: WIDE : One value per path per
+                                      row: [path1_val, path2_val, ...,
+                                      timestamp] (default) TALL : One value
+                                      per row: [path, value, quality,
+                                      timestamp] CALCULATION : Calculated
+                                      result per path aggregate
+    {returnSize}           (Integer)  The maximum number of results to
+                                      return. [Optional]
+    {includeBounds}        (Boolean)  Whether to include the bounds in the
+                                      query results.
+    {excludeObservations}  (Boolean)  Whether to exclude observed aggregated
+                                      data points in the query results. When
+                                      applied, observed values, such as
+                                      periodic samples from Tag Group
+                                      evaluations will be filtered out, while
+                                      source values, such as tag changes from
+                                      devices will remain in the returned
+                                      dataset. [Optional]
+
+  Returns: ~
+    Dataset - A dataset representing the raw data points for the specified
+    historical paths.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Query a specified historical simulator tag path and display raw data from within the past minute.
+    
+    end = system.date.now()
+    start = system.date.addMinutes(end, -1)
+    
+    myDataset = system.historian.queryRawPoints(["[default]_Simulator_/Random/RandomInteger1"], start, end, includeBounds=False)
+    
+    for row in myDataset:
+        print row[0], row[1]
+<
+
+------------------------------------------------------------------------------
+system.historian.storeAnnotations() *ignition-system.historian.storeAnnotations*
+
+  Store a list of annotations to the specified historian.
+
+  Syntax: >
+    system.historian.storeAnnotations(paths, startTimes, [endTimes], [types], [data], [storageIds], [deleted])
+<
+
+  Parameters: ~
+    {paths}       (List)  A list of historical paths.
+    {startTimes}  (List)  A list of start times associated with the
+                          annotation.
+    {endTimes}    (List)  A list of end times associated with the annotation.
+                          [optional]
+    {types}       (List)  A list of string types that indicate the annotation
+                          type. [optional]
+    {data}        (List)  A list of annotation data. [optional]
+    {storageIds}  (List)  A list of annotation storage IDs to indicate that
+                          the annotation should be updated. [optional]
+    {deleted}     (List)  A list of deleted flags to indicate whether the
+                          annotation should be marked deleted. [optional]
+
+  Returns: ~
+    List - A list of QualityCode objects. The quality code will indicate
+    success or failure.
+
+  Syntax: >
+    system.historian.storeAnnotations(annotations)
+<
+
+  Parameters: ~
+    {annotations}  (List)  A list of annotations objects created with
+                           system.historian.types.annotationPoint .
+
+  Returns: ~
+    List - A list of QualityCode objects. The quality code will indicate
+    success or failure.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Store an annotation on a tag and log an info level formatted message.
+    
+    paths = ["histprov:HistorianB:/sys:gw1:/prov:default:/tag:remote_200"]
+    endTimes = [system.date.now()]
+    startTimes = [system.date.addSeconds(endTimes[0], -5)]
+    types = ['note']
+    data = ['this is a test']
+    
+    result = system.historian.storeAnnotations(paths, startTimes, endTimes, types, data)
+    
+    system.util.getLogger('HistorianTest: storeAnnotations').info(str(result))
+<
+
+------------------------------------------------------------------------------
+system.historian.storeDataPoints() *ignition-system.historian.storeDataPoints*
+
+  Store a list of data points to the specified historian.
+
+  Syntax: >
+    system.historian.storeDataPoints(paths, values, [timestamps], [qualities])
+<
+
+  Parameters: ~
+    {paths}           (List)     A list of historical paths.
+    {values}          (List)     A list of historical values.
+    {timestamps}      (List)     A list of timestamps. If omitted, the
+                                 current time will be used. [optional]
+    {qualities}       (List)     A list of qualities. If omitted, "good"
+                                 quality will be used.[optional]
+    {blockForResult}  (Boolean)  Whether the result should be blocked until
+                                 confirmation that the storage has been
+                                 attempted. Default is True. [optional]
+
+  Returns: ~
+    List - A list of QualityCode objects. The quality code will indicate
+    success or failure.
+
+  Syntax: >
+    system.historian.storeDataPoints(datapoints)
+<
+
+  Parameters: ~
+    {datapoints}  (List)  A list of data point Java objects created with
+                          system.historian.types.dataPoint .
+
+  Returns: ~
+    List - A list of QualityCode objects. The quality code will indicate
+    success or failure.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    paths = ["histprov:mariadb:/sys:gatewayName1:/prov:default:/tag:test_a"]
+    values = [1]
+    timestamps = [system.date.now()]
+    qualities = [192]
+    
+    listOfQualityCodes = system.historian.storeDataPoints(paths, values, timestamps, qualities)
+<
+
+------------------------------------------------------------------------------
+system.historian.storeMetadata()     *ignition-system.historian.storeMetadata*
+
+  Store a list of metadata to the specified historian. This function applies
+  to the Core Historian and Internal Historian, and is not supported by SQL
+  Historian.
+
+  Syntax: >
+    system.historian.storeMetadata(paths, timestamps, properties)
+<
+
+  Parameters: ~
+    {paths}       (List)        A list of historical paths.
+    {timestamps}  (List)        A list of timestamps.
+    {properties}  (Dictionary)  A dictionary of desired properties to be
+                                stored as historical metadata, entered as
+                                defined key-value pairs corresponding to any
+                                relevant tag properties.
+
+  Returns: ~
+    List - A list of QualityCode objects. The quality code will indicate
+    success or failure.
+
+  Syntax: >
+    system.historian.storeMetadata(metadata)
+<
+
+  Parameters: ~
+    {metadata}  (List)  A list of metadata point objects created with
+                        system.historian.types.metadataPoint .
+
+  Returns: ~
+    List - A list of QualityCode objects. The quality code will indicate
+    success or failure.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Store a single property to a specified historical tag path and log an info level formatted message.
+    
+    paths = ["histprov:Historian:/sys:gw1:/prov:default:/tag:remote_200"]
+    curr = system.date.now()
+    timestamps = [curr]
+    properties = { "tooltip": "changing with perspective"}
+    
+    results = system.historian.storeMetadata(paths, timestamps, properties)
+    
+    system.util.getLogger('HistorianTest: storeMetadata').info(str(results))
+<
+
+------------------------------------------------------------------------------
+system.historian.updateRegisteredNodePath() *ignition-system.historian.updateRegisteredNodePath*
+
+  Updates the existing historical path for a stored historian node to the
+  newly specific path. This function applies to the Core Historian and
+  Internal Historian only.
+
+  Syntax: >
+    system.historian.updateRegisteredNodePath(previousPath, currentPath, [blockForResult])
+<
+
+  Parameters: ~
+    {previousPath}    (String)   The previous path for the historian node.
+    {currentPath}     (String)   The new current path for the historian node.
+                                 If null, then the historian node will be
+                                 retired.
+    {blockForResult}  (Boolean)  A flag indicating whether the result should
+                                 be blocked until confirmation that the
+                                 update has been attempted. [optional]
+
+  Returns: ~
+    List - A list of QualityCode objects. The quality code will indicate
+    success or failure, and if successful, the path will be updated.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Update a previously stored path.
+    
+    previousPath = "histprov:Core_Historian:/sys:gw1:/prov:default:/tag:updateNode1"
+    currentPath = "histprov:Core_Historian:/sys:gw1:/prov:default:/tag:updateNode2"
+    
+    system.historian.updateRegisteredNodePath(previousPath, currentPath, True)
+<
+
+
+vim:tw=78:ft=help:norl:

@@ -1,0 +1,254 @@
+*ignition-iec61850.txt*                     Ignition system.iec61850 functions
+
+SYSTEM.IEC61850                                     *ignition-system.iec61850*
+
+  |ignition-system.iec61850.cancel|
+  |ignition-system.iec61850.getControlParams|
+  |ignition-system.iec61850.listFiles|
+  |ignition-system.iec61850.operate|
+  |ignition-system.iec61850.readFile|
+  |ignition-system.iec61850.select|
+  |ignition-system.iec61850.writeFile|
+
+------------------------------------------------------------------------------
+system.iec61850.cancel()                     *ignition-system.iec61850.cancel*
+
+  Cancels the selection of an SBO type control on a configured IEC 61850
+  device to prevent the operate command from performing.
+
+  Syntax: >
+    system.iec81650.cancel(deviceName, mapParams)
+<
+
+  Parameters: ~
+    {deviceName}  (String)        The name of the configured IEC 61850
+                                  device.
+    {mapParams}   (PyDictionary)  Control parameters dictionary that requires
+                                  the following keys to be specified: name,
+                                  T, orCat, orIdent, Check, and Test. These
+                                  keys must match the params from the select
+                                  function. If you do not know the required
+                                  key value pairs, they can be found using
+                                  the getControlParams function.
+
+  Returns: ~
+    No return value.
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    # This example cancels the selected control
+    
+    mapParams = {'name': u'SSSA_52AFA_FPRCTRL/CBCSWI1.Mod', 'T':1 'orCat': 0, 'orIdent': u'not-supported', 'Check': 0, 'Test': False}
+    system.iec61850.select("IEC61850", mapParams, 1)
+    
+    # after the select function was applied, cancel if not needed.
+    system.iec61850.cancel("IEC61850", mapParams)
+<
+
+------------------------------------------------------------------------------
+system.iec61850.getControlParams() *ignition-system.iec61850.getControlParams*
+
+  This function returns a list of report control names and their attributes
+  contained in the configured IEC 61850 device.
+
+  Syntax: >
+    system.iec81650.getControlParams(deviceName)
+<
+
+  Parameters: ~
+    {deviceName}  (String)  The name of the configured IEC 61850 device.
+
+  Returns: ~
+    List[PyDictionary] - A list of PyDictionaries, where each dictionary
+    contains the following keys:
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    # This example prints the control names and corresponding param values on the IEC 61850 device.
+    # Declare results variable using the system function and print
+    
+    results = system.iec61850.getControlParams("IEC61850")
+    print(results)
+<
+
+------------------------------------------------------------------------------
+system.iec61850.listFiles()               *ignition-system.iec61850.listFiles*
+
+  This function returns a list of filenames from a remote path for the
+  configured IEC 61850 device.
+
+  Syntax: >
+    system.iec61850.listFiles(deviceName, remoteFilePath)
+<
+
+  Parameters: ~
+    {deviceName}      (String)  The name of the configured IEC 61850 device.
+    {remoteFilePath}  (String)  The remote file path on the server of the
+                                configured IEC 61850 device for the file to
+                                read. [optional]
+
+  Returns: ~
+    No return value.
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    # This example will pull files present in the
+    # device remote file path.
+    
+    result = system.iec61850.listFiles("IEC61850", "")
+    print(result)
+<
+
+------------------------------------------------------------------------------
+system.iec61850.operate()                   *ignition-system.iec61850.operate*
+
+  This function operates on the IEC 61850 device control immediately, such as
+  to change the position of a switch. This can be done directly, or following
+  a select command.
+
+  Syntax: >
+    system.iec61850.operate(deviceName, mapParams, controlValue)
+<
+
+  Parameters: ~
+    {deviceName}    (String)        The name of the configured IEC 61850
+                                    device.
+    {mapParams}     (PyDictionary)  Control parameters dictionary that
+                                    requires the following keys to be
+                                    specified: name, T, orCat, orIdent,
+                                    Check, and Test. Use the same params as
+                                    the select function when operating on an
+                                    SBO type control. If you do not know the
+                                    required key value pairs, they can be
+                                    found using the getControlParams
+                                    function.
+    {controlValue}  (Float)         Control value (32-bit float).
+
+  Returns: ~
+    No return value.
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    # This example sets a direct control value to 2.
+    
+    mapParams = {'name': u'SSSA_52AFA_FPRCTRL/CBCSWI1.Mod', 'T':1 'orCat': 0, 'orIdent': u'not-supported', 'Check': 0, 'Test': False}
+    system.iec61850.operate("IEC61850", mapParams, 2)
+<
+
+------------------------------------------------------------------------------
+system.iec61850.readFile()                 *ignition-system.iec61850.readFile*
+
+  This function downloads remote files from the configured IEC 61850 device
+  to an identified local path.
+
+  Syntax: >
+    system.iec61850.readFile(deviceName, remoteFilePath, localFilePath)
+<
+
+  Parameters: ~
+    {deviceName}      (String)  The name of the configured IEC 61850 device.
+    {remoteFilePath}  (String)  The remote file path on the server of the
+                                file to read.
+    {localFilePath}   (String)  The local file path on client to store the
+                                file contents.
+
+  Returns: ~
+    No return value.
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    # This example reads the file contents from device remote file path.
+    # The read file is stored in the local file path.
+    
+    # Ignition 61850 Device Name
+    device_name = 'IEC61850'
+    
+    # File name you wish to read for the 61850 Device
+    file_name = 'COMFEDE.ced'
+    
+    # Full Path where the file will be read from the 61850 device
+    file_path = '/{0}'.format(file_name)
+    
+    # Full Path where to store your file on your Ignition Gateway
+    local_path = '/usr/local/bin/ignition/COMFEDE/{0}'.format(file_name)
+    
+    
+    system.iec61850.readFile(device_name, file_path, local_path)
+<
+
+------------------------------------------------------------------------------
+system.iec61850.select()                     *ignition-system.iec61850.select*
+
+  Select an SBO type control to prepare it for a subsequent operate command
+  for a configured IEC 61850 device. These selections can be removed by using
+  the cancel function.
+
+  Syntax: >
+    system.iec61850.select(device_name, mapParams, value)
+<
+
+  Parameters: ~
+    {deviceName}    (String)        The name of the configured IEC 61850
+                                    device.
+    {mapParams}     (PyDictionary)  Control parameters dictionary that
+                                    requires the following keys to be
+                                    specified: name, T, orCat, orIdent,
+                                    Check, and Test. If you do not know the
+                                    required key value pairs, they can be
+                                    found using the getControlParams
+                                    function.
+    {controlValue}  (Float)         Control value (32-bit float).
+
+  Returns: ~
+    No return value.
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    # This example prepares an SBO type control for an operate command.
+    
+    mapParams = {'name': u'SSSA_52AFA_FPRCTRL/CBCSWI1.Mod', 'T':1 'orCat': 0, 'orIdent': u'not-supported', 'Check': 0, 'Test': False}
+    system.iec61850.select("IEC61850", mapParams, 1)
+<
+
+------------------------------------------------------------------------------
+system.iec61850.writeFile()               *ignition-system.iec61850.writeFile*
+
+  This function uploads a file from a local path to the configured IEC 61850
+  device remote path.
+
+  Syntax: >
+    system.iec61850.writeFile(deviceName, localFilePath, remoteFilePath)
+<
+
+  Parameters: ~
+    {deviceName}      (String)  The name of the configured IEC 61850 device.
+    {localFilePath}   (String)  The local file path on client to pull the
+                                file contents from.
+    {remoteFilePath}  (String)  The remote file path on the server of the
+                                file to write to.
+
+  Returns: ~
+    No return value.
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    # This example writes the file contents
+    # from the local temporary path to the remote file path.
+    
+    device_name = 'IEC61850'
+    file_name = 'COMFEDE.ced'
+    tmp_path = '/usr/local/bin/ignition/COMFEDE/{0}'.format(file_name)
+    file_path = '/{0}'.format(file_name)
+    
+    system.iec61850.writeFile(device_name, tmp_path, file_path)
+<
+
+
+vim:tw=78:ft=help:norl:

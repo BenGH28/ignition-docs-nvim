@@ -1,0 +1,74 @@
+*ignition-groups.txt*                         Ignition system.groups functions
+
+SYSTEM.GROUPS                                         *ignition-system.groups*
+
+  |ignition-system.groups.loadFromFile|
+  |ignition-system.groups.removeGroups|
+
+------------------------------------------------------------------------------
+system.groups.loadFromFile()             *ignition-system.groups.loadFromFile*
+
+  Loads a transaction group configuration from an xml export, into the
+  specified project (creating the project if necessary). The mode parameter
+  dictates how overwrites occur.
+
+  Syntax: >
+    system.groups.loadFromFile(filePath, projectName, mode)
+<
+
+  Parameters: ~
+    {filePath}     (String)  The path to a valid transaction group xml or csv
+                             file.
+    {projectName}  (String)  The name of the project to load into.
+    {mode}         (int)     How duplicates will be handled. 0 = Overwrite, 1
+                             = Ignore, 2 = Replace the existing project with
+                             this one.
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    # Note that backslashes are used in Windows filepaths, but are also escaped in Python. Thus, we use the double-backslashes here.
+    path = "C:\\Users\\user\\Desktop\\group.xml"
+    
+    projName = "MyProject"
+    
+    # Read a Transaction Group from a file and overwrite any preexisting groups that match those in our file.
+    system.groups.loadFromFile(path, projName, 0)
+<
+
+------------------------------------------------------------------------------
+system.groups.removeGroups()             *ignition-system.groups.removeGroups*
+
+  Removes the specified groups from the project. The group paths are
+  Folder/Path/To/GroupName , separated by forward slashes.
+
+  Syntax: >
+    system.groups.removeGroups(projectName, paths)
+<
+
+  Parameters: ~
+    {projectName}  (String)        The project to remove from. If the project
+                                   does not exist, throws an
+                                   IllegalArgumentException.
+    {paths}        (List[String])  A list of paths to remove. Group paths are
+                                   the full path to the resource, separated
+                                   by forward slashes, e.g.,
+                                   "Folder/Path/To/GroupName".
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    projName = "MyProject"
+    groups = ["Historical/Group1","DataSync/Group2"]
+    
+    system.groups.removeGroups(projName, groups)
+<
+
+
+vim:tw=78:ft=help:norl:

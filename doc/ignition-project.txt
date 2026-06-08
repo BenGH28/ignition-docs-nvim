@@ -1,0 +1,84 @@
+*ignition-project.txt*                       Ignition system.project functions
+
+SYSTEM.PROJECT                                       *ignition-system.project*
+
+  |ignition-system.project.getProjectName|
+  |ignition-system.project.getProjectNames|
+  |ignition-system.project.requestScan|
+
+------------------------------------------------------------------------------
+system.project.getProjectName()       *ignition-system.project.getProjectName*
+
+  Returns the name of the project where the function was called from. When
+  called from the Gateway scope from a resource that originates from a
+  singular project (reports, SFCs, etc.), will return that resources project.
+  Resources that run in the Gateway scope, but are configured in a singular
+  project (such as a report), will use that project's name.
+
+  Syntax: >
+    system.project.getProjectName()
+<
+
+  Returns: ~
+    String - The name of the currently running project.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This code displays the name of the currently running project to the appropriate console,
+    # depending on scope (Designer console, Gateway console, etc.).
+    system.util.getLogger("myLogger").warn("You are running project: %s" % system.project.getProjectName())
+<
+
+------------------------------------------------------------------------------
+system.project.getProjectNames()     *ignition-system.project.getProjectNames*
+
+  Returns an unsorted collection of strings, where each string represents the
+  name of a project on the Gateway. If no projects exist, returns an empty
+  list.
+
+  Syntax: >
+    system.project.getProjectNames()
+<
+
+  Returns: ~
+    List - A list containing string representations of project names on the
+    Gateway.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Calling this from the Script Console prints out each project name.
+    print system.project.getProjectNames()
+<
+
+------------------------------------------------------------------------------
+system.project.requestScan()             *ignition-system.project.requestScan*
+
+  Requests a manual scan of the projects directory in order to refresh
+  projects and their resources. If a scan is currently running, this method
+  has no effect and will return when the in-progress scan has finished. This
+  function blocks the current thread until a scan has completed.
+
+  Syntax: >
+    system.project.requestScan([timeout])
+<
+
+  Parameters: ~
+    {timeout}  (Integer)  The amount of time, in seconds, to block the
+                          current thread before timing out. Default is 10
+                          seconds. [optional]
+
+  Returns: ~
+    None
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    # This example requests a manual scan of the project directory
+    # while blocking the current thread for 30 seconds before timing out.
+    system.project.requestScan(30)
+<
+
+
+vim:tw=78:ft=help:norl:

@@ -1,0 +1,155 @@
+*ignition-eam.txt*                               Ignition system.eam functions
+
+SYSTEM.EAM                                               *ignition-system.eam*
+
+  |ignition-system.eam.getGroups|
+  |ignition-system.eam.queryAgentHistory|
+  |ignition-system.eam.queryAgentStatus|
+  |ignition-system.eam.runTask|
+
+------------------------------------------------------------------------------
+system.eam.getGroups()                         *ignition-system.eam.getGroups*
+
+  Returns the names of the defined agent organizational groups in the
+  Gateway. This function can only be called from the Controller. If called
+  from an Agent, this function will return an exception.
+
+  Syntax: >
+    system.eam.getGroups()
+<
+
+  Returns: ~
+    A list of group names.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Return and print all of the EAM groups
+    groups = system.eam.getGroups()
+    for group in groups:
+        print group
+<
+
+------------------------------------------------------------------------------
+system.eam.queryAgentHistory()         *ignition-system.eam.queryAgentHistory*
+
+  Returns a list of the most recent agent events. This function can only be
+  called from the Controller. If called from an Agent, this function will
+  return an exception.
+
+  Syntax: >
+    system.eam.queryAgentHistory(groupIds, agentIds, startDate, endDate, limit)
+<
+
+  Parameters: ~
+    {groupIds}   (List)  A list of groups to restrict the results to. If not
+                         specified, all groups will be included.
+    {agentIds}   (List)  A list of agent names to restrict the results to. If
+                         not specified, all agents will be allowed.
+    {startDate}  (Date)  The starting time for history events. If null,
+                         defaults to 8 hours previous to now.
+    {endDate}    (Date)  The ending time for the query range. If null,
+                         defaults to "now".
+    {limit}      (int)   The limit of results to return. Defaults to 100. A
+                         value of 0 means "no limit".
+
+  Returns: ~
+    Dataset - A dataset with columns id, agent_name, agent_role, event_time,
+    event_category, event_type, event_source, event_level, event_level_int,
+    and message, where each row is a new agent event.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This script will loop through each row of the dataset and grab out every value from that row and assign it to a matching variable. Those variables can then be used in some way.
+    results=system.eam.queryAgentHistory()
+    for row in range(results.rowCount):
+        eventId=results.getValueAt(row, "id")
+        agentName=results.getValueAt(row, "agent_name")
+        agentRole=results.getValueAt(row, "agent_role")
+        eventTime=results.getValueAt(row, "event_time")
+        eventCategory=results.getValueAt(row, "event_category")
+        eventType=results.getValueAt(row, "event_type")
+        eventSource=results.getValueAt(row, "event_source")
+        eventLevel=results.getValueAt(row, "event_level")
+        eventLevelInt=results.getValueAt(row, "event_level_int")
+        message=results.getValueAt(row, "message")
+        #Can include some code here to use the variables in some way for each row.
+<
+
+------------------------------------------------------------------------------
+system.eam.queryAgentStatus()           *ignition-system.eam.queryAgentStatus*
+
+  Returns the current state of the matching agents. This function can only be
+  called from the Controller. If called from an Agent, this function will
+  return an exception.
+
+  Syntax: >
+    system.eam.queryAgentStatus(groupIds, agentIds, isConnected)
+<
+
+  Parameters: ~
+    {groupIds}     (List)     A list of groups to restrict the results to. If
+                              not specified, all groups will be included.
+    {agentIds}     (List)     A list of agent names to restrict the results
+                              to. If not specified, all agents will be
+                              allowed.
+    {isConnected}  (Boolean)  If True, only returns agents that are currently
+                              connected. If False, only agents that are
+                              considered down will be returned, and if not
+                              specified, all agents will be returned.
+
+  Returns: ~
+    Dataset - A dataset with columns AgentName, NodeRole, AgentGroup,
+    LastCommunication, IsConnected, IsRunning, RunningState, RunningStateInt,
+    LicenseKey, and Version, where each row is a new agent.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This script will loop through each row of the dataset and grab out every value from that row and assign it to a matching variable. Those variables can then be used in some way.
+    results=system.eam.queryAgentStatus()
+    for row in range(results.rowCount):
+        agentName=results.getValueAt(row, "AgentName")
+        nodeRole=results.getValueAt(row, "NodeRole")
+        agentGroup=results.getValueAt(row, "AgentGroup")
+        lastComm=results.getValueAt(row, "LastCommunication")
+        isConnected=results.getValueAt(row, "IsConnected")
+        isRunning=results.getValueAt(row, "IsRunning")
+        runningState=results.getValueAt(row, "RunningState")
+        runningStateInt=results.getValueAt(row, "RunningStateInt")
+        licenseKey=results.getValueAt(row, "LicenseKey")
+        platformVersion=results.getValueAt(row, "Version")
+        # Can include some code here to use the variables in some way for each row like printing each variable to the console.
+<
+
+------------------------------------------------------------------------------
+system.eam.runTask()                             *ignition-system.eam.runTask*
+
+  Takes the name of a task as an argument as a string (must be configured on
+  the Controller before hand), attempts to execute the task. This function
+  can only be called from the Controller. If called from an Agent, this
+  function will return an exception.
+
+  Syntax: >
+    system.eam.runTask(taskname)
+<
+
+  Parameters: ~
+    {taskname}  (String)  Name of the task to run. If more than one task has
+                          this name, an error will be returned.
+
+  Returns: ~
+    A UIResponse with a list of infos, errors, and warnings. The UIResponse
+    object is functionally a list of runTask objects.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Simply execute a task called 'Collect Backup'
+    taskName = "Collect Backup"
+    response = system.eam.runTask(taskName)
+<
+
+
+vim:tw=78:ft=help:norl:

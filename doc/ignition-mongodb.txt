@@ -1,0 +1,448 @@
+*ignition-mongodb.txt*                       Ignition system.mongodb functions
+
+SYSTEM.MONGODB                                       *ignition-system.mongodb*
+
+  |ignition-system.mongodb.aggregate|
+  |ignition-system.mongodb.deleteMany|
+  |ignition-system.mongodb.deleteOne|
+  |ignition-system.mongodb.find|
+  |ignition-system.mongodb.findOne|
+  |ignition-system.mongodb.insertMany|
+  |ignition-system.mongodb.insertOne|
+  |ignition-system.mongodb.listCollectionNames|
+  |ignition-system.mongodb.listConnectorInfo|
+  |ignition-system.mongodb.replaceOne|
+  |ignition-system.mongodb.updateMany|
+  |ignition-system.mongodb.updateOne|
+
+------------------------------------------------------------------------------
+system.mongodb.aggregate()                 *ignition-system.mongodb.aggregate*
+
+  Returns a list of aggregate results.
+
+  Syntax: >
+    system.mongodb.aggregate(connector, collection, aggregate, [collation])
+<
+
+  Parameters: ~
+    {connector}   (String)              The name of connector
+                                        (case-insensitive).
+    {collection}  (String)              The name of collection
+                                        (case-sensitive).
+    {aggregate}   (List[PyDictionary])  A list of PyDictionaries to specify
+                                        an aggregate pipeline. See MongoDB
+                                        documentation for all valid aggregate
+                                        options.
+    {collation}   (PyDictionary)        A PyDictionary of items to specify
+                                        language-specific rules. See MongoDB
+                                        documentation for all valid collation
+                                        values. [optional]
+
+  Returns: ~
+    List[PyDictionary] result - A list of PyDictionary results containing
+    aggregation results.
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    from system.mongodb.types import ObjectId
+    
+    newObjectId = ObjectId.get()
+<
+
+------------------------------------------------------------------------------
+system.mongodb.deleteMany()               *ignition-system.mongodb.deleteMany*
+
+  Removes documents from the collection that match the filter.
+
+  Syntax: >
+    system.mongodb.deleteMany(connector, collection, filter, [options])
+<
+
+  Parameters: ~
+    {connector}   (String)        The name of connector (case-insensitive).
+    {collection}  (String)        The name of collection (case-sensitive).
+    {filter}      (PyDictionary)  A PyDictionary for specifying matching key
+                                  value pair criteria when querying a
+                                  collection.
+    {options}     (PyDictionary)  A PyDictionary for including additional
+                                  delete configurations. [optional]
+
+  Returns: ~
+    PyDictionary result - Result of delete action formatted as a PyDictionary
+    with keys âacknowledgedâ and âdeleteCountâ.
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    # Specify unique field values to locate specific documents.
+    filter = {"qualityControlProcess":"V020"}
+    
+    # Apply parameters for function call.
+    print system.mongodb.deleteMany("MongoDB", "data", filter)
+<
+
+------------------------------------------------------------------------------
+system.mongodb.deleteOne()                 *ignition-system.mongodb.deleteOne*
+
+  Removes a document from the collection that matches the filter.
+
+  Syntax: >
+    system.mongodb.deleteOne(connector, collection, filter, [options])
+<
+
+  Parameters: ~
+    {connector}   (String)        The name of connector (case-insensitive).
+    {collection}  (String)        The name of collection (case-sensitive).
+    {filter}      (PyDictionary)  A PyDictionary for specifying matching key
+                                  value pair criteria when querying a
+                                  collection.
+    {options}     (PyDictionary)  A PyDictionary for including additional
+                                  delete configurations. [optional]
+
+  Returns: ~
+    PyDictionary result - Result of delete action formatted as a PyDictionary
+    with keys âacknowledgedâ and âdeleteCountâ.
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    # Import required BSON types.
+    from system.mongodb.types import ObjectId
+    
+    # Specify unique field values to locate specific document. Here we are specifying the known _id of the document.
+    filter = {"_id": ObjectId("63fe3941519feb58abb3cda1")}
+    
+    # Apply parameters for function call.
+    print system.mongodb.deleteOne("MongoDB", "customers", filter)
+<
+
+------------------------------------------------------------------------------
+system.mongodb.find()                           *ignition-system.mongodb.find*
+
+  Returns a list of PyDictionaries that matches the criteria specified on the
+  filter parameter.
+
+  Syntax: >
+    system.mongodb.find(connector, collection, filter, [projection], [sort], [collation], [limit], [skip])
+<
+
+  Parameters: ~
+    {connector}   (String)        The name of connector (case-insensitive).
+    {collection}  (String)        The name of collection (case-sensitive).
+    {filter}      (PyDictionary)  A PyDictionary for specifying matching key
+                                  value pair criteria when querying a
+                                  collection.
+    {projection}  (PyDictionary)  A PyDictionary for including or omitting
+                                  specific key value pairs in the query
+                                  result. See MongoDB documentation for all
+                                  valid project values. [optional]
+    {sort}        (PyDictionary)  A PyDictionary of specified items to sort
+                                  returned results. See MongoDB documentation
+                                  for all valid sort values. [optional]
+    {collation}   (PyDictionary)  A PyDictionary of items to specify
+                                  language-specific rules. See MongoDB
+                                  documentation for all valid collation
+                                  values. [optional]
+    {limit}       (Int)           The maximum number of PyDictionaries that
+                                  will be returned. [optional]
+    {skip}        (Int)           The number of PyDictionaries to skip before
+                                  returning results. [optional]
+
+  Returns: ~
+    List[PyDictionary] result - A list of PyDictionary results.
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    from system.mongodb.types import ObjectId
+    
+    newObjectId = ObjectId.get()
+<
+
+------------------------------------------------------------------------------
+system.mongodb.findOne()                     *ignition-system.mongodb.findOne*
+
+  Returns a single PyDictionary that matches the criteria specified on the
+  filter parameter.
+
+  Syntax: >
+    system.mongodb.findOne(connector, collection, filter, [projection])
+<
+
+  Parameters: ~
+    {connector}   (String)        The name of connector (case-insensitive).
+    {collection}  (String)        The name of collection (case-sensitive).
+    {filter}      (PyDictionary)  A PyDictionary for specifying matching key
+                                  value pair criteria when querying a
+                                  collection.
+    {projection}  (PyDictionary)  A PyDictionary for including or omitting
+                                  specific key value pairs in the query
+                                  result. See MongoDB documentation for all
+                                  valid project values. [optional]
+
+  Returns: ~
+    PyDictionary result - A single PyDictionary as a result.
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    from system.mongodb.types import ObjectId
+    
+    newObjectId = ObjectId.get()
+<
+
+------------------------------------------------------------------------------
+system.mongodb.insertMany()               *ignition-system.mongodb.insertMany*
+
+  Inserts a list of PyDictionaries into a specified collection.
+
+  Syntax: >
+    system.mongodb.insertMany(connector, collection, document, [options])
+<
+
+  Parameters: ~
+    {connector}   (String)              The name of connector
+                                        (case-insensitive).
+    {collection}  (String)              The name of collection
+                                        (case-sensitive).
+    {document}    (List[PyDictionary])  A list of PyDictionaries that will
+                                        represent new records being added to
+                                        the collection. See MongoDB
+                                        documentation for more details about
+                                        documents.
+    {options}     (PyDictionary)        A PyDictionary for including
+                                        additional insert configurations.
+                                        [optional].
+
+  Returns: ~
+    List[PyObject] objectIdList - Keys representing the inserted documents.
+    The keys will usually be BSON document ObjectId, unless a different key
+    type is specified.
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    from system.mongodb.types import ObjectId
+    
+    newObjectId = ObjectId.get()
+<
+
+------------------------------------------------------------------------------
+system.mongodb.insertOne()                 *ignition-system.mongodb.insertOne*
+
+  Inserts a single PyDictionary into a specified collection.
+
+  Syntax: >
+    system.mongodb.insertOne(connector, collection, document, [options])
+<
+
+  Parameters: ~
+    {connector}   (String)        The name of connector (case-insensitive).
+    {collection}  (String)        The name of collection (case-sensitive).
+    {document}    (PyDictionary)  A PyDictionary of specified fields that
+                                  will represent a record being added to the
+                                  collection. See MongoDB documentation for
+                                  more details about documents.
+    {options}     (PyDictionary)  A PyDictionary for including additional
+                                  insert configurations. [optional].
+
+  Returns: ~
+    PyObject objectId - Key of inserted document. This will usually be BSON
+    document ObjectId, unless a different key type is specified.
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    from system.mongodb.types import ObjectId
+    
+    newObjectId = ObjectId.get()
+<
+
+------------------------------------------------------------------------------
+system.mongodb.listCollectionNames() *ignition-system.mongodb.listCollectionNames*
+
+  Returns a list of all collection names.
+
+  Syntax: >
+    system.mongodb.listCollectionNames(connector)
+<
+
+  Parameters: ~
+    {connector}  (String)  Name of connector (case-insensitive).
+
+  Returns: ~
+    List[String] collectionNames - A List of all collection names.
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    # Retrieve a connector name to query from.
+    
+    connectorList = system.mongodb.listConnectorInfo()
+    
+    # Iterate through the list of connectors and print out all collection names found.
+    for connector in connectorList:
+        print system.mongodb.listCollectionNames(connector['name'])
+<
+
+------------------------------------------------------------------------------
+system.mongodb.listConnectorInfo() *ignition-system.mongodb.listConnectorInfo*
+
+  Returns a list of PyDictionary descriptors of all MongoDB Connectors.
+
+  Syntax: >
+    system.mongodb.listConnectorInfo()
+<
+
+  Returns: ~
+    List[PyDictionary] connectors - A list of PyDictionaries containing
+    MongoDB Connector descriptors. Descriptor contains keys for ânameâ,
+    âdescriptionâ, âstatusâ, and âerrorâ (if present).
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    # Retrieve and print the returned list of connectors found.
+    connectors = system.mongodb.listConnectorInfo()
+    
+    print connectors[0]['name']
+    print connectors[0]['status']
+    print connectors[0]['description']
+    print connectors[0]['error']
+<
+
+------------------------------------------------------------------------------
+system.mongodb.replaceOne()               *ignition-system.mongodb.replaceOne*
+
+  Replaces a document in the collection that matches the filter.
+
+  Syntax: >
+    system.mongodb.replaceOne(connector, collection, filter, replacement, [options])
+<
+
+  Parameters: ~
+    {connector}    (String)        The name of connector (case-insensitive).
+    {collection}   (String)        The name of collection (case-sensitive).
+    {filter}       (PyDictionary)  A PyDictionary for specifying matching key
+                                   value pair criteria when querying a
+                                   collection.
+    {replacement}  (PyDictionary)  New values to apply for all non-immutable
+                                   document fields.
+    {options}      (PyDictionary)  A PyDictionary for including additional
+                                   replace configurations. [optional]
+
+  Returns: ~
+    PyDictionary result - Result of replace action formatted as a
+    PyDictionary with keys âacknowledgedâ, âmodifiedCountâ,
+    âmatchedCountâ, and âupsertedIdâ.
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    # Import required BSON types.
+    from system.mongodb.types import ObjectId
+    
+    # Specify unique field values to locate specific document. Here we are specifying the known _id of the document.
+    filter = {"_id": ObjectId("63fe3941519feb58abb3cda1")}
+    
+    # Specify required fields in a PyDictionary format for BSON document.
+    replacement = {
+                        "username": "jdoe2",
+                        "name": "Jane Doe II",
+                        "address": '321 Second Street, City CA 56789',
+                        "birthdate": system.date.getDate(2004, 5, 19),
+                        "email": "jdoe2@email.com",
+                        "active": True,
+                        "accounts": [],
+                        "tier_and_details": {}
+                    }
+    
+    
+    # Apply parameters for function call.
+    print system.mongodb.replaceOne("MongoDB", "customers", filter, replacement)
+<
+
+------------------------------------------------------------------------------
+system.mongodb.updateMany()               *ignition-system.mongodb.updateMany*
+
+  Updates all documents in the collection that match the filter.
+
+  Syntax: >
+    system.mongodb.updateMany(connector, collection, filter, updates, [options])
+<
+
+  Parameters: ~
+    {connector}           (String)        The name of connector
+                                          (case-insensitive).
+    {collection}          (String)        The name of collection
+                                          (case-sensitive).
+    {filter}              (PyDictionary)  A PyDictionary for specifying
+                                          matching key value pair criteria
+                                          when querying a collection.
+    {List[PyDictionary]}  (PyDictionary)  updates
+    {options}             (PyDictionary)  A PyDictionary for including
+                                          additional update configurations.
+                                          [optional].
+
+  Returns: ~
+    PyDictionary result - Result of update action formatted as a PyDictionary
+    with keys âacknowledgedâ, âmodifiedCountâ, âmatchedCountâ,
+    and âupsertedIdâ.
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    from system.mongodb.types import ObjectId
+    
+    newObjectId = ObjectId.get()
+<
+
+------------------------------------------------------------------------------
+system.mongodb.updateOne()                 *ignition-system.mongodb.updateOne*
+
+  Updates a document in the collection that matches the filter.
+
+  Syntax: >
+    system.mongodb.updateOne(connector, collection, filter, updates, [options])
+<
+
+  Parameters: ~
+    {connector}   (String)                             The name of connector
+                                                       (case-insensitive).
+    {collection}  (String)                             The name of collection
+                                                       (case-sensitive).
+    {filter}      (PyDictionary)                       A PyDictionary for
+                                                       specifying matching
+                                                       key value pair
+                                                       criteria when querying
+                                                       a collection.
+    {updates}     (PyDictionary / List[PyDictionary])  Changes to apply to
+                                                       specific document
+                                                       fields. Also supports
+                                                       aggregation pipeline
+                                                       for update operations
+                                                       See MongoDB
+                                                       documentation for all
+                                                       valid update
+                                                       operators.
+    {options}     (PyDictionary)                       A PyDictionary for
+                                                       including additional
+                                                       update configurations.
+                                                       [optional].
+
+  Returns: ~
+    PyDictionary result - Result of update action formatted as a PyDictionary
+    with keys âacknowledgedâ, âmodifiedCountâ, âmatchedCountâ,
+    and âupsertedIdâ.
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    from system.mongodb.types import ObjectId
+    
+    newObjectId = ObjectId.get()
+<
+
+
+vim:tw=78:ft=help:norl:

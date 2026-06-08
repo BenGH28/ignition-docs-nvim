@@ -1,0 +1,166 @@
+*ignition-report.txt*                         Ignition system.report functions
+
+SYSTEM.REPORT                                         *ignition-system.report*
+
+  |ignition-system.report.executeAndDistribute|
+  |ignition-system.report.executeReport|
+  |ignition-system.report.getReportNamesAsDataset|
+  |ignition-system.report.getReportNamesAsList|
+
+------------------------------------------------------------------------------
+system.report.executeAndDistribute() *ignition-system.report.executeAndDistribute*
+
+  Executes and distributes a report. Similar to scheduling a report to
+  execute , except a schedule is not required to utilize this function. This
+  is a great way to distribute the report on demand from a Client. Throws an
+  IllegalArgumentException when any of the following occurs: If the file type
+  is not recognized, path does not exist, project does not exist, or a key is
+  not valid.
+
+  Syntax: >
+    system.report.executeAndDistribute(path, project, [parameters], action, [actionSettings])
+<
+
+  Parameters: ~
+    {path}            (String)                       The path to the existing
+                                                     report.
+    {project}         (String)                       The name of the project
+                                                     where the report is
+                                                     located. Optional in
+                                                     client scope.
+    {parameters}      (Dictionary[String, Integer])  A dictionary of
+                                                     parameter overrides, in
+                                                     the form name :value
+                                                     pairs. [optional]
+    {action}          (String)                       The name of the
+                                                     distribution action to
+                                                     use. The action
+                                                     parameter supports the
+                                                     following keys as
+                                                     strings: email print
+                                                     save ftp
+    {actionSettings}  (Dictionary[List, Any])        A dictionary of settings
+                                                     particular to the
+                                                     action. Missing values
+                                                     will use the default
+                                                     value for that action.
+                                                     [optional]
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Executes and distributes the report to an email address.
+    system.report.executeAndDistribute(path="My Report Path", project="My Project", action= "email",
+    actionSettings = {"to":["plantmanager@myplant.com"], "smtpServerName":"myplantMailServer", "from":"reporting@myplant.com", "subject":"Production Report"})
+<
+
+------------------------------------------------------------------------------
+system.report.executeReport()           *ignition-system.report.executeReport*
+
+  Immediately executes an existing report and returns a List[Byte] of the
+  output. Throws an IllegalArgumentException when any of the following
+  occurs: If the file type is not recognized, path does not exist, project
+  does not exist.
+
+  Syntax: >
+    system.report.executeReport(path, project, [parameters], fileType)
+<
+
+  Parameters: ~
+    {path}        (String)                       The path to the existing
+                                                 report.
+    {project}     (String)                       The name of the project
+                                                 where the report is located.
+                                                 Optional in client scope.
+    {parameters}  (Dictionary[String, Integer])  A dictionary of parameter
+                                                 overrides, in the form name
+                                                 :value . [optional]
+    {fileType}    (String)                       The file type the resulting
+                                                 byte array should represent.
+                                                 Defaults to "pdf". Not
+                                                 case-sensitive
+
+  Returns: ~
+    List[Byte] - A byte array of the resulting report.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Executes the report, overriding two parameters.
+    overrides = {"myStringParam":"Hello world", "myIntParam":3}
+    bytesArray = system.report.executeReport(path="My Path", project="MyProject", parameters=overrides, fileType="pdf")
+<
+
+------------------------------------------------------------------------------
+system.report.getReportNamesAsDataset() *ignition-system.report.getReportNamesAsDataset*
+
+  Gets a data of all reports for a project. Throws an
+  IllegalArgumentException when any of the following occurs: If the project
+  name is omitted in the Gateway scope, project does not exist.
+
+  Syntax: >
+    system.report.getReportNamesAsDataset([ project], [includeReportName])
+<
+
+  Parameters: ~
+    {project}            (String)   The name of the project where the reports
+                                    are located. Optional in client scope.
+    {includeReportName}  (Boolean)  When set to False, the end of Path does
+                                    not include the report name. Default is
+                                    True. [optional]
+
+  Returns: ~
+    Dataset - A dataset of report paths and names for the project. Returns an
+    empty dataset if the project has no reports.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Gets a dataset of reports for the current project and displays
+    # them in a Tree View component.
+    
+    event.source.parent.getComponent('Tree View').data = system.report.getReportNamesAsDataset()
+<
+
+------------------------------------------------------------------------------
+system.report.getReportNamesAsList() *ignition-system.report.getReportNamesAsList*
+
+  Gets a list of all reports for a project. Throws an
+  IllegalArgumentException when any of the following occurs: If the project
+  name is omitted in the Gateway scope or if project does not exist.
+
+  Syntax: >
+    system.report.getReportNamesAsList(project)
+<
+
+  Parameters: ~
+    {project}  (String)  The name of the project where the reports are
+                         located. Optional in Client scope and Perspective
+                         Session scope.
+
+  Returns: ~
+    List - A list of report paths for the project. Returns an empty list if
+    the project has no reports.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    
+    # Gets a list of reports for the current project and prints it.
+    reports = system.report.getReportNamesAsList()
+    for report in reports:
+        print report
+    
+    """Output from the above example looks like the following:
+    Comparisons
+    Line Reports/Line 1/Defect rates
+    Line Reports/Line 1/Production
+    Line Reports/Line 2/Defect Rates
+    """
+<
+
+
+vim:tw=78:ft=help:norl:

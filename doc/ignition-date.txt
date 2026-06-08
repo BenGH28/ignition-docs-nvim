@@ -1,0 +1,499 @@
+*ignition-date.txt*                             Ignition system.date functions
+
+SYSTEM.DATE                                             *ignition-system.date*
+
+  |ignition-system.date.between|
+  |ignition-system.date.add|
+  |ignition-system.date.format|
+  |ignition-system.date.fromMillis|
+  |ignition-system.date.get|
+  |ignition-system.date.getDate|
+  |ignition-system.date.getTimezone|
+  |ignition-system.date.getTmezoneOffset|
+  |ignition-system.date.getTimezoneRawOffset|
+  |ignition-system.date.isAfter|
+  |ignition-system.date.isBefore|
+  |ignition-system.date.isBetween|
+  |ignition-system.date.isDaylightTime|
+  |ignition-system.date.midnight|
+  |ignition-system.date.now|
+  |ignition-system.date.parse|
+  |ignition-system.date.setTime|
+  |ignition-system.date.toMillis|
+
+------------------------------------------------------------------------------
+system.date.between()                           *ignition-system.date.between*
+
+  This function is a set of functions that include:
+
+  Syntax: >
+    system.date.*Between(date_1, date_2)
+<
+
+  Parameters: ~
+    {date_1}  (Date)  The first date to use.
+    {date_2}  (Date)  The second date to use.
+
+  Returns: ~
+    Integer - An integer that is representative of the difference between two
+    dates.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example would grab the current time, and add 119 minutes to it, then calculate the number
+    # of hours between the two dates.
+    
+    first = system.date.now()
+    second = system.date.addMinutes(first, 119)
+    print system.date.hoursBetween(first, second) # This would print 1 since it is only 1 whole hour.
+<
+
+------------------------------------------------------------------------------
+system.date.add()                                   *ignition-system.date.add*
+
+  This function is a set of functions that include:
+
+  Syntax: >
+    system.date.add*(date, value)
+<
+
+  Parameters: ~
+    {date}   (Date)     The starting date.
+    {value}  (Integer)  The number of units to add, or subtract if the value
+                        is negative.
+
+  Returns: ~
+    Date - A new date object offset by the integer passed to the function.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example would add two days to the date passed in.
+    
+    today = system.date.now()
+    twoDaysFromToday = system.date.addDays(today, 2)
+<
+
+------------------------------------------------------------------------------
+system.date.format()                             *ignition-system.date.format*
+
+  Returns the given date as a string and formatted according to a pattern.
+  The pattern is a format that is full of various placeholders that display
+  different parts of the date. These are case-sensitive. These placeholders
+  can be repeated for a different effect. For example, M will give you 1-12,
+  MM will give you 01-12, MMM will give you Jan-Dec, MMMM will give you
+  January-December.
+
+  Syntax: >
+    system.date.format(date, format)
+<
+
+  Parameters: ~
+    {date}    (Date)    The date to format.
+    {format}  (String)  A format string such as "yyyy-MM-dd HH:mm :ss ". The
+                        format argument is optional. The default is
+                        "yyyy-MM-dd HH:mm :ss ". Refer to Data Type
+                        Formatting Reference for a table of acceptable
+                        symbols.
+
+  Returns: ~
+    String - A string representing the formatted datetime.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example would format the current date to look like "01/01/01"
+    
+    today = system.date.now()
+    print system.date.format(today, "yy/MM/dd")
+    #This printed 16/04/01
+<
+
+------------------------------------------------------------------------------
+system.date.fromMillis()                     *ignition-system.date.fromMillis*
+
+  Creates a date object given a millisecond value.
+
+  Syntax: >
+    system.date.fromMillis(millis)
+<
+
+  Parameters: ~
+    {millis}  (Long)  The number of milliseconds elapsed since January 1,
+                      1970, 00:00:00 UTC (GMT)
+
+  Returns: ~
+    Date - A new date object
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example will print out the date "Fri Aug 18 14:35:25 PDT 2017"
+    print system.date.fromMillis(1503092125000)
+<
+
+------------------------------------------------------------------------------
+system.date.get()                                   *ignition-system.date.get*
+
+  This function is a set of functions that include:
+
+  Syntax: >
+    system.date.get*(date)
+<
+
+  Parameters: ~
+    {date}  (Date)  The date to use.
+
+  Returns: ~
+    Integer - An integer that is representative of the extracted value.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example would grab the current time, and print the current month.
+    
+    date = system.date.now()
+    print system.date.getMonth(date) #This would print the current month.
+<
+
+------------------------------------------------------------------------------
+system.date.getDate()                           *ignition-system.date.getDate*
+
+  Creates a new Date object given a year, month and a day. The time will be
+  set to midnight of that day.
+
+  Syntax: >
+    system.date.getDate(year, month, day)
+<
+
+  Parameters: ~
+    {year}   (Integer)  The year for the new date.
+    {month}  (Integer)  The month of the new date. January is month 0.
+    {day}    (Integer)  The day of the month for the new date. The first day
+                        of the month is day 1.
+
+  Returns: ~
+    Date - A new date, set to midnight of that day.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example will create a new date object set to January 1st, 2017.
+    
+    date = system.date.getDate(2017, 0, 1)
+    print date
+<
+
+------------------------------------------------------------------------------
+system.date.getTimezone()                   *ignition-system.date.getTimezone*
+
+  Returns the ID of the current timezone.
+
+  Syntax: >
+    system.date.getTimezone()
+<
+
+  Returns: ~
+    String - A representation of the current time zone.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example will print out your current Timezone.
+    
+    print system.date.getTimezone()
+<
+
+------------------------------------------------------------------------------
+system.date.getTmezoneOffset()         *ignition-system.date.getTmezoneOffset*
+
+  Returns the current timezone's offset versus UTC for a given instant,
+  taking Daylight Savings Time into account.
+
+  Syntax: >
+    system.date.getTimezoneOffset([date])
+<
+
+  Parameters: ~
+    {date}  (Date)  The instant in time for which to calculate the offset.
+                    Uses now() if omitted. [optional]
+
+  Returns: ~
+    Double - The timezone offset compared to UTC, in hours.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example will give the time zone offset using the date February 22, 2021
+    # and the computers current time zone.
+    
+    date = system.date.getDate(2021, 1, 22)
+    print system.date.getTimezoneOffset(date) # returns -8.0 (if you are in Pacific Daylight Time)
+<
+
+------------------------------------------------------------------------------
+system.date.getTimezoneRawOffset() *ignition-system.date.getTimezoneRawOffset*
+
+  Returns the current timezone offset versus UTC, not taking daylight savings
+  into account.
+
+  Syntax: >
+    system.date.getTimezoneRawOffset()
+<
+
+  Returns: ~
+    Double - The timezone offset.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example will give the Raw timezone offset (ignoring daylight savings) for the computers current timezone.
+    
+    print system.date.getTimezoneRawOffset() # returns -8.0 (if you are in the Pacific Timezone)
+<
+
+------------------------------------------------------------------------------
+system.date.isAfter()                           *ignition-system.date.isAfter*
+
+  Compares two dates to see if date_1 is after date_2.
+
+  Syntax: >
+    system.date.isAfter(date_1, date_2)
+<
+
+  Parameters: ~
+    {date_1}  (Date)  The first date.
+    {date_2}  (Date)  The second date.
+
+  Returns: ~
+    Boolean - True if date_1 is after date_2, false otherwise.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    #This will compare if the first date is after the second date, which it is.
+    
+    first = system.date.getDate(2018, 4, 28)
+    second = system.date.getDate(2018, 3, 22)
+    print system.date.isAfter(first, second) #Will print true.
+<
+
+------------------------------------------------------------------------------
+system.date.isBefore()                         *ignition-system.date.isBefore*
+
+  Compares two dates to see if date_1 is before date_2.
+
+  Syntax: >
+    system.date.isBefore(date_1, date_2)
+<
+
+  Parameters: ~
+    {date_1}  (Date)  The first date.
+    {date_2}  (Date)  The second date.
+
+  Returns: ~
+    Boolean - True if date_1 is before date_2, false otherwise.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This will compare if the first date is before the second date, which it is not.
+    
+    first = system.date.getDate(2018, 4, 28)
+    second = system.date.getDate(2018, 3, 22)
+    print system.date.isBefore(first, second) #Will print false.
+<
+
+------------------------------------------------------------------------------
+system.date.isBetween()                       *ignition-system.date.isBetween*
+
+  Compares two dates to see if a target date is between two other dates;
+  checks to see if the target date is between the other two dates.
+
+  Syntax: >
+    system.date.isBetween(target_date, start_date, end_date)
+<
+
+  Parameters: ~
+    {target_date}  (Date)  The date to compare.
+    {start_date}   (Date)  The start of a date range.
+    {end_date}     (Date)  The end of a date range. This date must be after
+                           the start date.
+
+  Returns: ~
+    Boolean - True if target_date is >= start_date and target_date <=
+    end_date, false otherwise.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This will compare if the first date is between the other dates, which it is not.
+    # Note that if the end date is before the start date, this function will always return False
+    
+    target = system.date.getDate(2017, 4, 28)
+    start = system.date.getDate(2017, 3, 22)
+    end = system.date.getDate(2017, 4, 22)
+    print system.date.isBetween(target, start, end) #Will print false.
+<
+
+------------------------------------------------------------------------------
+system.date.isDaylightTime()             *ignition-system.date.isDaylightTime*
+
+  Checks to see if the current timezone is using daylight savings time during
+  the date specified.
+
+  Syntax: >
+    system.date.isDaylightTime([date])
+<
+
+  Parameters: ~
+    {date}  (Date)  The date you want to check if the current timezone is
+                    observing daylight savings time. Uses now() if omitted.
+                    [optional]
+
+  Returns: ~
+    Boolean - True if date is observing daylight savings time in the current
+    timezone; false otherwise.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    date = system.date.getDate(2018, 6, 28)
+    print system.date.isDaylightTime(date) #Will print True in the US Pacific time zone.
+<
+
+------------------------------------------------------------------------------
+system.date.midnight()                         *ignition-system.date.midnight*
+
+  Returns a copy of a date with the hour, minute, second, and millisecond
+  fields set to zero.
+
+  Syntax: >
+    system.date.midnight(date)
+<
+
+  Parameters: ~
+    {date}  (Date)  The starting date.
+
+  Returns: ~
+    Date - A new date, set to midnight of the day provided
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example prints out the current date with the time set to midnight.
+    
+    date = system.date.now()
+    print system.date.midnight(date)
+<
+
+------------------------------------------------------------------------------
+system.date.now()                                   *ignition-system.date.now*
+
+  Returns a java.util.Date object that represents the current time according
+  to the local system clock.
+
+  Syntax: >
+    system.date.now()
+<
+
+  Returns: ~
+    Date - A new date, set to the current date and time.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example will set a calendar component to the current date and time.
+    
+    event.source.parent.getComponent('Calendar').date = system.date.now()
+<
+
+------------------------------------------------------------------------------
+system.date.parse()                               *ignition-system.date.parse*
+
+  Attempts to parse a string and create a Date. Causes ParseException if the
+  date dateString parameter is in an unrecognized format.
+
+  Syntax: >
+    system.date.parse(dateString, [formatString], [locale])
+<
+
+  Parameters: ~
+    {dateString}    (String)  The string to parse into a date.
+    {formatString}  (String)  Format string used by the parser. Default is
+                              "yyyy-MM-dd HH:mm :ss " Refer to Data Type
+                              Formatting Reference . [optional]
+    {locale}        (Object)  Locale used for parsing. Can be the locale name
+                              such as 'fr', or the Java Locale such as
+                              'Locale.French'. Default is 'Locale.English'.
+                              Refer to Java Locale . [optional]
+
+  Returns: ~
+    Date - The parsed date.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example will return a date object set to the given date and time, May 28th, 1992 at 4:22am.
+    print system.date.parse('May 28, 1992 4:22', 'MMMM dd, yyyy hh:mm')
+<
+
+------------------------------------------------------------------------------
+system.date.setTime()                           *ignition-system.date.setTime*
+
+  Takes in a date, and returns a copy of it with the time fields set as
+  specified.
+
+  Syntax: >
+    system.date.setTime(date, hour, minute, second)
+<
+
+  Parameters: ~
+    {date}    (Date)     The starting date.
+    {hour}    (Integer)  The hours (0-23) to set.
+    {minute}  (Integer)  The minutes (0-59) to set.
+    {second}  (Integer)  The seconds (0-59) to set.
+
+  Returns: ~
+    Date - A new date, set to the appropriate time.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example will set the date object to the current date with the time set to 01:37 in the morning and 44 seconds.
+    
+    date = system.date.getDate(2018, 6, 29) #getDate is zero based, so a month parameter of 6 will return July.
+    print system.date.setTime(date, 1, 37, 44) #This will print Sun July 29 01:37:44 PDT 2018
+<
+
+------------------------------------------------------------------------------
+system.date.toMillis()                         *ignition-system.date.toMillis*
+
+  Converts a Date object to its millisecond value elapsed since January 1,
+  1970, 00:00:00 UTC (GMT)
+
+  Syntax: >
+    system.date.toMillis(date)
+<
+
+  Parameters: ~
+    {date}  (Date)  The date object to convert.
+
+  Returns: ~
+    Integer - an 8-byte integer representing the number of millisecond
+    elapsed since January 1, 1970, 00:00:00 UTC (GMT)
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example takes the date Fri Aug 18 14:35:25 PDT 2017,
+    # and prints it out 1503092125000.
+    
+    date = system.date.getDate(2017, 7, 18)
+    datetime = system.date.setTime(date, 14, 35, 25)
+    print system.date.toMillis(datetime)
+<
+
+
+vim:tw=78:ft=help:norl:

@@ -1,0 +1,421 @@
+*ignition-secsgem.txt*                       Ignition system.secsgem functions
+
+SYSTEM.SECSGEM                                       *ignition-system.secsgem*
+
+  |ignition-system.secsgem.copyEquipment|
+  |ignition-system.secsgem.enableDisableEquipment|
+  |ignition-system.secsgem.getResponse|
+  |ignition-system.secsgem.getToolProgram|
+  |ignition-system.secsgem.getToolProgramDataset|
+  |ignition-system.secsgem.sendRequest|
+  |ignition-system.secsgem.startSimEventRun|
+  |ignition-system.secsgem.toDataset|
+  |ignition-system.secsgem.toTreeDataset|
+  |ignition-system.secsgem.sendResponse|
+
+------------------------------------------------------------------------------
+system.secsgem.copyEquipment()         *ignition-system.secsgem.copyEquipment*
+
+  Creates a copy of an equipment connection and places it in the Gateway >
+  Config > SECS/GEM > Equipment. Common settings can be overridden for the
+  new connection.
+
+  Syntax: >
+    system.secsgem.copyEquipment( equipmentSource, newEquipmentName, enabled, activeAddress, activePort, passiveAddress, passivePort, deviceId [, dbTablePrefix] [,description])
+<
+
+  Parameters: ~
+    {equipmentSource}   (String)   Some new equipment settings will be
+                                   retrieved from this equipment connection.
+                                   Specify the source equipment connection
+                                   name.
+    {newEquipmentName}  (String)   The name of the new equipment connection.
+    {enabled}           (Boolean)  If set to false, the new equipment
+                                   connection will be disabled after it is
+                                   created.
+    {activeAddress}     (String)   IP Address of new equipment. Must be
+                                   specified if the SECS/GEM module is used
+                                   in Active mode. Otherwise, do not use this
+                                   parameter.
+    {activePort}        (Integer)  Port number of new equipment. Must be
+                                   specified if the SECS/GEM module is used
+                                   in Active mode. Otherwise, do not use this
+                                   parameter.
+    {passiveAddress}    (String)   IP Address of new equipment. Must be
+                                   specified if the SECS/GEM module is used
+                                   in Passive mode. Otherwise, do not use
+                                   this parameter.
+    {passivePort}       (Integer)  Port number of new equipment. Must be
+                                   specified if the SECS/GEM module is used
+                                   in Passive mode. Otherwise, do not use
+                                   this parameter.
+    {deviceId}          (Integer)  Unique identifier of new equipment. This
+                                   value must be an integer, and is specified
+                                   within the equipment.
+    {dbTablePrefix}     (String)   SECS/GEM database table names will use the
+                                   specified prefix for the new equipment
+                                   connection. If no prefix is specified, the
+                                   description of the source equipment will
+                                   be used. Optional.
+    {description}       (String)   The description for the new equipment
+                                   connection. If no description is
+                                   specified, the description of the source
+                                   equipment will be used. Optional.
+
+  Returns: ~
+    Nothing
+
+  Scope: Vision Client
+
+  Example: >
+    system.secsgem.copyEquipment(equipmentSource="ToolOne", newEquipmentName="ToolTwo", enabled=True, activeAddress="192.168.1.5", activePort=15500, deviceId=0)
+<
+
+------------------------------------------------------------------------------
+system.secsgem.enableDisableEquipment() *ignition-system.secsgem.enableDisableEquipment*
+
+  Enables or disables a Tuple of equipment connections from a script.
+
+  Syntax: >
+    system.secsgem.enableDisableEquipment(enable, names)
+<
+
+  Parameters: ~
+    {enable}  (Boolean)  Set to True to enable equipment connections, or set
+                         to False to disable them.
+    {names}   (Tuple)    A Tuple of Strings. Each String should match an
+                         Equipment Connection configured on the Gateway. If
+                         this parameter contains the name of an Equipment
+                         Connection that does not exist, then a message will
+                         be included in the List returned by this function.
+
+  Returns: ~
+    List - A List of unicode strings. Each string contains a message about an
+    equipment connection that could not be enabled/disabled. If the list is
+    empty, then all specified equipment connections were successfully
+    modified.
+
+  Scope: Vision Client
+
+  Example: >
+    # Executing this example script will attempt to disable two Equipment Connections
+    
+    # Create a Python Tuple of equipment names to disable.
+    equipmentNames = ("ToolOne","ToolTwo")
+    
+    # Invoke the Function
+    result = system.secsgem.enableDisableEquipment(False, equipmentNames)
+    
+    # Print the results of any equipment connections that could not be modified.
+    print result
+<
+
+------------------------------------------------------------------------------
+system.secsgem.getResponse()             *ignition-system.secsgem.getResponse*
+
+  Attempts to retrieve a response message from the Gateway. The transaction
+  id from the sent message is used to retrieve the response.
+
+  Syntax: >
+    system.secsgem.getResponse(transactionID, equipment, [timeout], [poll])
+<
+
+  Parameters: ~
+    {transactionID}  (Integer)  The transactionID of the request and
+                                response. The transactionID is used to
+                                retrieve the response. Typically used in
+                                conjunction with system.secsgem.sendRequest
+                                to generate a transactionID.
+    {equipment}      (String)   Name of equipment connection.
+    {timeout}        (Integer)  Specifies in seconds how long to wait for a
+                                response before returning None. If omitted
+                                the timeout will be 5 seconds.
+    {poll}           (Integer)  Specifies in milliseconds how often to poll
+                                the system for a response. If omitted the
+                                poll will be 150 milliseconds.
+
+  Returns: ~
+    Any - A Python object, typically a dictionary. The actual result is a
+    JSON string that's decoded into a Python object, as shown on the mapping
+    on the system.util.jsonDecode page.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Replace the string below with the equipment name you want to send the request to.
+    myEquipment = "EquipmentOne"
+    
+    # Define the contents of the body. We're using an empty string, since S1F1 doesn't expect a body, and we need to define something (Python's None will result in an exception).
+    body = ""
+    
+    # Store the returned transactionID in a variable.
+    transactionID = system.secsgem.sendRequest("S1F1", True, body, myEquipment)
+    
+    # Use the transactionID to lookup the response.
+    response = system.secsgem.getResponse(transactionID, myEquipment, 2)
+    
+    # We're printing out the response here, but you could do something more useful instead.
+    print response
+<
+
+------------------------------------------------------------------------------
+system.secsgem.getToolProgram()       *ignition-system.secsgem.getToolProgram*
+
+  Returns a process program from the Gateway that was previously sent by a a
+  tool in an S7F3 message.
+
+  Syntax: >
+    system.secsgem.getToolProgram(ppid)
+<
+
+  Parameters: ~
+    {ppid}  (String)  The PPID that was sent from the tool when the S7F3
+                      message was saved.
+
+  Returns: ~
+    Dictionary - A Python Dictionary containing the following keys:
+    [editDate, ppbody, bodyFormat].
+
+  Scope: Vision Client
+
+  Example: >
+    # Retrieve information on all programs.
+    results = system.secsgem.getToolProgramDataset()
+    
+    for program in results:
+        # If the format of the program is ASCII...
+        if program[2] == "A":
+            ppid = program[0]
+    
+            # Retrieve more information on the program.
+            programData = system.secsgem.getToolProgram(ppid)
+    
+            # Print the program. Writing to a file would most
+            # likely be a better practice here.
+            print "Program %s: %s" % (ppid, programData[1])
+<
+
+------------------------------------------------------------------------------
+system.secsgem.getToolProgramDataset() *ignition-system.secsgem.getToolProgramDataset*
+
+  Returns a Dataset containing information about all stored process programs.
+
+  Syntax: >
+    system.secsgem.getToolProgramDataset()
+<
+
+  Returns: ~
+    Dataset - A Dataset containing information about all stored process
+    programs. Includes the following columns in order: ppid, editDate,
+    bodyFormat.
+
+  Scope: Vision Client
+
+  Example: >
+    # Retrieve information about all programs.
+    results = system.secsgem.getToolProgramDataset()
+    
+    for program in results:
+        # Print out details on each program.
+        print "Program %s was last modified on %s" % (program[0], program[1])
+<
+
+------------------------------------------------------------------------------
+system.secsgem.sendRequest()             *ignition-system.secsgem.sendRequest*
+
+  Sends a JSON-formatted SECS message to a tool. An equipment connection must
+  be configured for the tool in the Gateway.
+
+  Syntax: >
+    system.secsgem.sendRequest(streamFunction, reply, body, equipment)
+<
+
+  Parameters: ~
+    {streamFunction}  (String)   The stream and function of the SECS message
+                                 to send. Example: "S1F13"
+    {reply}           (Boolean)  Whether or not the SECS message expects a
+                                 reply message.
+    {body}            (Object)   This contains the body of a SECS message.
+                                 The argument can be a Python Object or JSON
+                                 string representing the body of a SECS
+                                 message. If this argument is a string then
+                                 it will be converted to a Python Object
+                                 using the system.util.jsonDecode function.
+    {equipment}       (String)   Name of the equipment connection to use.
+
+  Returns: ~
+    Integer - The transactionID of the SECS message response.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Replace the string below with the equipment name you want to send the request to.
+    myEquipment = "EquipmentOne"
+    
+    # Define the contents of the body. We're using an empty string, since S1F1 doesn't expect a body, and we need to define something (Python's None will result in an exception).
+    body = ""
+    
+    # Store the returned transactionID in a variable. This script could be extended by using system.secsgem.getResponse to view the response.
+    transactionID = system.secsgem.sendRequest("S1F1", True, body, myEquipment)
+<
+
+------------------------------------------------------------------------------
+system.secsgem.startSimEventRun()   *ignition-system.secsgem.startSimEventRun*
+
+  Starts a configured simulator event run in the Gateway. Note, that this
+  function only works with the simulators that come included with the
+  SECS/GEM module.
+
+  Syntax: >
+    system.secsgem.startSimEventRun(simulatorName, eventRunName)
+<
+
+  Parameters: ~
+    {simulatorName}  (String)  The simulator that holds the configured event
+                               run. Will throw an exception if the specified
+                               simulator can't be found.
+    {eventRunName}   (String)  The event run to start. Will throw an
+                               exception if the specified simulator can't be
+                               found.
+
+  Returns: ~
+    Nothing
+
+  Scope: Vision Client
+
+  Example: >
+    # This examples requires that the Gateway has a simulator named "simulator1", and
+    # an Event Run in that same simulator named "myEventRun".
+    mySimulator = "simulator1"
+    eventRun = "myEventRun"
+    
+    system.secsgem.startSimEventRun(mySimulator, eventRun)
+<
+
+------------------------------------------------------------------------------
+system.secsgem.toDataset()                 *ignition-system.secsgem.toDataset*
+
+  Converts a SECS message data structure, as returned by the
+  system.secsgem.getResponse function, into a dataset and returns it.
+
+  Syntax: >
+    system.secsgem.toDataset(secsObject)
+<
+
+  Parameters: ~
+    {secsObject}  (Any)  A Python object, such as Sequence or a Dictionary,
+                         representing a SECS message to convert to a dataset.
+                         More information on how to format the Python object
+                         can be found on the SECS Definition Language (SDL)
+                         File page.
+
+  Returns: ~
+    DataSet - A Dataset representing a SECS message.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Receive a SECS message.
+    object = system.secsgem.getResponse(transactionID, "myEquipment", 2)
+    
+    # Turn the message into a dataset.
+    dataset = system.secsgem.toDataSet(object)
+    
+    # Assuming this script was called from a component script, and a Table component was in the same container as the component that called this script, we could pass
+    # the dataset to the Data property.
+    event.source.parent.getComponent('Table').data = dataset
+<
+
+------------------------------------------------------------------------------
+system.secsgem.toTreeDataset()         *ignition-system.secsgem.toTreeDataset*
+
+  Changes an existing dataset, as returned by the system.secsgem.toDataSet
+  function, to make it usable for the Tree View component.
+
+  Syntax: >
+    system.secsgem.toTreeDataset(dataset)
+<
+
+  Parameters: ~
+    {dataset}  (Dataset)  A DataSet containing a SECS message. Note that this
+                          parameter cannot take a JSON message, so the object
+                          returned by system.secsgem.getResponse must first
+                          be processed by system.secsgem.toDataSet .
+
+  Returns: ~
+    Dataset - A dataset containing a SECS message with the following columns,
+    as suited for Vision's tree view component: "path", "text", "icon",
+    "background", "foreground", "tooltip", "border", "selectedText",
+    "selectedIcon", "selectedBackground", "selectedForeground",
+    "selectedTooltip", "selectedBorder"
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Assuming the variable named "message" contains a SECS message, we will first convert it to a Dataset.
+    dataset = system.secsgem.toDataset(message)
+    
+    # The initial dataset generated by toDataSet will not work with the Tree View component, so we'll modify it...
+    dataset = system.secsgem.toTreeDataset(dataset)
+    
+    # ...and now pass the dataset into the Tree View component's data property.
+    event.source.parent.getComponent('Tree View').data = dataset
+<
+
+------------------------------------------------------------------------------
+system.secsgem.sendResponse()           *ignition-system.secsgem.sendResponse*
+
+  Sends a JSON-formatted SECS response message to a message sent by a tool.
+  An equipment connection must be configured for the tool in the Gateway, and
+  this must be used within a Message Handler to create a Custom Message
+  Response Handler .
+
+  Syntax: >
+    system.secsgem.sendResponse(transactionID, systemBytes, streamFunction, body, equipment)
+<
+
+  Parameters: ~
+    {transactionID}   (Integer)  The TxID of the response. The TxID from the
+                                 received request in the payload of the
+                                 message handler must be specified here.
+    {systemBytes}     (Integer)  The SystemBytes of the response. The
+                                 SystemBytes from the received request in the
+                                 payload of the message handler must be
+                                 specified here.
+    {streamFunction}  (String)   The stream and function of the SECS message
+                                 to send. Example: "S1F14"
+    {body}            (Any)      This contains the body of a SECS response.
+                                 The argument can be a Python Object or JSON
+                                 string representing the body of a SECS
+                                 message. If this argument is a string then
+                                 it will be converted to a Python Object
+                                 using the system.util.jsonDecode function.
+    {equipment}       (String)   Name of the equipment connection to use.
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    # This will create a logger that will print to the console that a custom response is happening for S6F12.
+    # It will then send the response with system.secsgem.sendResponse().
+    equipment= payload['Equipment']
+    txId = payload['TxID']
+    systemBytes = payload['SystemBytes']
+    message = payload['Message']
+    
+    msg = "Equipment=" + equipment
+    msg += ", TxID=" + str(txId)
+    msg += ", SystemBytes=" + str(systemBytes)
+    msg += ", Message=" + message
+    logger = system.util.getLogger("SECSGEM.Gateway.S6F12Handler")
+    logger.info("S6F12Handler: Sending back response to S6F11 message:" + msg)
+    
+    body = '{"format":"B", "value": 0, "doc":"ACKC6, Acknowledge Code", "codeDesc": "Accepted"}'
+    system.secsgem.sendResponse(txId, systemBytes, "S6F12", body, equipment)
+    logger.info("S6F12Handler: S612 response sent")
+<
+
+
+vim:tw=78:ft=help:norl:

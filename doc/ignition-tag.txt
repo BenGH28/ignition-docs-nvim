@@ -1,0 +1,705 @@
+*ignition-tag.txt*                               Ignition system.tag functions
+
+SYSTEM.TAG                                               *ignition-system.tag*
+
+  |ignition-system.tag.browse|
+  |ignition-system.tag.configure|
+  |ignition-system.tag.copy|
+  |ignition-system.tag.deleteTags|
+  |ignition-system.tag.exists|
+  |ignition-system.tag.exportTags|
+  |ignition-system.tag.getConfiguration|
+  |ignition-system.tag.importTags|
+  |ignition-system.tag.move|
+  |ignition-system.tag.query|
+  |ignition-system.tag.readAsync|
+  |ignition-system.tag.readBlocking|
+  |ignition-system.tag.rename|
+  |ignition-system.tag.requestGroupExecution|
+  |ignition-system.tag.writeAsync|
+  |ignition-system.tag.writeBlocking|
+
+------------------------------------------------------------------------------
+system.tag.browse()                               *ignition-system.tag.browse*
+
+  Returns a list of nodes found at the specified path. The list objects are
+  returned as dictionaries with some basic information about each node.
+
+  Syntax: >
+    system.tag.browse(path, filter)
+<
+
+  Parameters: ~
+    {path}    (String)                   The path that will be browsed,
+                                         typically to a folder or UDT
+                                         instance.
+    {filter}  (Dictionary[String, Any])  A dictionary of browse filter keys.
+                                         Keys are listed below.
+
+  Returns: ~
+    Results - A Results object which contains a list of tag dictionaries, one
+    for each tag found during the browse. See Scripting Object Reference .
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This simple script will browse a given tag path, in this case the root of the provider called default, and print the results.
+    
+    results = system.tag.browse(path = '[default]', filter = {})
+    for result in results.getResults():
+        print result
+<
+
+------------------------------------------------------------------------------
+system.tag.configure()                         *ignition-system.tag.configure*
+
+  Creates tags from a given list of Python dictionaries or from a JSON source
+  string. Can be used to overwrite a current tag's configuration.
+
+  Syntax: >
+    system.tag.configure(basePath, tags, [collisionPolicy])
+<
+
+  Parameters: ~
+    {basePath}         (String)  The starting point where the new tags will
+                                 be created. When making changes to existing
+                                 tags with this function, you want to set the
+                                 path to the parent folder of the existing
+                                 tag(s), not the tag(s) themselves.
+    {tags}             (Any)     A list of tag definitions, where each tag
+                                 definition is a Python dictionary.
+                                 Alternatively, a JSON source string may be
+                                 passed to this parameter. When editing
+                                 existing tags, it is generally easier to
+                                 retrieve the tag configurations with
+                                 system.tag.getConfiguration , modify the
+                                 results of the getConfiguration call, and
+                                 then write the new configuration to the
+                                 parent folder of the existing tag(s).
+    {collisionPolicy}  (String)  The action to take when a tag or folder with
+                                 the same path and name is encountered.
+                                 Defaults to Overwrite. [optional]. Possible
+                                 values include: a - Abort and throw an
+                                 exception. o - Overwrite and replace
+                                 existing tag's configuration. i - Ignore
+                                 that item in the list. m - MergeOverwrite,
+                                 modifying values that are specified in the
+                                 definition, without impacting values that
+                                 aren't defined in the definition. Use this
+                                 when you want to apply a slight change to
+                                 tags, without having to build a complete
+                                 configuration object.
+
+  Returns: ~
+    List - A List of QualityCode objects, one for each tag in the list, that
+    is representative of the result of the operation. See Scripting Object
+    Reference .
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example will retrieve some existing tag configurations, make changes to the configurations,
+    # and write the new configurations to the original tags.
+    
+    
+    # Define a base path. Sometime useful, but we could hardcode the paths
+    # in the getConfiguration() and configure() calls.
+    parentPath = "[NewProvider]SomeFolder"
+    
+    # Get the current configurations recursively, which is useful when targeting
+    # folders and UDT Instances.
+    configs = system.tag.getConfiguration(parentPath + "/AnotherFolder", True)
+    
+    # The getConfiguration() above always returns a list of dictionaries, and our results
+    # are inside of the first dictionary.
+    for tag in configs[0]['tags']:
+    
+        # Check each node. At this point we may get folders or other nodes
+        # that we're uninterested in. Examine tagType to figure it out.
+        # Note that we're making sure the tagType is in fact a string for this comparison.
+        if str(tag['tagType']) != 'Folder':
+    
+            # Make a change to the Tag. If we're iterating over UDT instances,
+            # then we can change the parameters here. Commented example below:
+            # tag['parameters']['myParam'] = foo
+    
+            # In our case, we'll just disable the Tags.
+            tag['enabled'] = False
+    
+    system.tag.configure(parentPath, configs, "o")
+<
+
+------------------------------------------------------------------------------
+system.tag.copy()                                   *ignition-system.tag.copy*
+
+  Copies tags from one folder to another. Multiple Tag and folder paths may
+  be passed to a single call of this function. The new destination can be a
+  separate tag provider.
+
+  Syntax: >
+    system.tag.copy(tags, destination, [collisionPolicy])
+<
+
+  Parameters: ~
+    {tags}             (List)    A List of tag paths to move.
+    {destination}      (String)  The destination to copy the tags to. All
+                                 specified tags will be copied to the same
+                                 destination. The destination tag provider
+                                 must be specified.
+    {collisionPolicy}  (String)  The action to take when a tag or folder with
+                                 the same path and name is encountered.
+                                 Defaults to Abort. [optional]. Possible
+                                 values include: a - Abort and throw an
+                                 exception o - Overwrite and replace existing
+                                 tag's configuration i - Ignore that item in
+                                 the list.
+
+  Returns: ~
+    List - A List of QualityCode objects, one for each tag in the list, that
+    is representative of the result of the operation. See Scripting Object
+    Reference .
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Define the tag/folder path(s).
+    tags = ['[default]Old_Tags/Subfolder' ]
+    
+    # We'll move the tag/folder above to the new path.
+    destination = '[default]New_Tags'
+    
+    # If there is a collision with the destination, we'll abort the process.
+    policy = 'a'
+    
+    # Copy the Tags.
+    system.tag.copy(tags, destination, policy)
+<
+
+------------------------------------------------------------------------------
+system.tag.deleteTags()                       *ignition-system.tag.deleteTags*
+
+  Deletes multiple tags or tag folders. When deleting a tag folder, all tags
+  under the folder are also deleted.
+
+  Syntax: >
+    system.tag.deleteTags(tagPaths)
+<
+
+  Parameters: ~
+    {tagPaths}  (List)  A List of the paths to the tags or tag folders that
+                        are to be removed.
+
+  Returns: ~
+    List - A List of QualityCode objects, one for each tag in the list, that
+    is representative of the result of the operation. See Scripting Object
+    Reference .
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example will delete several Tags. Modify the paths argument to change which Tags will be deleted.
+    # Note that a confirmation isn't automatically included, so be cautious when calling this on a production server.
+    
+    paths = [
+        '[default]A_Tag',
+        '[default]Folder/Some_Other_Tag'
+    ]
+    
+    # Delete the Tags.
+    results = system.tag.deleteTags(paths)
+    
+    # We could expand this example further by examining the list of quality codes...
+    for index in range(len(results)):
+    
+        # ...check if a returned anything except Good.
+        if results[index].isNotGood():
+    
+            # ...and do something if we failed, such as retrieve the Tag path from earlier, and pair it with a quality code.
+            print 'Could not delete tag at path: %s \n Reason: %s' % (paths[index], results[index])
+<
+
+------------------------------------------------------------------------------
+system.tag.exists()                               *ignition-system.tag.exists*
+
+  Checks whether or not a tag with a given path exists.
+
+  Syntax: >
+    system.tag.exists(tagPath)
+<
+
+  Parameters: ~
+    {tagPath}  (String)  The path of the tag to look up.
+
+  Returns: ~
+    Boolean - True if a tag exists for the given path, false otherwise.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This code writes a 1 to the tag "Compressors/C28/ClearFault" if that tag exists.
+    
+    if system.tag.exists("Compressors/C28/ClearFault"):
+        system.tag.writeBlocking(["Compressors/C28/ClearFault"], [1])
+<
+
+------------------------------------------------------------------------------
+system.tag.exportTags()                       *ignition-system.tag.exportTags*
+
+  Exports tags to a file on a local file system.
+
+  Syntax: >
+    system.tag.exportTags([filePath], tagPaths, [recursive], [exportType])
+<
+
+  Parameters: ~
+    {filePath}    (String or Nothing)  The file path that the tags will be
+                                       exported to. If the file does not
+                                       already exist, this function will
+                                       attempt to create it.
+    {tagPaths}    (List)               A List of tag paths to export. All tag
+                                       paths in the list must be from the
+                                       same parent folder.
+    {recursive}   (Boolean)            Set to true to export all tags under
+                                       each tag path, including tags in child
+                                       folders. Defaults to true. [optional]
+    {exportType}  (String)             The type of file that will be
+                                       exported. Set to "json" or "xml".
+                                       Defaults to "json".
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example attempts to export the entire Tag Provider, including UDT definitions.
+    
+    # The filepath is Operating System dependent, so the path notation below may differ based on where the function is called from.
+    filePath = 'C:\\Users\\myUser\\Desktop\\myTags'
+    tagPaths = ["[default]"]
+    recursive = True
+    
+    system.tag.exportTags(filePath, tagPaths, recursive)
+<
+
+------------------------------------------------------------------------------
+system.tag.getConfiguration()           *ignition-system.tag.getConfiguration*
+
+  Retrieves tags from the Gateway as Python dictionaries. These can be edited
+  and then saved back using system.tag.configure .
+
+  Syntax: >
+    system.tag.getConfiguration(basePath, recursive, [overridesOnly])
+<
+
+  Parameters: ~
+    {basePath}       (String)   The starting point where the tags will be
+                                retrieved. This can be a folder containing,
+                                and if recursive is true, then the function
+                                will retrieve all of the tags in the folder.
+    {recursive}      (Boolean)  If true, the entire tag tree under the
+                                specified path will be retrieved.
+    {overridesOnly}  (Boolean)  New in 8.3.5 If true, only overridden
+                                properties from UDT members will be returned.
+                                If the tag is not a UDT member, this
+                                parameter is ignored. [optional]
+
+  Returns: ~
+    List - A List of tag dictionaries. Nested tags are placed in a list under
+    the tags key in the dictionary.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example will look up the name property on a Tag.
+    
+    path = '[default]My_Folder/My_Tag'
+    
+    config = system.tag.getConfiguration(path, False)
+    
+    # While the call above was directed at a single Tag, the function
+    # still returns a list, so we access index 0 to examine the properties
+    # (hence the "[0]").
+    #
+    # Additionally, we can access the name property in a similar manner
+    # to accessing a key in a Python Dictionary.
+    
+    print config[0]['name']
+<
+
+------------------------------------------------------------------------------
+system.tag.importTags()                       *ignition-system.tag.importTags*
+
+  Imports a JSON tag file at the provided path. Also supports XML and CSV Tag
+  file exports from legacy systems.
+
+  Syntax: >
+    system.tag.importTags(filePath, basePath, [collisionPolicy])
+<
+
+  Parameters: ~
+    {filePath}         (String)  The file path of the tag export to import.
+    {basePath}         (String)  The Tag path that will serve as the root
+                                 node for the imported tags.
+    {collisionPolicy}  (String)  The action to take when a tag or folder with
+                                 the same path and name is encountered.
+                                 Defaults to Overwrite. [optional]. Possible
+                                 values include: a - Abort and throw an
+                                 exception o - Overwrite and replace existing
+                                 tag's configuration i - Ignore that item in
+                                 the list.
+
+  Returns: ~
+    List - A List of QualityCode objects, one for each tag in the list, that
+    is representative of the result of the operation. See Scripting Object
+    Reference .
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This script will import a .json file containing Sine Tags from the desktop into a folder in the Tag Browser called "Imported Tags".
+    filePath = "C:/Users/[USERNAME]/Desktop/SineTags.json"
+    basePath = "[default]Imported Tags"
+    
+    system.tag.importTags(filePath,basePath)
+<
+
+------------------------------------------------------------------------------
+system.tag.move()                                   *ignition-system.tag.move*
+
+  Moves tags or folders to a new destination. The new destination can be a
+  separate tag provider. If interested in copying the tags to a new
+  destination, instead of moving them, please see the system.tag.copy page.
+
+  Syntax: >
+    system.tag.move(tags, destination, [collisionPolicy])
+<
+
+  Parameters: ~
+    {tags}             (List)    A List of tag paths to move.
+    {destination}      (String)  The destination to move the tags to. The
+                                 destination tag provider must be specified:
+                                 i.e., [default]Folder/myTag .
+    {collisionPolicy}  (String)  The action to take when a tag or folder with
+                                 the same path and name is encountered.
+                                 Defaults to Overwrite. [optional]. Possible
+                                 values include: a - Abort and throw an
+                                 exception o - Overwrite and replace existing
+                                 tag's configuration i - Ignore that item in
+                                 the list.
+
+  Returns: ~
+    List - A List of QualityCode objects, one for each tag in the list, that
+    is representative of the result of the operation. See Scripting Object
+    Reference .
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This function moves a folder in a Tag provider to a new folder.
+    
+    # Since both paths are at the same node, the "Old_Folder" will be placed at the root of the provider, and the name changed, effectively renaming the folder.
+    tags = ['[default]Old_Folder']
+    destination  = '[default]New_Folder/'
+    
+    # Move the folder.
+    system.tag.move(tags, destination)
+<
+
+------------------------------------------------------------------------------
+system.tag.query()                                 *ignition-system.tag.query*
+
+  Queries a Tag Provider to produce a list of tags that meet the specified
+  criteria. Provides the same functionality as the Tag Report Tool .
+
+  Syntax: >
+    system.tag.query([provider], [query], [limit], [continuation])
+<
+
+  Parameters: ~
+    {provider}      (String)    The Tag Provider to query. Note: Technically,
+                                this parameter is optional, but omitting it
+                                will result in an empty Results object.
+                                [optional]
+    {query}         (PyObject)  An object that specifies the query
+                                conditions. Can be configured in the Tag
+                                Report Tool using the Copy as Script
+                                function. See example below. [optional]
+    {limit}         (Integer)   Maximum results to return. If more results
+                                are possible, the result will have a
+                                continuation point set. [optional]
+    {continuation}  (String)    The tag ID of a previously returned
+                                continuation point, to continue the
+                                associated query from that point [optional]
+
+  Returns: ~
+    Results - A Results object which contains a list of tag dictionaries, one
+    for each tag found during the browse. See Scripting Object Reference .
+
+  Scope: Gateway
+
+  Example: >
+    provider = 'Sample_Tags'
+    limit = 100
+    
+    query = {
+      "condition": {
+        "path": "Ramp/Ramp*",
+        "tagType": "AtomicTag",
+        "attributes": {
+          "values": [
+            "alarm"
+          ],
+          "requireAll": True
+        },
+        "valueSource": "opc",
+        "quality": "Error"
+      },
+      "returnProperties": [
+        "path",
+        "tagType",
+        "quality"
+      ]
+    }
+    
+    # Limited to 100 rows. Use continuation functionality to continue from last result,
+    # or remove limit for full results.
+    results = system.tag.query(provider, query, limit)
+    for result in results:
+        print(result)
+    
+    
+    # To continue from last result, use continuation
+     # Note: The query is stored on the gateway, and therefore does not need to be sent again.
+    # A query parameter will be ignored if continuation is specified.
+    results = system.tag.query(continuation=results.continuationPoint)
+    for result in results:
+        print(result)
+<
+
+------------------------------------------------------------------------------
+system.tag.readAsync()                         *ignition-system.tag.readAsync*
+
+  Asynchronously reads the value of the tags at the given paths. Meaning,
+  execution of the calling script will continue without waiting for this
+  function to finish. This is useful in cases where the rest of the script
+  should continue without waiting for the results from system.tag.readAsync.
+
+  Syntax: >
+    system.tag.readAsync(tagPaths, callback)
+<
+
+  Parameters: ~
+    {tagPaths}  (List)      A List of Tag paths to read from. If no property
+                            is specified in the path, the Value property is
+                            assumed.
+    {callback}  (Callable)  A Python callback function to process the read
+                            results. The function definition must provide a
+                            single argument, which will hold a List of
+                            qualified values when the callback function is
+                            invoked. The qualified values will have three
+                            sub-members: value, quality, and timestamp.
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Vision Clients, Perspective Sessions
+
+  Example: >
+    # Define a function that will iterate over the results of our async read.
+    def checkValues(asyncReturn):
+    
+        # In this case we'll just create a counter, and increment it when values are over 100.
+        counter = 0
+        for qValue in asyncReturn:
+            if qValue.value > 100:
+                counter += 1
+    
+        # Replace this part of the function with something more useful, such as
+        # a Tag or DB write.
+        # The print statement will output in the Designer Console instead of the Script Console since the print function runs on a separate thread.
+        print str(counter)
+    
+    # Define the Tag paths you want to read.
+    paths = ["[default]Tag1", "[default]Tag2"]
+    
+    system.tag.readAsync(paths, checkValues)
+<
+
+------------------------------------------------------------------------------
+system.tag.readBlocking()                   *ignition-system.tag.readBlocking*
+
+  Reads the value of the tags at the given paths. Will "block" until the read
+  operation is complete or times out. Meaning, execution of the calling
+  script will pause until this function finishes. This is useful in cases
+  where the tag read must complete before further lines in the same script
+  should execute.
+
+  Syntax: >
+    system.tag.readBlocking(tagPaths, [timeout])
+<
+
+  Parameters: ~
+    {tagPaths}  (String or List[String])  Either a string of a single tag
+                                          path, or a list of strings tag
+                                          paths to read from. If no property
+                                          is specified in a path, the Value
+                                          property is assumed.
+    {timeout}   (Integer)                 How long to wait in milliseconds
+                                          before the read operation times
+                                          out. This parameter is optional,
+                                          and defaults to 45000 milliseconds
+                                          if not specified. [optional]
+
+  Returns: ~
+    List - A list of QualifiedValue objects corresponding to the tag paths.
+    See Scripting Object Reference .
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Specify the paths.
+    paths = ["[default]Folder/Tag_A","[default]Folder/Tag_B"]
+    
+    # Send the reads off.
+    values = system.tag.readBlocking(paths)
+    
+    # Here we can examine each value.
+    for i in range(len(values)):
+        print "Tag at Path: %s\n Had a value of %s" % (paths[i], values[i].value)
+<
+
+------------------------------------------------------------------------------
+system.tag.rename()                               *ignition-system.tag.rename*
+
+  Renames a single tag or folder.
+
+  Syntax: >
+    system.tag.rename(tag, newName, [collisionPolicy])
+<
+
+  Parameters: ~
+    {tag}              (String)  A path to the tag or folder to rename.
+    {newName}          (String)  The new name for the tag or folder.
+    {collisionPolicy}  (String)  The action to take when a tag or folder with
+                                 the same path and name is encountered.
+                                 Defaults to Abort. [optional]. Possible
+                                 values include: a - Abort and throw an
+                                 exception o - Overwrite and replace existing
+                                 tag's configuration i - Ignore that item in
+                                 the list.
+
+  Returns: ~
+    QualityCode - A QualityCode object that contains the results of the
+    rename operation.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    old = "[default]folder/tag"
+    new = "noun_1"      # Note that the new name should not include the full path or tag provider. Just the name suffices.
+    
+    system.tag.rename(old, new)
+<
+
+------------------------------------------------------------------------------
+system.tag.requestGroupExecution() *ignition-system.tag.requestGroupExecution*
+
+  Sends a request to the specified tag group to execute now.
+
+  Syntax: >
+    system.tag.requestGroupExecution(provider, tagGroup)
+<
+
+  Parameters: ~
+    {provider}  (String)  Name of the Tag Provider that the tag group is in.
+    {tagGroup}  (String)  The name of the tag group to execute.
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example will use a Tag Provider called "default" and a Tag group called [default].
+    system.tag.requestGroupExecution("default", "[default]")
+<
+
+------------------------------------------------------------------------------
+system.tag.writeAsync()                       *ignition-system.tag.writeAsync*
+
+  Asynchronously writes values to tags at specified paths. The script will
+  not wait for the write operation to complete before moving on, but you can
+  provide a callback function to run further code after the write has
+  finished.
+
+  Syntax: >
+    system.tag.writeAsync(tagPaths, values, [callback])
+<
+
+  Parameters: ~
+    {tagPaths}  (List)      A List of tag paths to write to. A tag property
+                            can be included in the path. If no property is
+                            specified in a tag path, the Value property is
+                            assumed.
+    {values}    (List)      The values to write to the specified paths.
+    {callback}  (Callable)  A function that will be invoked after the write
+                            operation is complete. The function must take a
+                            single argument: a List of QualityCode objects
+                            corresponding to the results of the write
+                            operation. [optional]
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    paths = ["[default]Tag1", "[default]Folder/Tag2"]
+    values = [10, 10]
+    system.tag.writeAsync(paths, values)
+<
+
+------------------------------------------------------------------------------
+system.tag.writeBlocking()                 *ignition-system.tag.writeBlocking*
+
+  Writes values to tags at the given paths. This function will "block" until
+  the write operation is complete or times out. Meaning, execution of the
+  calling script will pause until this function finishes. This is useful in
+  cases where the tag write must complete before further lines in the same
+  script should execute.
+
+  Syntax: >
+    system.tag.writeBlocking(tagPaths, values, [timeout])
+<
+
+  Parameters: ~
+    {tagPaths}  (List)     A List of tag paths to write to. If no property is
+                           specified in a tag path, the Value property is
+                           assumed.
+    {values}    (List)     A list of values to write to the specified tag
+                           paths.
+    {timeout}   (Integer)  How long to wait in milliseconds before the write
+                           operation times out. This parameter is optional
+                           and defaults to 45000 milliseconds if not
+                           specified. [optional]
+
+  Returns: ~
+    List - A List of QualityCode objects, one for each Tag path. See
+    Scripting Object Reference .
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Create a list with the tag paths to be updated.
+    paths = ["[default]Folder/Tag_A","[default]Folder/Tag_B"]
+    
+    # Create a list with the update values, one value for each path.
+    values = [1,2]
+    
+    # Execute the write operation.
+    system.tag.writeBlocking(paths, values)
+<
+
+
+vim:tw=78:ft=help:norl:

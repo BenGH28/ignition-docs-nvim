@@ -1,0 +1,266 @@
+*ignition-dnp3.txt*                             Ignition system.dnp3 functions
+
+SYSTEM.DNP3                                             *ignition-system.dnp3*
+
+  |ignition-system.dnp3.directOperateAnalog|
+  |ignition-system.dnp3.directOperateBinary|
+  |ignition-system.dnp3.freezeAnalogs|
+  |ignition-system.dnp3.freezeAnalogsAtTime|
+  |ignition-system.dnp3.freezeCounters|
+  |ignition-system.dnp3.freezeCountersAtTime|
+  |ignition-system.dnp3.selectOperateAnalog|
+  |ignition-system.dnp3.selectOperateBinary|
+
+------------------------------------------------------------------------------
+system.dnp3.directOperateAnalog()   *ignition-system.dnp3.directOperateAnalog*
+
+  Issues a Select-And-Operate command to set an analog value in an analog
+  output point.
+
+  Syntax: >
+    system.dnp3.directOperateAnalog(deviceName, index, value, [variation])
+<
+
+  Parameters: ~
+    {deviceName}  (String)   The name of the DNP3 device driver.
+    {index}       (Integer)  The index of the object to be modified in the
+                             outstation.
+    {value}       (Numeric)  The analog value that is requested (of type int,
+                             short, float, or double).
+    {variation}   (Integer)  The DNP3 object variation to use in the request.
+
+  Returns: ~
+    Integer - The DNP3 status code of the response, as an integer.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example shows setting the analog output at index 0 to the
+    #   Double value 3.14
+    
+    system.dnp3.directOperateAnalog("Dnp3", 0, 3.14)
+<
+
+------------------------------------------------------------------------------
+system.dnp3.directOperateBinary()   *ignition-system.dnp3.directOperateBinary*
+
+  Issues a Direct-Operate command for digital control operations at binary
+  output points (CROB).
+
+  Syntax: >
+    system.dnp3.directOperateBinary(deviceName, indexes, opType, tcCode, count, onTime, offTime)
+<
+
+  Parameters: ~
+    {deviceName}  (String)   The name of the DNP3 device driver.
+    {indexes}     (List)     A list of indexes of the objects to be modified
+                             in the outstation.
+    {opType}      (Integer)  The type of the operation. 0=NUL, 1=PULSE_ON,
+                             2=PULSE_OFF, 3=LATCH_ON, 4=LATCH_OFF
+    {tcCode}      (Integer)  The Trip-Close code, used in conjunction with
+                             the opType. 0=NUL, 1=CLOSE, 2=TRIP
+    {count}       (Integer)  The number of times the outstation shall execute
+                             the operation.
+    {onTime}      (Long)     The duration that the output drive remains
+                             active, in millis. [optional]
+    {offTime}     (Long)     The duration that the output drive remains
+                             non-active, in millis. [optional]
+
+  Returns: ~
+    The DNP3 status code of the response, as an integer.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example shows latching off 3 binary output points with the Direct-Operate command.
+    
+    off = system.dnp3.LATCH_OFF
+    system.dnp3.directOperateBinary("Dnp3", [0, 1, 2], off)
+<
+
+------------------------------------------------------------------------------
+system.dnp3.freezeAnalogs()               *ignition-system.dnp3.freezeAnalogs*
+
+  Issues a freeze command on the given analog outputs.
+
+  Syntax: >
+    system.dnp3.freezeAnalogs(deviceName, [indexes])
+<
+
+  Parameters: ~
+    {deviceName}  (String)  The name of the DNP3 device driver.
+    {indexes}     (List)    A list of specific indexes on which to issue the
+                            freeze command. An empty list can be passed to
+                            freeze all analogs.
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example shows a request to freeze all analog inputs in the outstation.
+    system.dnp3.freezeAnalogs("Dnp3", [])
+<
+
+------------------------------------------------------------------------------
+system.dnp3.freezeAnalogsAtTime()   *ignition-system.dnp3.freezeAnalogsAtTime*
+
+  Issues a freeze command on the given analog outputs at the given time for
+  the specified duration.
+
+  Syntax: >
+    system.dnp3.freezeAnalogsAtTime(deviceName, absoluteTime, intervalTime, indexes)
+<
+
+  Parameters: ~
+    {deviceName}    (String)   The name of the DNP3 device driver.
+    {absoluteTime}  (Integer)  The absolute time at which to freeze, in
+                               millis.
+    {intervalTime}  (Integer)  The interval at which to periodically freeze,
+                               in millis.
+    {indexes}       (List)     A list of specific indexes on which to issue
+                               the freeze command. An empty list will freeze
+                               all points.
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example shows a request to freeze analog inputs at indexes 2 and 4,
+    # 5 minutes from the current time, with no interval.
+    from time import *
+    
+    fiveMikes = (60 * 1000 * 5) + int(time() * 1000) #ms
+    system.dnp3.freezeAnalogsAtTime("Dnp3", fiveMikes, 0, [2, 4])
+<
+
+------------------------------------------------------------------------------
+system.dnp3.freezeCounters()             *ignition-system.dnp3.freezeCounters*
+
+  Issues a freeze command on the given counters.
+
+  Syntax: >
+    system.dnp3.freezeCounters(deviceName, [indexes])
+<
+
+  Parameters: ~
+    {deviceName}  (String)  The name of the DNP3 device driver.
+    {indexes}     (List)    A list of specific indexes on which to issue the
+                            freeze command. An empty list can be passed to
+                            freeze all counters. [optional]
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example shows a request to freeze all counters in the outstation.
+    system.dnp3.freezeCounters("Dnp3")
+<
+
+------------------------------------------------------------------------------
+system.dnp3.freezeCountersAtTime() *ignition-system.dnp3.freezeCountersAtTime*
+
+  Issues a freeze command on the given counters at the given time for the
+  specified duration.
+
+  Syntax: >
+    system.dnp3.freezeCountersAtTime(deviceName, absoluteTime, intervalTime, indexes)
+<
+
+  Parameters: ~
+    {deviceName}    (String)   The name of the DNP3 device driver.
+    {absoluteTime}  (Integer)  The absolute time at which to freeze, in
+                               millis.
+    {intervalTime}  (Integer)  The interval at which to periodically freeze,
+                               in millis.
+    {indexes}       (List)     A list of specific indexes on which to issue
+                               the freeze command. An empty list will freeze
+                               all counters.
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example shows a request to freeze counters at indexes 2 and 4,
+    #  5 minutes from the current time, with no interval.
+    from time import *
+    
+    fiveMikes = (60 * 1000 * 5) + int(time() * 1000) #ms
+    system.dnp3.freezeCountersAtTime("Dnp3", fiveMikes, 0, [2, 4])
+<
+
+------------------------------------------------------------------------------
+system.dnp3.selectOperateAnalog()   *ignition-system.dnp3.selectOperateAnalog*
+
+  Issues a Select-And-Operate command to set an analog value in an analog
+  output point.
+
+  Syntax: >
+    system.dnp3.selectOperateAnalog(deviceName, index, value, [variation])
+<
+
+  Parameters: ~
+    {deviceName}  (String)   The name of the DNP3 device driver.
+    {index}       (Integer)  The index of the object to be modified in the
+                             outstation.
+    {value}       (Numeric)  The analog value that is requested (of type int,
+                             short, float, or double).
+    {variation}   (Integer)  The DNP3 object variation to use in the request.
+                             [optional]
+
+  Returns: ~
+    The DNP3 status code of the response, as an integer.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example shows setting the analog output at index 0 to the Double value 3.14
+    system.dnp3.selectOperateAnalog("Dnp3", 0, 3.14)
+<
+
+------------------------------------------------------------------------------
+system.dnp3.selectOperateBinary()   *ignition-system.dnp3.selectOperateBinary*
+
+  Issues a Select-And-Operate command for digital control operations at
+  binary output points (CROB).
+
+  Syntax: >
+    system.dnp3.selectOperateBinary(deviceName, indexes, opType, tcCode, [count], [onTime], [offTime])
+<
+
+  Parameters: ~
+    {deviceName}  (String)   The name of the DNP3 driver .
+    {indexes}     (List)     A list of indexes of the objects to be modified
+                             in the outstation.
+    {opType}      (Integer)  The type of operation. 0=NUL, 1=PULSE_ON,
+                             2=PULSE_OFF, 3=LATCH_ON, 4=LATCH_OFF
+    {tcCode}      (Integer)  The Trip-Close code, used in conjunction with
+                             the opType. 0=NUL, 1=CLOSE, 2=TRIP
+    {count}       (Integer)  The number of times the outstation shall execute
+                             the operation. [optional]
+    {onTime}      (Integer)  The duration that the output drive remains
+                             active, in millis. [optional]
+    {offTime}     (Integer)  The duration that the output drive remains
+                             non-active, in millis. [optional]
+
+  Returns: ~
+    The DNP3 status code of the response, as an integer.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example shows latching on 3 binary output points with the Select-And-Operate command.
+    
+    latch = system.dnp3.LATCH_ON
+    system.dnp3.selectOperateBinary("Dnp3", [0, 1, 2], latch)
+<
+
+
+vim:tw=78:ft=help:norl:

@@ -1,0 +1,453 @@
+*ignition-opc.txt*                               Ignition system.opc functions
+
+SYSTEM.OPC                                               *ignition-system.opc*
+
+  |ignition-system.opc.browse|
+  |ignition-system.opc.browseServer|
+  |ignition-system.opc.browseSimple|
+  |ignition-system.opc.getServers|
+  |ignition-system.opc.getServerState|
+  |ignition-system.opc.isServerEnabled|
+  |ignition-system.opc.readValue|
+  |ignition-system.opc.readValues|
+  |ignition-system.opc.writeValue|
+  |ignition-system.opc.writeValues|
+  |ignition-system.opc.setServerEnabled|
+
+------------------------------------------------------------------------------
+system.opc.browse()                               *ignition-system.opc.browse*
+
+  Allows browsing of the OPC servers in the runtime, returning a list of
+  tags.
+
+  Syntax: >
+    system.opc.browse(opcServer, device, folderPath, opcItemPath)
+<
+
+  Parameters: ~
+    {opcServer}    (String)  The name of the OPC server to browse
+    {device}       (String)  The name of the device to browse
+    {folderPath}   (String)  Filters on a folder path. Use * as a wildcard
+                             for any number of characters and a ? for a
+                             single character.
+    {opcItemPath}  (String)  Filters on a OPC item path. Use * as a wildcard
+                             for any number of characters and a ? for a
+                             single character.
+
+  Returns: ~
+    List[OPCBrowseTag] - An array of OPCBrowseTag objects. OPCBrowseTag has
+    the following functions: getOpcServer(), getOpcItemPath(), getType(),
+    getDisplayName(), getDisplayPath(), getDataType().
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Browse every OPC server
+    
+    tags = system.opc.browse()
+    for row in tags:
+        print row.getOpcServer(), row.getOpcItemPath(), row.getType(),
+        print row.getDisplayName(), row.getDisplayPath(), row.getDataType()
+<
+
+------------------------------------------------------------------------------
+system.opc.browseServer()                   *ignition-system.opc.browseServer*
+
+  When called from a Vision Client, Perspective Session, or the Designer,
+  returns a list of OPCBrowseElement objects for the given server. Otherwise
+  returns a list of PyOPCTagEx objects.
+
+  Syntax: >
+    system.opc.browseServer(opcServer, nodeId)
+<
+
+  Parameters: ~
+    {opcServer}  (String)  The name of the OPC server connection.
+    {nodeId}     (String)  The node ID to browse.
+
+  Returns: ~
+    List - A list of PyOPCTagEx objects.
+
+  Syntax: >
+    system.opc.browseServer(opcServer, nodeId)
+<
+
+  Parameters: ~
+    {opcServer}  (String)  The name of the OPC server connection.
+    {nodeId}     (String)  The node ID to browse.
+
+  Returns: ~
+    List - A list of OPCBrowseElement objects.
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    # Print the name of all devices on Ignition OPC UA
+    opcServer="Ignition OPC UA Server"
+    nodeId = "Devices"
+    devices = system.opc.browseServer(opcServer, nodeId)
+    for device in devices:
+     print device.getDisplayName()
+<
+
+------------------------------------------------------------------------------
+system.opc.browseSimple()                   *ignition-system.opc.browseSimple*
+
+  Allows browsing of OPC servers in the runtime returning a list of tags.
+  browseSimple() takes mandatory parameters, which can be null, while
+  browse() uses keyword-style arguments. The spelling on the opcServer and
+  device parameters must be exact.
+
+  Syntax: >
+    system.opc.browseSimple(opcServer, device, folderPath, opcItemPath)
+<
+
+  Parameters: ~
+    {opcServer}    (String)  The name of the OPC server to browse
+    {device}       (String)  The name of the device to browse
+    {folderPath}   (String)  Filters on a folder path. Use * as a wildcard
+                             for any number of characters and a ? for a
+                             single character.
+    {opcItemPath}  (String)  Filters on a OPC item path. Use * as a wildcard
+                             for any number of characters and a ? for a
+                             single character.
+
+  Returns: ~
+    OPCBrowseTag[] - An array of OPCBrowseTag objects. OPCBrowseTag has the
+    following functions: getOpcServer(), getOpcItemPath(), getType(),
+    getDisplayName(), getDisplayPath(), getDataType().
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example will print out the the OPC item path for each item in a specific folder,
+    
+    # Browse Ignition's OPC UA Server. This can be changed to match any connected OPC server.
+    server = "Ignition OPC UA Server"
+    
+    # Focus on the "SLC" device connection. This must match a valid device connection in the OPC server.
+    device = "SLC"
+    
+    # Specify that the folder path should contain "B3".
+    folderPath = "*B3*"
+    
+    # This example is not filtering on a specific OPCItemPath, so it pass Python's None for this parameter
+    opcItemPath = None
+    
+    # Call browseSimple and store the results in a variable. Note that it may take some time to complete the browse.
+    OpcObjects = system.opc.browseSimple(server, device, folderPath, opcItemPath)
+    
+    # For each returned address, print out the
+    for address in OpcObjects:
+        print address.getOpcItemPath()
+<
+
+------------------------------------------------------------------------------
+system.opc.getServers()                       *ignition-system.opc.getServers*
+
+  Returns a list of server names.
+
+  Syntax: >
+    system.opc.getServers()
+<
+
+  Parameters: ~
+    {includeDisabled}  (Boolean)  If set to True, enabled and disabled
+                                  servers will be returned. If set to False,
+                                  only enabled servers will be returned.
+                                  Defaults to False. [optional]
+
+  Returns: ~
+    List - A list of server name strings. If no servers are found, returns an
+    empty list.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # print a list of all server names found
+    servers = system.opc.getServers()
+    if not servers:
+     print "No servers found"
+    else:
+     for server in servers:
+         print server
+<
+
+------------------------------------------------------------------------------
+system.opc.getServerState()               *ignition-system.opc.getServerState*
+
+  Retrieves the current state of the given OPC server connection. If the
+  given server is not found, the return value will be None. Otherwise, the
+  return value will be one of these strings:
+
+  Syntax: >
+    system.opc.getServerState(opcServer)
+<
+
+  Parameters: ~
+    {opcServer}  (String)  The name of an OPC server connection.
+
+  Returns: ~
+    String - A string representing the current state of the connection, or
+    None if the connection doesn't exist.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # The following will check the state of all configured servers, and show them in a message box.
+    # This code interacts in the client scope, so it should be placed on a component, such as a Button.
+    
+    # Retrieve a list of all servers in the gateway
+    allServers = system.opc.getServers()
+    
+    # Initialize a message. The example will append the state of each server to this message.
+    # The "\n" at the end of the string adds a new line
+    message = "Server State:\n"
+    
+    # Iterate through each server.
+    for server in allServers:
+        # For each server, append the server name, a colon, the state of the server, and a new line
+        message += server + ": " + system.opc.getServerState(server) + "\n"
+    
+    # Show the state of the servers in a message box.
+    system.vision.showMessage(message)
+<
+
+------------------------------------------------------------------------------
+system.opc.isServerEnabled()             *ignition-system.opc.isServerEnabled*
+
+  Checks if an OPC server connection is enabled or disabled.
+
+  Syntax: >
+    system.opc.isServerEnabled(serverName)
+<
+
+  Parameters: ~
+    {serverName}  (String)  The name of an OPC server connection.
+
+  Returns: ~
+    Boolean - True if the connection is enabled, false if the connection is
+    disabled
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # The following will iterate through all configured OPC servers, and check if they are enabled or disabled
+    # This code interacts in the client scope, so it should be placed on a component, such as a Button.
+    
+    # Retrieve a list of all servers in the gateway
+    allServers = system.opc.getServers()
+    
+    # Initialize a message. The example will append the state of each server to this message.
+    # The "\n" at the end of the string adds a new line
+    message = "Server Status:\n"
+    
+    # Iterate through each server.
+    for server in allServers:
+        # For each server, append the server name, a colon, the state of the server, and a new line.
+        # isServerEnabled returns a boolean, but may use the string format specifier (%s)
+        message += "%s : %s \n" % (server, system.opc.isServerEnabled(server))
+    
+    # Show the state of the servers in a message box.
+    system.vision.showMessage(message)
+<
+
+------------------------------------------------------------------------------
+system.opc.readValue()                         *ignition-system.opc.readValue*
+
+  Reads a single value directly from an OPC server connection. The address is
+  specified as a string, for example, [MyDevice]N11/N11:0The object returned
+  from this function has three attributes: value, quality, and timestamp. The
+  value attribute represents the current value for the address specified.
+
+  Syntax: >
+    system.opc.readValue(opcServer, itemPath)
+<
+
+  Parameters: ~
+    {opcServer}  (String)  The name of the OPC server connection in which the
+                           item resides.
+    {itemPath}   (String)  The item path, or address, to read from.
+
+  Returns: ~
+    QualifiedValue - A QualifedValue object that contains the value, quality,
+    and timestamp returned from the OPC server for the address specified.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    server = "Ignition OPC UA Server"
+    path = "[SLCSim]_Meta:N7/N7:0"
+    qualifiedValue = system.opc.readValue(server, path)
+    print "Value: " + str(qualifiedValue.getValue())
+    print "Quality: " + qualifiedValue.getQuality().toString()
+    print "Timestamp: " + qualifiedValue.getTimestamp().toString()
+<
+
+------------------------------------------------------------------------------
+system.opc.readValues()                       *ignition-system.opc.readValues*
+
+  This function is equivalent to the system.opc.readValue function, except
+  that it can operate in bulk. You can specify a list of multiple addresses
+  to read from, and you will receive a list of the same length, where each
+  entry is the qualified value object for the corresponding address.
+
+  Syntax: >
+    system.opc.readValues(opcServer, itemPaths)
+<
+
+  Parameters: ~
+    {opcServer}  (String)        The name of the OPC server connection in
+                                 which the items reside.
+    {itemPaths}  (List[String])  A list of strings, each representing an item
+                                 path, or address to read from.
+
+  Returns: ~
+    List[QualifiedValue] - A sequence of QualifedValue objects, one for each
+    address specified, in order. Each object contains a value, quality, and
+    timestamp returned from the OPC server for the corresponding address.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example will read values from a Tag provider called "testSimTags".
+    # Declare list values for itemPaths parameter
+    itemPaths = ['[testSimTags]_Meta:Random/RandomInteger1', '[testSimTags]_Meta:Random/RandomInteger1']
+    
+    # Call the system function
+    system.opc.readValues('Ignition OPC UA Server', itemPaths)
+<
+
+------------------------------------------------------------------------------
+system.opc.writeValue()                       *ignition-system.opc.writeValue*
+
+  Writes a value directly through an OPC server connection synchronously.
+  Will return an OPC UA status code object. You can quickly check if the
+  write succeeded by calling isGood() on the return value from this function.
+
+  Syntax: >
+    system.opc.writeValue(opcServer, itemPath, value)
+<
+
+  Parameters: ~
+    {opcServer}  (String)  The name of the OPC server connection in which the
+                           item resides.
+    {itemPath}   (String)  The item path, or address, to write to.
+    {value}      (Object)  The value to write to the OPC item.
+
+  Returns: ~
+    Quality - The status of the write. Use returnValue.isGood() to check if
+    the write succeeded. Refer to the list of writeValue objects.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example will write to an OPC Tag that is on a provider called SLCSim
+    # Declare the server name
+    server = "Ignition OPC UA Server"
+    
+    # Declare the Tag path
+    path = "[SLCSim]_Meta:N7/N7:0"
+    
+    # Declare the system function parameters
+    oldQualifiedValue = system.opc.readValue(server, path)
+    newValue = oldQualifiedValue.getValue() + 1
+    
+    # Call the system function and print out results
+    returnQuality = system.opc.writeValue(server, path, newValue)
+    if returnQuality.isGood():
+        print "Write was successful"
+    else:
+        print "Write failed"
+<
+
+------------------------------------------------------------------------------
+system.opc.writeValues()                     *ignition-system.opc.writeValues*
+
+  This function is a bulk version of system.opc.writeValue . It takes a list
+  of addresses and a list of objects, which must be the same length. It will
+  write the corresponding object to the corresponding address in bulk. It
+  will return a list of status codes representing the individual write
+  success or failure for each corresponding address.
+
+  Syntax: >
+    system.opc.writeValues(opcServer, itemPaths, values)
+<
+
+  Parameters: ~
+    {opcServer}  (String)        The name of the OPC server connection in
+                                 which the items reside.
+    {itemPaths}  (List[String])  A list of item paths, or addresses, to write
+                                 to.
+    {values}     (List[Any])     A list of values to write to each address
+                                 specified.
+
+  Returns: ~
+    List[Quality] - An array of Quality objects, each entry corresponding in
+    order to the addresses specified. Refer to the list of writeValues
+    objects.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example will write values to specified OPC items
+    # Declare a list of values
+    objectValue = [3]
+    
+    # Declare the item path to write values back to
+    itemPath = "ns=1;s=[GoldSim]B3/B3:100"
+    
+    # Write the values to the specified item. Replace "Ignition OPC UA Server" with your chosen OPC UA server.
+    system.opc.writeValues("Ignition OPC UA Server", itemPath, objectValue)
+<
+
+------------------------------------------------------------------------------
+system.opc.setServerEnabled()           *ignition-system.opc.setServerEnabled*
+
+  Enables or disables an OPC server connection.
+
+  Syntax: >
+    system.opc.setServerEnabled(serverName, enabled)
+<
+
+  Parameters: ~
+    {serverName}  (String)   The name of an OPC server connection.
+    {enabled}     (Boolean)  The new state the connection should be set to:
+                             true to enable the connection, false to disable.
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # The following will iterate through all configured OPC servers, and check if they are enabled or disabled.
+    # If an OPC server is disabled, the code will enable it with a call to setServerEnabled.
+    # This code interacts in the Client scope, so it should be placed on a component, such as a Button.
+    
+    # Retrieve a list of all servers in the Gateway.
+    allServers = system.opc.getServers(True)
+    
+    # Initialize a message. The empty string is initially used so that the value may be checked later.
+    message = ""
+    
+    # Iterate through each server.
+    for server in allServers:
+        # For each server, call isServerEnabled. Uses Python's "not" operator to check if a false value is returned.
+        if not system.opc.isServerEnabled(server):
+            # If disabled, then enable the server.
+            system.opc.setServerEnabled(server, True)
+            # Append details about the state change we made to the message variable.
+            message += "%s \n" % (server)
+    
+    # Check to see if any changes were made. If the length (len()) of the message is less than 1 character, then a change wasn't made.
+    if len(message) < 1:
+        # Notify the user that the code did not make any changes.
+        system.vision.showMessage("No servers were modified")
+    else:
+        # Otherwise, let the user know which servers we enabled.
+        system.vision.showMessage("The following servers were modified:\n" + message)
+<
+
+
+vim:tw=78:ft=help:norl:

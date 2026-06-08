@@ -1,0 +1,368 @@
+*ignition-bacnet.txt*                         Ignition system.bacnet functions
+
+SYSTEM.BACNET                                         *ignition-system.bacnet*
+
+  |ignition-system.bacnet.readRaw|
+  |ignition-system.bacnet.readRawMultiple|
+  |ignition-system.bacnet.synchronizeTime|
+  |ignition-system.bacnet.synchronizeTimeUtc|
+  |ignition-system.bacnet.writeRaw|
+  |ignition-system.bacnet.writeRawMultiple|
+  |ignition-system.bacnet.writeWithPriority|
+  |ignition-system.bacnet.readRaw#importing-classes|
+
+------------------------------------------------------------------------------
+system.bacnet.readRaw()                       *ignition-system.bacnet.readRaw*
+
+  Read from any BACnet object not explicitly supported by the BACnet driver.
+
+  Syntax: >
+    system.bacnet.readRaw(deviceName, objectType, objectId, propertyId, [propertyArrayIndex])
+<
+
+  Parameters: ~
+    {deviceName}          (String)              The name of the configured
+                                                BACnet/IP device instance to
+                                                read from.
+    {objectType}          (ObjectType)          The numeric id of the
+                                                objectType of the object
+                                                instance being read from. See
+                                                the objectType Reference
+                                                below.
+    {objectId}            (Integer)             The object instance number to
+                                                read.
+    {propertyId}          (PropertyIdentifier)  The PropertyIdentifier of the
+                                                object instance being read.
+                                                See the propertyId Reference
+                                                below.
+    {propertyArrayIndex}  (Integer)             [optional] The array index of
+                                                the property to read from.
+                                                This parameter is optional
+                                                and should not be used when
+                                                reading from the entire array
+                                                or if the property is not an
+                                                array.
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway
+
+------------------------------------------------------------------------------
+system.bacnet.readRawMultiple()       *ignition-system.bacnet.readRawMultiple*
+
+  This function is the bulk version of system.bacnet.readRaw to allow
+  multiple object/property combinations to be read simultaneously from a
+  single request. Returns a list of corresponding Encodable objects provided
+  equal-length lists of object types, object instance numbers, property IDs,
+  and property array indices.
+
+  Syntax: >
+    system.bacnet.readRawMultiple(deviceName, objectTypes, objectIds, propertyIds)
+<
+
+  Parameters: ~
+    {deviceName}   (String)              The name of the configured BACnet/IP
+                                         device instance to read from.
+    {objectTypes}  (ObjectTypes)         The numeric ids of the objectType of
+                                         the object instances being read
+                                         from. See the objectType Reference
+                                         below.
+    {objectIds}    (Integer)             The object instance number to read.
+    {propertyIds}  (PropertyIdentifier)  The PropertyIdentifier of the object
+                                         instance being read. See the
+                                         propertyId Reference below.
+
+  Returns: ~
+    A list of Encodable objects corresponding to the properties being read.
+
+  Scope: Gateway
+
+  Example: >
+    ot1 = system.bacnet.enumerated.ObjectType.analogOutput
+    pid1 = system.bacnet.enumerated.PropertyIdentifier.eventTimeStamps
+    
+    # read indices of the eventTimeStamps property
+    arrayCount = system.bacnet.readRawMultiple(
+        deviceName="bacnet_device_2",
+        objectTypes=[ot1, ot1, ot1],
+        objectIds=[1, 1, 1],
+        propertyIds=[pid1, pid1, pid1],
+        propertyArrayIndices=[1, 2, 3])
+    print arrayCount
+<
+
+------------------------------------------------------------------------------
+system.bacnet.synchronizeTime()       *ignition-system.bacnet.synchronizeTime*
+
+  Notifies the remote device of the correct current time, which is the system
+  time (factoring in time zone and DST) of the server Ignition is running on.
+
+  Syntax: >
+    system.bacnet.synchronizeTime(deviceName)
+<
+
+  Parameters: ~
+    {deviceName}  (String)  The name of the configured BACnet/IP device
+                            instance to write from.
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    deviceName = "BACnet Remote"
+    system.bacnet.synchronizeTime(deviceName)
+<
+
+------------------------------------------------------------------------------
+system.bacnet.synchronizeTimeUtc() *ignition-system.bacnet.synchronizeTimeUtc*
+
+  Notifies the remote device of the correct current time in UTC.
+
+  Syntax: >
+    system.bacnet.synchronizeTimeUtc(deviceName)
+<
+
+  Parameters: ~
+    {deviceName}  (String)  The name of the configured BACnet/IP device
+                            instance to write from.
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    deviceName = "BACnet Remote"
+    system.bacnet.synchronizeTimeUtc(deviceName)
+<
+
+------------------------------------------------------------------------------
+system.bacnet.writeRaw()                     *ignition-system.bacnet.writeRaw*
+
+  Write to any BACnet object not explicitly supported by the BACnet driver.
+
+  Syntax: >
+    system.bacnet.writeRaw(deviceName, objectType, objectId, propertyId, value, [priority], [propertyArrayIndex])
+<
+
+  Parameters: ~
+    {deviceName}          (String)              The name of the configured
+                                                BACnet/IP device instance to
+                                                write from.
+    {objectType}          (ObjectType)          The numeric id of the
+                                                objectType of the object
+                                                instance being written to.
+                                                See the objectType Reference
+                                                below.
+    {objectId}            (Integer)             The object instance number to
+                                                write to.
+    {propertyId}          (PropertyIdentifier)  The PropertyIdentifier of the
+                                                object instance being written
+                                                to. See the propertyId
+                                                Reference below.
+    {value}               (Object)              The value to write. Clearing
+                                                a value can be accomplished
+                                                by writing a None value.
+    {priority}            (Integer)             [optional] The priority level
+                                                to use when writing to
+                                                commandable properties. Must
+                                                match a level in the standard
+                                                BACnet priority array (a
+                                                value from 1 to 16). See the
+                                                Priority Reference table
+                                                below. This parameter is
+                                                optional and defaults to 8 if
+                                                not specified.
+    {propertyArrayIndex}  (Integer)             [optional] The array index of
+                                                the property to write to.
+                                                This parameter is optional
+                                                and should not be used when
+                                                writing to the entire array
+                                                or if the property is not an
+                                                array.
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway
+
+  Example: >
+    ot = system.bacnet.enumerated.ObjectType.binaryLightingOutput
+    pid = system.bacnet.enumerated.PropertyIdentifier.polarity
+    
+    # The below writes all do the same thing:
+    
+    polarity = system.bacnet.enumerated.Polarity.forId(1)
+    system.bacnet.writeRaw("bacnetDevice", ot, 1, pid, polarity)
+    
+    # Integer codes are automatically coerced to the appropriate enumerated object
+    system.bacnet.writeRaw("bacnetDevice", ot, 1, pid, 1)
+    
+    # Enumerated names are also automatically coerced (case-insensitive)
+    system.bacnet.writeRaw("bacnetDevice", ot, 1, pid, "reverse")
+<
+
+------------------------------------------------------------------------------
+system.bacnet.writeRawMultiple()     *ignition-system.bacnet.writeRawMultiple*
+
+  This function is the bulk version of system.bacnet.writeRaw by writing
+  properties to objects provided equal-length lists of object types, object
+  instance numbers, property IDs, values, priorities, and property array
+  indices. The system.bacnet.writeRawMultiple() function will accept
+  Encodable values on the value parameter.
+
+  Syntax: >
+    system.bacnet.writeRawMultiple(deviceName, objectTypes, objectIds, propertyIds, values, [priorities], [propertyArrayIndices])
+<
+
+  Parameters: ~
+    {deviceName}                       (String)              Name of the
+                                                             configured
+                                                             BACnet/IP device
+                                                             instance to
+                                                             write from.
+    {objectTypes}                      (ObjectType)          A list of
+                                                             ObjectType(s)
+                                                             for the object
+                                                             instance being
+                                                             written to.
+    {objectIds}                        (Integer)             A list of object
+                                                             instance numbers
+                                                             to write to.
+    {propertyIds}                      (PropertyIdentifier)  A list of
+                                                             PropertyIdentifier(s)
+                                                             for the object
+                                                             instances being
+                                                             written to.
+    {values}                           (Object)              A list of values
+                                                             to write.
+    {priorities [optional]}            (Integer)             An optional list
+                                                             of priority
+                                                             levels to use
+                                                             when writing to
+                                                             commandable
+                                                             properties. All
+                                                             elements must be
+                                                             in the range
+                                                             [1..16].
+                                                             Defaults to 8
+                                                             for all
+                                                             properties when
+                                                             this parameter
+                                                             is omitted.
+    {propertyArrayIndices [optional]}  (Integer)             An optional list
+                                                             of array indices
+                                                             corresponding to
+                                                             array properties
+                                                             being written.
+                                                             None should be
+                                                             specified as an
+                                                             element when
+                                                             writing to the
+                                                             entire array
+                                                             property or if
+                                                             the property is
+                                                             not an array.
+                                                             Defaults to a
+                                                             list of None
+                                                             when this
+                                                             parameter is
+                                                             omitted.
+
+  Returns: ~
+    No return value.
+
+  Scope: Gateway
+
+  Example: >
+    ### Writing with an enumerated property
+    ### Note you can reference the id (int) or name (string) from system.bacnet.enumerated import DoorAlarmState
+    
+    ot1 = system.bacnet.enumerated.ObjectType.accessDoor
+    pid1 = system.bacnet.enumerated.PropertyIdentifier.maskedAlarmValues
+<
+
+------------------------------------------------------------------------------
+system.bacnet.writeWithPriority()   *ignition-system.bacnet.writeWithPriority*
+
+  Write to the Present_Value attribute of an object with a custom priority
+  level.
+
+  Syntax: >
+    system.bacnet.writeWithPriority(deviceName, objectType, objectId, value, priority)
+<
+
+  Parameters: ~
+    {deviceName}  (String)   The name of the configured BACnet/IP device
+                             instance to write from.
+    {objectType}  (Integer)  The numeric id of the objectType of the object
+                             instance being written to. See the objectType
+                             Reference table below.
+    {objectId}    (Integer)  The object instance number to write to.
+    {value}       (Object)   The value to write. Clearing a value can be
+                             accomplished by writing a None value.
+    {priority}    (Integer)  The priority level to write the value at. Must
+                             match a level in the standard BACnet priority
+                             array (a value from 1 to 16). See the Priority
+                             Reference table below.
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    # Write a value of 'True' to Binary Value 1 with a Priority of 7.
+    
+    deviceName = 'BACnet Remote'
+    objectType = 5 # Binary Value
+    objectId = 1
+    value = True
+    priority = 7
+    
+    
+    system.bacnet.writeWithPriority(deviceName, objectType, objectId, value, priority)
+<
+
+------------------------------------------------------------------------------
+system.bacnet.readRaw#importing-classes() *ignition-system.bacnet.readRaw#importing-classes*
+
+  Read from any BACnet object not explicitly supported by the BACnet driver.
+
+  Syntax: >
+    system.bacnet.readRaw(deviceName, objectType, objectId, propertyId, [propertyArrayIndex])
+<
+
+  Parameters: ~
+    {deviceName}          (String)              The name of the configured
+                                                BACnet/IP device instance to
+                                                read from.
+    {objectType}          (ObjectType)          The numeric id of the
+                                                objectType of the object
+                                                instance being read from. See
+                                                the objectType Reference
+                                                below.
+    {objectId}            (Integer)             The object instance number to
+                                                read.
+    {propertyId}          (PropertyIdentifier)  The PropertyIdentifier of the
+                                                object instance being read.
+                                                See the propertyId Reference
+                                                below.
+    {propertyArrayIndex}  (Integer)             [optional] The array index of
+                                                the property to read from.
+                                                This parameter is optional
+                                                and should not be used when
+                                                reading from the entire array
+                                                or if the property is not an
+                                                array.
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway
+
+
+vim:tw=78:ft=help:norl:

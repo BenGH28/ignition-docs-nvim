@@ -1,0 +1,49 @@
+*ignition-print.txt*                           Ignition system.print functions
+
+SYSTEM.PRINT                                           *ignition-system.print*
+
+  |ignition-system.print.getPrinterNames|
+  |ignition-system.print.getDefaultPrinterName|
+
+------------------------------------------------------------------------------
+system.print.getPrinterNames()         *ignition-system.print.getPrinterNames*
+
+  Lists the available local printers.
+
+  Syntax: >
+    system.print.getPrinterNames()
+<
+
+  Returns: ~
+    List - A list of strings that contain the names of local printers.
+    Returns an empty list if there are no available local printers.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This code will return a list of names of the machine's local printers.
+    system.print.getPrinterNames()
+<
+
+------------------------------------------------------------------------------
+system.print.getDefaultPrinterName() *ignition-system.print.getDefaultPrinterName*
+
+  Obtains the local default printer.
+
+  Syntax: >
+    system.print.getDefaultPrinterName()
+<
+
+  Returns: ~
+    String - A string that represents the default printer. Returns null if
+    there is no default printer.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This code will return the name of the local default printer.
+    system.print.getDefaultPrinterName()
+<
+
+
+vim:tw=78:ft=help:norl:

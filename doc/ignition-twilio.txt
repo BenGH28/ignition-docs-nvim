@@ -1,0 +1,287 @@
+*ignition-twilio.txt*                         Ignition system.twilio functions
+
+SYSTEM.TWILIO                                         *ignition-system.twilio*
+
+  |ignition-system.twilio.getAccounts|
+  |ignition-system.twilio.getAccountsDataset|
+  |ignition-system.twilio.getActiveCalls|
+  |ignition-system.twilio.getPhoneNumbers|
+  |ignition-system.twilio.getPhoneNumbersDataset|
+  |ignition-system.twilio.sendFreeformWhatsApp|
+  |ignition-system.twilio.sendPhoneCall|
+  |ignition-system.twilio.sendSms|
+  |ignition-system.twilio.sendWhatsAppTemplate|
+
+------------------------------------------------------------------------------
+system.twilio.getAccounts()               *ignition-system.twilio.getAccounts*
+
+  Returns a list of Twilio account names that have been configured in the
+  Gateway.
+
+  Syntax: >
+    system.twilio.getAccounts()
+<
+
+  Returns: ~
+    List[String] - A list of configured Twilio account names.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Retrieves a list of Twilio accounts and then iterates through the resulting list.
+    # Call system.twilio.getAccounts() and store the returned list into a variable.
+    twilioAccounts = system.twilio.getAccounts()
+    
+    # Iterate through the list of accounts.
+    for account in twilioAccounts:
+        # Prints the account name to the console.
+        print account
+<
+
+------------------------------------------------------------------------------
+system.twilio.getAccountsDataset() *ignition-system.twilio.getAccountsDataset*
+
+  Returns a list of Twilio account names that have been configured in the
+  Gateway as a single-column Dataset.
+
+  Syntax: >
+    system.twilio.getAccountsDataset()
+<
+
+  Returns: ~
+    Dataset - A list of configured Twilio accounts as a single-column
+    Dataset.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Retrieves a list of Twilio accounts and then passes the data to a Table component's data property.
+    
+    # Call system.twilio.getAccountsDataset() and store the returned list into a variable.
+    twilioAccounts = system.twilio.getAccountsDataset()
+    
+    
+    # Pass the dataset to a Table component. The Table is located in the same container as the
+    # component calling this script.
+    event.source.parent.getComponent('Table').data = twilioAccounts
+<
+
+------------------------------------------------------------------------------
+system.twilio.getActiveCalls()         *ignition-system.twilio.getActiveCalls*
+
+  Returns a list of configurations for currently active Twilio voice calls.
+  This only applies to synchronous calls that use the reverse-proxy system to
+  call back into Ignition for authentication and alarm acknowledgements.
+  Since calls can last minutes and potentially be stuck ringing for some
+  time, this function gives users a view of the current state of call
+  notifications while they're active.
+
+  Syntax: >
+    system.twilio.getActiveCall(accountName)
+<
+
+  Parameters: ~
+    {accountName}  (String)  The Twilio account to use for the calls.
+
+  Returns: ~
+    CallView - An array of CallView objects, including the properties listed
+    below.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+------------------------------------------------------------------------------
+system.twilio.getPhoneNumbers()       *ignition-system.twilio.getPhoneNumbers*
+
+  Returns a list of outgoing phone numbers for a Twilio account. Note that
+  these numbers are supplied by Twilio, and are not defined on a user in
+  Ignition.
+
+  Syntax: >
+    system.twilio.getPhoneNumbers(accountName)
+<
+
+  Parameters: ~
+    {accountName}  (String)  The Twilio account to retrieve phone numbers for
+
+  Returns: ~
+    List[String] - A list of phone numbers for the given Twilio account
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Retrieves a list of phone numbers associated with a Twilio account and then iterates through the resulting list.
+    # Checks against a Twilio profile configured on the Gateway by the name of "Twilio Account".
+    
+    # Call system.twilio.getPhoneNumbers() and store the returned list into a variable.
+    twilioNumbers = system.twilio.getPhoneNumbers("Twilio Account")
+    
+    # Iterate through the list of numbers.
+    for number in twilioNumbers:
+    
+        # Prints the numbers to the console
+        print number
+<
+
+------------------------------------------------------------------------------
+system.twilio.getPhoneNumbersDataset() *ignition-system.twilio.getPhoneNumbersDataset*
+
+  Returns a list of outgoing phone numbers for a Twilio account as a
+  single-column Dataset. Note that these numbers are supplied by Twilio, and
+  are not defined on a user in Ignition.
+
+  Syntax: >
+    system.twilio.getPhoneNumbersDataset(accountName)
+<
+
+  Parameters: ~
+    {accountName}  (String)  The Twilio account for which to retrieve phone
+                             numbers.
+
+  Returns: ~
+    Dataset - A list of phone numbers for the given Twilio account as a
+    single-column Dataset
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Retrieves a list of phone numbers associated with a Twilio account and then passes the resulting list to a Table component's Data property.
+    # Checks against a Twilio profile configured on the Gateway by the name of "Twilio Account".
+    
+    # Call system.twilio.getPhoneNumbers() and store the returned list into a variable.
+    twilioNumbers = system.twilio.getPhoneNumbersDataset("Twilio Account")
+    
+    # Pass the dataset to a Table component. The Table is located in the same container as the
+    # component calling this script.
+    event.source.parent.getComponent('Table').data = twilioNumbers
+<
+
+------------------------------------------------------------------------------
+system.twilio.sendFreeformWhatsApp() *ignition-system.twilio.sendFreeformWhatsApp*
+
+  Sends a free-form WhatsApp message. WhatsApp considers any message that is
+  not a pre-approved template a free-form message. Free-form messages can
+  only be sent with Ignition after a 24-hour Session opens. A user can open a
+  24-hour Session by simply sending a WhatsApp message to the Twilio account.
+  Then, the Session remains open for 24 hours from the last inbound message
+  received from the user.
+
+  Syntax: >
+    system.twilio.sendFreeformWhatsApp(accountName, fromNumber, toNumber, message)
+<
+
+  Parameters: ~
+    {accountName}  (String)  The Twilio account to send from.
+    {fromNumber}   (String)  The phone number configured with Twilio to use
+                             for making the calls.
+    {toNumber}     (String)  The phone number of the recipient.
+    {message}      (String)  The body of the free-form WhatsApp message.
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+------------------------------------------------------------------------------
+system.twilio.sendPhoneCall()           *ignition-system.twilio.sendPhoneCall*
+
+  Sends a phone call to a specific phone number. In order to work, a Twilio
+  account must be configured in the Gateway with a valid number configured
+  for use with Twilio Voice.
+
+  Syntax: >
+    system.twilio.sendPhoneCall(accountName, fromNumber, toNumber, message, voice, language, recordCall)
+<
+
+  Parameters: ~
+    {accountName}  (String)   The Twilio account to use for the calls.
+    {fromNumber}   (String)   The phone number configured with Twilio to use
+                              for making the calls.
+    {toNumber}     (String)   The phone number of the recipient.
+    {message}      (String)   The message text to use in the call.
+    {voice}        (String)   The voice-to-text algorithm to use. âmanâ
+                              and âwomanâ are the basic Twilio
+                              voice-to-text algorithms, but Twilio also
+                              supports using Amazonâs and Googleâs
+                              voice-to-text algorithms, though pricing may
+                              vary depending on your Twilio subscription.
+                              Defaults to âmanâ. [optional]
+    {language}     (String)   The language code for the language to use for
+                              text-to-speech generation. Defaults to en-US if
+                              no language is configured. [optional]
+    {recordCall}   (Boolean)  Whether to record the calls. Defaults to false.
+                              [optional]
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+------------------------------------------------------------------------------
+system.twilio.sendSms()                       *ignition-system.twilio.sendSms*
+
+  Sends an SMS message.
+
+  Syntax: >
+    system.twilio.sendSms(accountName, fromNumber, toNumber, message)
+<
+
+  Parameters: ~
+    {accountName}  (String)  The Twilio account to send the SMS from.
+    {fromNumber}   (String)  The outbound phone number belonging to the
+                             Twilio account to use.
+    {toNumber}     (String)  The phone number of the recipient.
+    {message}      (String)  The body of the SMS.
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Send an SMS message.
+    # Fetch the Twilio account name.
+    # getAccounts() returns a list, so the "[0]" operator is referring to the first item in the list.
+    account = system.twilio.getAccounts()[0]
+    
+    # Fetch the first number associated with the account.
+    fromNumber = system.twilio.getPhoneNumbers(account)[0]
+    
+    # Fetch a specific user's contact information.
+    # A static value is used below, but system.user.getUser() could be used to retrieved a user's phone number.
+    toNumber = "+19165550101"
+    
+    # Define the text message.
+    # A static message is used below, but multiple messages could be stored in a database table and retrieved here.
+    textMessage = "This is the body of a text message"
+    
+    # Send the message.
+    system.twilio.sendSms(account, fromNumber, toNumber, textMessage)
+<
+
+------------------------------------------------------------------------------
+system.twilio.sendWhatsAppTemplate() *ignition-system.twilio.sendWhatsAppTemplate*
+
+  Sends a WhatsApp template message. Template messages are configurable
+  messages on Twilio that can be sent to users via Twilio WhatsApp Refer to
+  WhatsApp Template Overview documentation for more information.
+
+  Syntax: >
+    system.twilio.sendWhatsAppTemplate(accountName, userNumber, whatsAppService, whatsAppTemplate, templateParameters)
+<
+
+  Parameters: ~
+    {accountName}         (String)  The Twilio account to send from.
+    {userNumber}          (String)  The phone number of the recipient.
+    {whatsAppService}     (String)  The Twilio Messaging Service SID
+                                    configured to send WhatsApp Messages.
+    {whatsAppTemplate}    (String)  The Twilio Content Template SID.
+    {templateParameters}  (String)  A list of values to pass into the Twilio
+                                    Content Template as parameters.
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+
+vim:tw=78:ft=help:norl:

@@ -1,0 +1,246 @@
+*ignition-kafka.txt*                           Ignition system.kafka functions
+
+SYSTEM.KAFKA                                           *ignition-system.kafka*
+
+  |ignition-system.kafka.listConnectorInfo|
+  |ignition-system.kafka.listTopicPartitions|
+  |ignition-system.kafka.listTopics|
+  |ignition-system.kafka.pollPartition|
+  |ignition-system.kafka.pollTopic|
+  |ignition-system.kafka.seekLatest|
+  |ignition-system.kafka.sendRecord|
+  |ignition-system.kafka.sendRecordAsync|
+
+------------------------------------------------------------------------------
+system.kafka.listConnectorInfo()     *ignition-system.kafka.listConnectorInfo*
+
+  Returns descriptions of all Kafka connectors in PyDictionary format.
+
+  Syntax: >
+    system.kafka.listConnectorInfo()
+<
+
+  Returns: ~
+    List - A list of descriptions of all Kafka connectors in PyDictionary
+    format.
+
+  Scope: Gateway
+
+  Example: >
+    # Returns a descriptive list of Kafka connectors.
+    system.kafka.listConnectorInfo()
+<
+
+------------------------------------------------------------------------------
+system.kafka.listTopicPartitions() *ignition-system.kafka.listTopicPartitions*
+
+  Returns a list of records that match the filter.
+
+  Syntax: >
+    system.kafka.listTopicPartitions(connector, topic, groupId, [options])
+<
+
+  Parameters: ~
+    {connector}  (String)      The name of the Kafka connector.
+    {topic}      (String)      The name of the Kafka topic.
+    {groupId}    (String)      The unique string of the consumer group the
+                               consumer belongs to.
+    {options}    (Dictionary)  Custom options specific to the consumer, with
+                               key value string pairs. Optional.
+
+  Returns: ~
+    List - A list of records that match the filter.
+
+  Scope: Gateway
+
+  Example: >
+    # Returns a list of records according to the parameter filters.
+    system.kafka.listTopicPartitions("MyKafkaConnector", "MyKafkaTopic", "consumer-group-one")
+<
+
+------------------------------------------------------------------------------
+system.kafka.listTopics()                   *ignition-system.kafka.listTopics*
+
+  Returns a list of topics for the provided connector.
+
+  Syntax: >
+    system.kafka.listTopics(connector)
+<
+
+  Parameters: ~
+    {connector}  (String)  The name of the Kafka connector.
+
+  Returns: ~
+    List - A list of topics for the provided connector.
+
+  Scope: Gateway
+
+  Example: >
+    # Returns a list of topics from the specified connector.
+    system.kafka.listTopics("MyKafkaConnector")
+<
+
+------------------------------------------------------------------------------
+system.kafka.pollPartition()             *ignition-system.kafka.pollPartition*
+
+  Returns a list of records polled from a specified partition.
+
+  Syntax: >
+    system.kafka.pollPartition(connector, topic, partition, offset, [options], sizeCutoff, timeoutMs)
+<
+
+  Parameters: ~
+    {connector}   (String)      The name of the Kafka connector.
+    {topic}       (String)      The name of the Kafka topic.
+    {partition}   (Integer)     The partition to poll.
+    {offset}      (Long)        The position of offset to start the poll at.
+    {options}     (Dictionary)  Custom options specific to the consumer, with
+                                key value string pairs. Optional.
+    {sizeCutoff}  (Integer)     New in 8.3.3 The total record count allowed
+                                before polling will be stopped.
+    {timeoutMs}   (Long)        New in 8.3.3 The amount of time in
+                                milliseconds before polling will be stopped.
+
+  Returns: ~
+    List - A list of records polled from a specified partition.
+
+  Scope: Gateway
+
+  Example: >
+    # Get a list of records from the specified partition.
+    system.kafka.pollPartition("MyKafkaConnector", "MyKafkaTopic", 2, 4, 5, 1000 )
+<
+
+------------------------------------------------------------------------------
+system.kafka.pollTopic()                     *ignition-system.kafka.pollTopic*
+
+  Returns a list of records from the specified topic.
+
+  Syntax: >
+    system.kafka.pollTopic(connector, topic, groupId, [options], sizeCutoff, timeoutMs)
+<
+
+  Parameters: ~
+    {connector}   (String)      The name of the Kafka connector.
+    {topic}       (String)      The name of the Kafka topic.
+    {groupId}     (String)      The unique string of the consumer group the
+                                consumer belongs to.
+    {options}     (Dictionary)  Custom options specific to the consumer, with
+                                key value string pairs. Optional.
+    {sizeCutoff}  (Integer)     New in 8.3.3 The total record count allowed
+                                before polling will be stopped.
+    {timeoutMs}   (Long)        New in 8.3.3 The amount of time in
+                                milliseconds before polling will be stopped.
+
+  Returns: ~
+    List - A list of records from the specified topic.
+
+  Scope: Gateway
+
+  Example: >
+    # Returns a list of records from the specified topic.
+    
+    system.kafka.pollTopic("MyKafkaConnector", "MyKafkaTopic", "consumer-group-one")
+<
+
+------------------------------------------------------------------------------
+system.kafka.seekLatest()                   *ignition-system.kafka.seekLatest*
+
+  Retrieves the last N number of records from a specified topic.
+
+  Syntax: >
+    system.kafka.seekLatest(connector, topic, partition, recordCount, [options])
+<
+
+  Parameters: ~
+    {connector}    (String)      The name of the Kafka connector.
+    {topic}        (String)      The name of the Kafka topic.
+    {partition}    (Integer)     The partition to target.
+    {recordCount}  (Integer)     The number of records to return.
+    {options}      (Dictionary)  Custom options specific to the consumer,
+                                 with key value string pairs. Optional.
+
+  Returns: ~
+    List - An N number of records from a specified topic, as a list.
+
+  Scope: Gateway
+
+  Example: >
+    # Returns the latest 5 records from the specified topic.
+    system.kafka.seekLatest("MyKafkaConnector", "MyKafkaTopic", 3, 5)
+<
+
+------------------------------------------------------------------------------
+system.kafka.sendRecord()                   *ignition-system.kafka.sendRecord*
+
+  Sends a record to a specified topic, with further sends blocked until a
+  response is received. This is considerably slower than
+  system.kafka.sendRecordAsync , and should only be used if a metadata
+  response is required.
+
+  Syntax: >
+    system.kafka.sendRecord(connector, topic, key, value, [partition], [timestamp], [headerKeys], [headerValues], [options])
+<
+
+  Parameters: ~
+    {connector}     (String)      The name of the Kafka connector.
+    {topic}         (String)      The name of the Kafka topic.
+    {key}           (String)      The Kafka record key, used in identifying
+                                  the record.
+    {value}         (String)      The Kafka record value you want to send.
+    {partition}     (Integer)     The partition to target. Optional.
+    {timestamp}     (Long)        The record timestamp, in milliseconds.
+                                  Optional.
+    {headerKeys}    (List)        The header keys for the record. Optional.
+    {headerValues}  (List)        The header values for the record. Optional.
+    {options}       (Dictionary)  Custom options specific to the producer,
+                                  with key value string pairs. Optional.
+
+  Returns: ~
+    PyDictionary - A PyDictionary representing metadata response in key value
+    pairs. The metadata contains keys for:
+
+  Scope: Gateway
+
+  Example: >
+    # Sends a record to the specified topic, with further sends blocked until a response is received.
+    system.kafka.sendRecord("MyKafkaConnector", "MyKafkaTopic", "k2", "25")
+<
+
+------------------------------------------------------------------------------
+system.kafka.sendRecordAsync()         *ignition-system.kafka.sendRecordAsync*
+
+  Sends a record to a specified topic asynchronously. If a metadata response
+  is required, system.kafka.sendRecord can be used for blocking until a
+  response is received.
+
+  Syntax: >
+    system.kafka.sendRecordAsync(connector, topic, key, value, [partition], [timestamp], [headerKeys], [headerValues], [options])
+<
+
+  Parameters: ~
+    {connector}     (String)      The name of the Kafka connector.
+    {topic}         (String)      The name of the Kafka topic.
+    {key}           (String)      The Kafka record key, used in identifying
+                                  the record.
+    {value}         (String)      The Kafka record value you want to send.
+    {partition}     (Integer)     The partition to target. Optional.
+    {timestamp}     (Long)        The record timestamp, in milliseconds.
+                                  Optional.
+    {headerKeys}    (List)        The header keys for the record. Optional.
+    {headerValues}  (List)        The header values for the record. Optional.
+    {options}       (Dictionary)  Custom options specific to the producer,
+                                  with key value string pairs. Optional.
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway
+
+  Example: >
+    # Sends a record to the specified topic, without any blocking.
+    system.kafka.sendRecordAsync("MyKafkaConnector", "MyKafkaTopic", "k2", "25")
+<
+
+
+vim:tw=78:ft=help:norl:

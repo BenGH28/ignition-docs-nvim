@@ -1,0 +1,228 @@
+*ignition-device.txt*                         Ignition system.device functions
+
+SYSTEM.DEVICE                                         *ignition-system.device*
+
+  |ignition-system.device.addDevice|
+  |ignition-system.device.listDevices|
+  |ignition-system.device.refreshBrowse|
+  |ignition-system.device.removeDevice|
+  |ignition-system.device.restart|
+  |ignition-system.device.setDeviceEnabled|
+  |ignition-system.device.setDeviceHostname|
+  |ignition-system.device.getDeviceHostname|
+
+------------------------------------------------------------------------------
+system.device.addDevice()                   *ignition-system.device.addDevice*
+
+  Adds a new device connection in Ignition. Accepts a dictionary of
+  parameters to configure the connection. Acceptable parameters differ by
+  device type: i.e., a Modbus/TCP connection requires a hostname and port,
+  but a simulator doesn't require any parameters.
+
+  Syntax: >
+    system.device.addDevice(deviceType, deviceName, deviceProps, [description])
+<
+
+  Parameters: ~
+    {deviceType}   (String)                   The device driver type.
+                                              Possible values are listed in
+                                              the Device Types table below.
+    {deviceName}   (String)                   The name that will be given to
+                                              the new device connection.
+    {deviceProps}  (Dictionary[String, Any])  A dictionary of device
+                                              connection properties and
+                                              values. Each deviceType has
+                                              different properties, but most
+                                              require at least a hostname.
+                                              Keys in the dictionary are
+                                              case-insensitive, spaces are
+                                              omitted, and the names of the
+                                              properties that appear when
+                                              manually creating a device
+                                              connection.
+    {description}  (String)                   The description that will be
+                                              given to the new device
+                                              connection. [optional]
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Below is an example of creating a new Generic Simulator device connection.
+    # Note that we MUST pass a dictionary as the 3rd parameter, even if it's empty.
+    
+    # Call the function
+    system.device.addDevice(deviceType = "Simulator", deviceName = "New_Generic_Simulator", deviceProps = {} )
+<
+
+------------------------------------------------------------------------------
+system.device.listDevices()               *ignition-system.device.listDevices*
+
+  Returns a dataset of information about each configured device. Each row
+  represents a single device.
+
+  Syntax: >
+    system.device.listDevices()
+<
+
+  Returns: ~
+    Dataset - A dataset, where each row represents a device. Contains 4
+    columns:
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    deviceDataset = system.device.listDevices()
+    
+    # Assign the deviceDataset to a Power Table. This example assumes
+    # the Power Table is in the same container as the component that called this script
+    event.source.parent.getComponent('Power Table').data = deviceDataset
+<
+
+------------------------------------------------------------------------------
+system.device.refreshBrowse()           *ignition-system.device.refreshBrowse*
+
+  Forces Ignition to browse the controller. Only works for Allen-Bradley
+  controllers using legacy Allen-Bradley drivers, such as CompactLogix and
+  ControlLogix.
+
+  Syntax: >
+    system.device.refreshBrowse(deviceName)
+<
+
+  Parameters: ~
+    {deviceName}  (String)  The name of the device in Ignition.
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Example 1:
+    system.device.refreshBrowse("CLX")
+<
+
+------------------------------------------------------------------------------
+system.device.removeDevice()             *ignition-system.device.removeDevice*
+
+  Removes a given device from Ignition.
+
+  Syntax: >
+    system.device.removeDevice(deviceName)
+<
+
+  Parameters: ~
+    {deviceName}  (String)  The name of the device in Ignition.
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Example 1:
+    system.device.removeDevice("CLX")
+<
+
+------------------------------------------------------------------------------
+system.device.restart()                       *ignition-system.device.restart*
+
+  Restarts the named device connection.
+
+  Syntax: >
+    system.device.restart(deviceName)
+<
+
+  Parameters: ~
+    {deviceName}  (String)  The name of the device connection to restart. The
+                            function will throw an error if the specified
+                            deviceName does not exist on the host gateway.
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    system.device.restart("my_device")
+<
+
+------------------------------------------------------------------------------
+system.device.setDeviceEnabled()     *ignition-system.device.setDeviceEnabled*
+
+  Enables/disables a device in Ignition.
+
+  Syntax: >
+    system.device.setDeviceEnabled(deviceName, enabled)
+<
+
+  Parameters: ~
+    {deviceName}  (String)   The name of the device in Ignition.
+    {enabled}     (Boolean)  Specifies whether the device connection will be
+                             set to enabled or disabled state.
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Example 1: Enable a device
+    
+    system.device.setDeviceEnabled("CLX", 1)
+<
+
+------------------------------------------------------------------------------
+system.device.setDeviceHostname()   *ignition-system.device.setDeviceHostname*
+
+  Changes the hostname of a device. Used for all ethernet based drivers.
+
+  Syntax: >
+    system.device.setDeviceHostname(deviceName, hostname)
+<
+
+  Parameters: ~
+    {deviceName}  (String)  The name of the device in Ignition.
+    {hostname}    (String)  The new IP address or hostname.
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Set Hostname:
+    
+    system.device.setDeviceHostname("CLX", "10.10.1.20")
+<
+
+------------------------------------------------------------------------------
+system.device.getDeviceHostname()   *ignition-system.device.getDeviceHostname*
+
+  Returns the hostname of the device.
+
+  Syntax: >
+    system.device.getDeviceHostname()
+<
+
+  Parameters: ~
+    {deviceName}  (String)  The name of the device in Ignition.
+
+  Returns: ~
+    The hostname of the device. The value will display null if the device
+    doesn't have a hostname.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # The following example displays the device hostname
+    # for the device as entered in Ignition.
+    
+    print system.device.getDeviceHostname(deviceName)
+<
+
+
+vim:tw=78:ft=help:norl:

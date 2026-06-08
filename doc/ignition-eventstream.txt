@@ -1,0 +1,92 @@
+*ignition-eventstream.txt*               Ignition system.eventstream functions
+
+SYSTEM.EVENTSTREAM                               *ignition-system.eventstream*
+
+  |ignition-system.eventstream.getDiagnostics|
+  |ignition-system.eventstream.listEventStreams|
+  |ignition-system.eventstream.publishEvent|
+
+------------------------------------------------------------------------------
+system.eventstream.getDiagnostics() *ignition-system.eventstream.getDiagnostics*
+
+  Retrieves diagnostics for an event stream.
+
+  Syntax: >
+    system.eventstream.getDiagnostics(project, path)
+<
+
+  Parameters: ~
+    {project}  (String)  The project the event stream belongs to.
+    {path}     (String)  The path to the event stream resource.
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway
+
+  Example: >
+    # Retrieve the diagnostics from the "listener" event stream located within the "event-stream" project.
+    system.eventstream.getDiagnostics("event-stream", "listener")
+<
+
+------------------------------------------------------------------------------
+system.eventstream.listEventStreams() *ignition-system.eventstream.listEventStreams*
+
+  Lists event stream resource paths that are part of the specified project.
+
+  Syntax: >
+    system.eventstream.listEventStreams(project)
+<
+
+  Parameters: ~
+    {project}  (String)  The project the event stream(s) belong to.
+
+  Returns: ~
+    List - A list of event stream resources within the specified project.
+
+  Scope: Gateway
+
+  Example: >
+    # Retrieve the list of event streams from the "event-stream" project.
+    system.eventstream.listEventStreams("event-stream")
+<
+
+------------------------------------------------------------------------------
+system.eventstream.publishEvent()   *ignition-system.eventstream.publishEvent*
+
+  Publishes a message to a Gateway Event Source. You can publish a message to
+  the local Gateway, or a remote Gateway.
+
+  Syntax: >
+    system.eventstream.publishEvent(project, path, message, acknowledge, [gatewayName])
+<
+
+  Parameters: ~
+    {project}      (String)   The project the event stream(s) belong to.
+    {path}         (String)   The path to the event stream resource.
+    {message}      (String)   The string message to send.
+    {acknowledge}  (Boolean)  If True, further messages will be blocked until
+                              the receiving Gateway Event Listener source
+                              finishes processing the current message. If
+                              False, further messages will not be blocked
+                              while waiting for a response from the Gateway
+                              Event Listener source.
+    {gatewayName}  (String)   The Gateway Name of the remote Gateway you want
+                              to send the message to. Not specifying a remote
+                              Gateway or using None will send the message to
+                              the specified event stream path and project on
+                              the local Gateway. [Optional]
+
+  Returns: ~
+    PyDictionary - A dictionary of key and value status pairs resulting from
+    publishing the specified event stream. Keys returned include:
+
+  Scope: Gateway
+
+  Example: >
+    # Sends the specified message to the "listener" event stream located within the "event-stream" project.
+    system.eventstream.publishEvent("event-stream", "listener", "I am a message!", True)
+<
+
+
+vim:tw=78:ft=help:norl:

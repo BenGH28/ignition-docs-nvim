@@ -1,0 +1,237 @@
+*ignition-roster.txt*                         Ignition system.roster functions
+
+SYSTEM.ROSTER                                         *ignition-system.roster*
+
+  |ignition-system.roster.addUsers|
+  |ignition-system.roster.createRoster|
+  |ignition-system.roster.deleteRoster|
+  |ignition-system.roster.getRoster|
+  |ignition-system.roster.getRosterNames|
+  |ignition-system.roster.getRosters|
+  |ignition-system.roster.getUsers|
+  |ignition-system.roster.removeUsers|
+
+------------------------------------------------------------------------------
+system.roster.addUsers()                     *ignition-system.roster.addUsers*
+
+  Adds a list of users to an existing roster. Users are always appended to
+  the end of the roster.
+
+  Syntax: >
+    system.roster.addUsers(rosterName, [users])
+<
+
+  Parameters: ~
+    {rosterName}  (String)  The name of the roster to modify.
+    {users}       (List)    A list of User objects that will be added to the
+                            end of the roster. User objects can be created
+                            with the system.user.getUser and
+                            system.user.addUser functions. These users must
+                            exist before being added to the roster.
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    # Adds a couple of users to a roster.
+    userSource = "default"
+    rosterName = "rosterEast"
+    
+    # getUser() returns a user object, which is needed for addUser()
+    userA = system.user.getUser(userSource, "george")
+    userB = system.user.getUser(userSource, "joe")
+    
+    system.roster.addUsers(rosterName, [userA, userB])
+<
+
+------------------------------------------------------------------------------
+system.roster.createRoster()             *ignition-system.roster.createRoster*
+
+  Creates a roster with the given name and description, if it does not
+  already exist.
+
+  Syntax: >
+    system.roster.createRoster(name, description)
+<
+
+  Parameters: ~
+    {name}         (String)  The name of the roster to create.
+    {description}  (String)  The description for the roster. May be None, but
+                             the parameter is mandatory.
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    # Create an empty roster with a description.
+    system.roster.createRoster("rosterEast", "East plant user roster")
+    
+    
+    # Create an empty roster roster without a description.
+    system.roster.createRoster("rosterWest", None)
+<
+
+------------------------------------------------------------------------------
+system.roster.deleteRoster()             *ignition-system.roster.deleteRoster*
+
+  Deletes a roster with the given name.
+
+  Syntax: >
+    system.roster.deleteRoster(rosterName)
+<
+
+  Parameters: ~
+    {name}  (String)  The name of the roster to delete.
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    
+    system.roster.deleteRoster("some roster")
+<
+
+------------------------------------------------------------------------------
+system.roster.getRoster()                   *ignition-system.roster.getRoster*
+
+  Returns the roster corresponding to the given name. You can call getUsers()
+  to access a list of User objects in the RosterModel.
+
+  Syntax: >
+    system.roster.getRoster(rosterName)
+<
+
+  Parameters: ~
+    {name}  (String)  The name of the roster to get the RosterModel object
+                      from.
+
+  Returns: ~
+    RosterModel - The RosterModel object of the given roster name.
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    # This example gets the RosterModel object from a roster called "some roster" when a Button is pressed and prints the object to the browser console.
+    
+    roster = system.roster.getRoster("some roster")
+    system.perspective.print(roster)
+<
+
+------------------------------------------------------------------------------
+system.roster.getRosterNames()         *ignition-system.roster.getRosterNames*
+
+  Returns a list of roster names.
+
+  Syntax: >
+    system.roster.getRosterNames()
+<
+
+  Returns: ~
+    List[String] - List of rosters on the Gateway.
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    # This example gets a list of rosters from the Gateway when a Button is pressed and prints the list to the browser console.
+    
+    roster = system.roster.getRosterNames()
+    system.perspective.print(roster)
+<
+
+------------------------------------------------------------------------------
+system.roster.getRosters()                 *ignition-system.roster.getRosters*
+
+  Returns a dictionary of rosters, where the key is the name of the roster,
+  and the value is an array list of string user names.
+
+  Syntax: >
+    system.roster.getRosters()
+<
+
+  Returns: ~
+    Dictionary[String, List[String]] - A dictionary that maps roster names to
+    a list of usernames in the roster. The list of usernames may be empty if
+    no users have been added to the roster.
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    # This example prints out all existing rosters to the console of a Perspective session:
+    
+    rosters = system.roster.getRosters()
+    
+    # Iterate over the rosters, extracting the name and user lists.
+    for name, users in rosters.items():
+    
+        # Format the results in a somewhat presentable manner.
+        msg = "{0} : {1}".format(name, users)
+    
+        # Output the result.
+        system.perspective.print(msg)
+<
+
+------------------------------------------------------------------------------
+system.roster.getUsers()                     *ignition-system.roster.getUsers*
+
+  Returns the list of users corresponding to the given rosterName.
+
+  Syntax: >
+    system.roster.getUsers(rosterName)
+<
+
+  Parameters: ~
+    {rosterName}  (String)  The name of the roster to get a list of users
+                            from.
+
+  Returns: ~
+    List[String] - List of users within the specified roster.
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    # This script gets a list of users within a specified roster and prints their
+    # information to the browser console.
+    
+    users = system.roster.getUsers("myRoster")
+    system.perspective.print(users)
+<
+
+------------------------------------------------------------------------------
+system.roster.removeUsers()               *ignition-system.roster.removeUsers*
+
+  Removes one or more users from an existing roster.
+
+  Syntax: >
+    system.roster.removeUsers(rosterName, users)
+<
+
+  Parameters: ~
+    {rosterName}  (String)  The name of the roster to modify.
+    {users}       (List)    A list of user objects that will be removed from
+                            the roster. User objects can be created with the
+                            system.user.getUser and system.user.addUser
+                            functions.
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Perspective Session
+
+  Example: >
+    userSource = "default"
+    rosterName = "rosterEast"
+    
+    # getUser() returns a user object, which is needed for removeUser()
+    user = system.user.getUser(userSource, "joe")
+    
+    system.roster.removeUsers(rosterName, [user])
+<
+
+
+vim:tw=78:ft=help:norl:

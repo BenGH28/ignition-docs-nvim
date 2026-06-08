@@ -1,0 +1,425 @@
+*ignition-serial.txt*                         Ignition system.serial functions
+
+SYSTEM.SERIAL                                         *ignition-system.serial*
+
+  |ignition-system.serial.closeSerialPort|
+  |ignition-system.serial.configureSerialPort|
+  |ignition-system.serial.openSerialPort|
+  |ignition-system.serial.port|
+  |ignition-system.serial.readBytes|
+  |ignition-system.serial.readBytesAsString|
+  |ignition-system.serial.readLine|
+  |ignition-system.serial.readUntil|
+  |ignition-system.serial.sendBreak|
+  |ignition-system.serial.write|
+  |ignition-system.serial.writeBytes|
+
+------------------------------------------------------------------------------
+system.serial.closeSerialPort()       *ignition-system.serial.closeSerialPort*
+
+  Closes a previously opened serial port. Returns without doing anything if
+  the named serial port is not currently open. Will throw an exception if the
+  port is open and cannot be closed.
+
+  Syntax: >
+    system.serial.closeSerialPort(port)
+<
+
+  Parameters: ~
+    {port}  (String)  The name of the serial port, e.g., "COM1" or
+                      "dev/ttyS0".
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example will close a port called "COM1".
+    system.serial.closeSerialPort("COM1")
+<
+
+------------------------------------------------------------------------------
+system.serial.configureSerialPort() *ignition-system.serial.configureSerialPort*
+
+  Configure a serial port for use in a later call. This only needs to be done
+  once unless the configuration has changed after the initial call. All
+  access to constants must be prefixed by " system.serial. ".
+
+  Syntax: >
+    system.serial.configureSerialPort(port, [bitRate], [dataBits], [hardwareFlowControl], [parity], [stopBits])
+<
+
+  Parameters: ~
+    {port}                 (String)   The name of the serial port, e.g.,
+                                      "COM1" or "/dev/ttyS0". This parameter
+                                      is required.
+    {bitRate}              (Integer)  Configure the bit rate. Valid values
+                                      are defined by the following constants
+                                      [optional]: system.serial.BIT_RATE_110,
+                                      system.serial.BIT_RATE_150 ,
+                                      system.serial.BIT_RATE_300,
+                                      system.serial.BIT_RATE_600 ,
+                                      system.serial.BIT_RATE_1200,
+                                      system.serial.BIT_RATE_2400 ,
+                                      system.serial.BIT_RATE_4800,
+                                      system.serial.BIT_RATE_9600 ,
+                                      system.serial.BIT_RATE_19200,
+                                      system.serial.BIT_RATE_38400 ,
+                                      system.serial.BIT_RATE_57600,
+                                      system.serial.BIT_RATE_115200 ,
+                                      system.serial.BIT_RATE_230400,
+                                      system.serial.BIT_RATE_460800 ,
+                                      system.serial.BIT_RATE_921600
+    {dataBits}             (Integer)  Configure the data bits. Valid values
+                                      are defined by the following constants
+                                      [optional]: system.serial.DATA_BITS_5,
+                                      system.serial.DATA_BITS_6 ,
+                                      system.serial.DATA_BITS_7,
+                                      system.serial.DATA_BITS_8
+    {hardwareFlowControl}  (Boolean)  Configure hardware flow control. On or
+                                      off. [optional]
+    {parity}               (Integer)  Configure parity. Valid values are
+                                      defined by the following constants
+                                      [optional]: system.serial.PARITY_EVEN,
+                                      system.serial.PARITY_ODD ,
+                                      system.serial.PARITY_MARK,
+                                      system.serial.PARITY_SPACE,
+                                      system.serial.PARITY_NONE
+    {stopBits}             (Integer)  Configure stop bits.Valid values are
+                                      defined by the following constants
+                                      [optional]: system.serial.STOP_BITS_1,
+                                      system.serial.STOP_BITS_2
+
+  Returns: ~
+    SerialConfigurator - A SerialConfigurator object with exposed functions
+    that can be used to configure the serial port instead of, or in addition
+    to, the arguments passed to configureSerialPort .
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Configure a serial port using keyword args.
+    # The "port" keyword is mandatory.
+    
+    system.serial.configureSerialPort(\
+    port="COM1",\
+    bitRate=system.serial.BIT_RATE_9600,\
+    dataBits=system.serial.DATA_BITS_8,\
+    handshake=system.serial.HANDSHAKE_NONE,\
+    hardwareFlowControl=False,\
+    parity=system.serial.PARITY_NONE,\
+    stopBits=system.serial.STOP_BITS_1)
+<
+
+------------------------------------------------------------------------------
+system.serial.openSerialPort()         *ignition-system.serial.openSerialPort*
+
+  Opens a previously configured serial port for use. Will throw an exception
+  if the serial port cannot be opened.
+
+  Syntax: >
+    system.serial.openSerialPort(port)
+<
+
+  Parameters: ~
+    {port}  (String)  The name of the serial port, e.g., "COM1" or
+                      "dev/ttyS0".
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example will open a port called "COM1"
+    system.serial.openSerialPort("COM1")
+<
+
+------------------------------------------------------------------------------
+system.serial.port()                             *ignition-system.serial.port*
+
+  Returns a context manager wrapping a serial port, allowing the rest of the
+  system to interact with that port. This function effectively combines the
+  system.serial.configureSerialPort , system.serial.openSerialPort , and
+  system.serial.closeSerialPort functions into a single call.
+
+  Syntax: >
+    system.serial.port(port, [bitRate], [dataBits], [handshake], [hardwareFlowControl], [parity], [stopBits])
+<
+
+  Parameters: ~
+    {port}                 (String)   The name of the serial port, e.g.,
+                                      "COM1" or "/dev/ttyS0". This parameter
+                                      is required.
+    {bitRate}              (Integer)  Configure the bit rate. Valid values
+                                      are defined by the following constants
+                                      [optional]: system.serial.BIT_RATE_110,
+                                      system.serial.BIT_RATE_150 ,
+                                      system.serial.BIT_RATE_300,
+                                      system.serial.BIT_RATE_600 ,
+                                      system.serial.BIT_RATE_1200,
+                                      system.serial.BIT_RATE_2400 ,
+                                      system.serial.BIT_RATE_4800,
+                                      system.serial.BIT_RATE_9600 ,
+                                      system.serial.BIT_RATE_19200,
+                                      system.serial.BIT_RATE_38400 ,
+                                      system.serial.BIT_RATE_57600,
+                                      system.serial.BIT_RATE_115200 ,
+                                      system.serial.BIT_RATE_230400,
+                                      system.serial.BIT_RATE_460800 ,
+                                      system.serial.BIT_RATE_921600
+    {dataBits}             (Integer)  Configure the data bits. Valid values
+                                      are defined by the following constants
+                                      [optional]: system.serial.DATA_BITS_5,
+                                      system.serial.DATA_BITS_6 ,
+                                      system.serial.DATA_BITS_7,
+                                      system.serial.DATA_BITS_8
+    {hardwareFlowControl}  (Boolean)  Configure hardware flow control. On or
+                                      off. [optional]
+    {parity}               (Integer)  Configure parity. Valid values are
+                                      defined by the following constants
+                                      [optional]: system.serial.PARITY_EVEN,
+                                      system.serial.PARITY_ODD ,
+                                      system.serial.PARITY_MARK,
+                                      system.serial.PARITY_SPACE,
+                                      system.serial.PARITY_NONE
+    {stopBits}             (Integer)  Configure stop bits.Valid values are
+                                      defined by the following constants
+                                      [optional]: system.serial.STOP_BITS_1,
+                                      system.serial.STOP_BITS_2
+
+  Returns: ~
+    PortManager - A wrapper around the configured port, that can be entered
+    by using a 'with' statement. The port will automatically close on exiting
+    the 'with' statement scope.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Reads a value from a port.
+    
+    # First we call the function using a 'with' statement, and create an aliased object named 'port'
+    with system.serial.port("COM1", bitRate=system.serial.BIT_RATE_9600) as port:
+    
+        # Within the 'with' statement, we can call other serial functions by referencing the aliased object.
+        # Meaning, in this example, 'port' can easily call the system.serial.readLine() function with the following:
+        line = port.readLine(60000)
+<
+
+------------------------------------------------------------------------------
+system.serial.readBytes()                   *ignition-system.serial.readBytes*
+
+  Read numberOfBytes bytes from a serial port.
+
+  Syntax: >
+    system.serial.readBytes(port, numberOfBytes [, timeout])
+<
+
+  Parameters: ~
+    {port}           (String)  The previously configured serial port to use.
+    {numberOfBytes}  (int)     The number of bytes to read.
+    {timeout}        (int)     Maximum amount of time, in milliseconds, to
+                               block before returning. Default is 5000.
+                               [optional]
+
+  Returns: ~
+    List[Byte] - A list containing bytes read from the serial port.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example will read a specified number of bytes from a port called "COM1".
+    port = "COM1"
+    
+    system.serial.readBytes("COM1",2)
+<
+
+------------------------------------------------------------------------------
+system.serial.readBytesAsString()   *ignition-system.serial.readBytesAsString*
+
+  Read numberOfBytes bytes from a serial port and convert them to a String.
+  If a specific encoding is needed to match the source of the data, use
+  system.serial.readBytes and use the desired encoding to decode the byte
+  array returned.
+
+  Syntax: >
+    system.serial.readBytesAsString(port, numberOfBytes, [timeout], [encoding])
+<
+
+  Parameters: ~
+    {port}           (String)   The previously configured serial port to use.
+    {numberOfBytes}  (Integer)  The number of bytes to read.
+    {timeout}        (Integer)  Maximum amount of time, in milliseconds, to
+                                block before returning. Default is 5000.
+                                [optional]
+    {encoding}       (String)   Encoding to use when constructing the string.
+                                Defaults to the platform's default character
+                                set. [optional]
+
+  Returns: ~
+    String - A String created from the bytes read.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example will read a specified number of bytes as a String from a port called "COM1".
+    port = "COM1"
+    numberOfBytes = 2
+    
+    system.serial.readBytesAsString(port,numberOfBytes)
+<
+
+------------------------------------------------------------------------------
+system.serial.readLine()                     *ignition-system.serial.readLine*
+
+  Attempts to read a line from a serial port. A "line" is considered to be
+  terminated by either a line feed ('\n'), a carriage return ('\r'), or a
+  carriage return followed immediately by a line feed.
+
+  Syntax: >
+    system.serial.readLine(port [, timeout] [, encoding])
+<
+
+  Parameters: ~
+    {port}      (String)   The previously configured serial port to use.
+    {timeout}   (Integer)  Maximum amount of time, in milliseconds, to block
+                           before returning. Default is 5000. [optional]
+    {encoding}  (String)   The String encoding to use. Default is UTF8.
+                           [optional]
+
+  Returns: ~
+    String - A line of text.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example will read from the "COM1" port and set the timeout to 10000 milliseconds.
+    port = "COM1"
+    timeout = 10000
+    system.serial.readLine(port,timeout)
+<
+
+------------------------------------------------------------------------------
+system.serial.readUntil()                   *ignition-system.serial.readUntil*
+
+  Reads a byte at a time from a serial port until a delimiter character is
+  encountered. The read will block for up to timeout milliseconds before
+  returning.
+
+  Syntax: >
+    system.serial.readUntil(port, delimiter, includeDelimiter, [timeout])
+<
+
+  Parameters: ~
+    {port}              (String)   The previously configured serial port to
+                                   use.
+    {delimiter}         (Char)     The delimiter to read until.
+    {includeDelimiter}  (Boolean)  If true, the delimiter will be included in
+                                   the return value.
+    {timeout}           (Integer)  Timeout in milliseconds. Default is 5000.
+                                   [optional]
+
+  Returns: ~
+    String - Returns a String containing all 8-bit ASCII characters read
+    until the delimiter was reached, and including the delimiter if the
+    "includeDelimiter" parameter was true.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example will read bytes from an open port called "COM1" until the delimiter character is reached.
+    port = "COM1"
+    delimiter = "$"
+    
+    system.serial.readUntil(port,delimiter,True)
+<
+
+------------------------------------------------------------------------------
+system.serial.sendBreak()                   *ignition-system.serial.sendBreak*
+
+  Sends a break signal for approximately millis milliseconds.
+
+  Syntax: >
+    system.serial.sendBreak(port, millis)
+<
+
+  Parameters: ~
+    {port}    (String)   The name of the serial port, e.g., "COM1" or
+                         "dev/ttyS0".
+    {millis}  (Integer)  Approximate length of break signal, in milliseconds.
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    
+    # This example will send a break signal to a port called "COM1" for 10000 milliseconds.
+    port = "COM1"
+    millis = 10000
+    
+    system.serial.sendBreak(port,millis)
+<
+
+------------------------------------------------------------------------------
+system.serial.write()                           *ignition-system.serial.write*
+
+  Write a String to a serial port using the platforms default character
+  encoding.
+
+  Syntax: >
+    system.serial.write(port, toWrite, [timeout], [encoding])
+<
+
+  Parameters: ~
+    {port}      (String)   The previously configured serial port to use.
+    {toWrite}   (String)   The String to write.
+    {timeout}   (Integer)  A timeout, in milliseconds. Writes exceeding this
+                           period will . Defaults to 5000 [optional]
+    {encoding}  (String)   Encoding to decode the string with, for example:
+                           UTF-8. Default is the platform default character
+                           set. [optional]
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example will write a string to a port called "COM1".
+    port = "COM1"
+    toWrite = "I am a string"
+    
+    system.serial.write(port,toWrite)
+<
+
+------------------------------------------------------------------------------
+system.serial.writeBytes()                 *ignition-system.serial.writeBytes*
+
+  Write a List[Byte] to a serial port.
+
+  Syntax: >
+    system.serial.writeBytes(port, toWrite)
+<
+
+  Parameters: ~
+    {port}     (String)      The previously configured serial port to use.
+    {toWrite}  (List[Byte])  The List[Byte] to write.
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example will write a list of bytes to a port called "COM1"
+    port = "COM1"
+    toWrite = [1,1,0,0,1]
+    
+    system.serial.writeBytes(port,toWrite)
+<
+
+
+vim:tw=78:ft=help:norl:

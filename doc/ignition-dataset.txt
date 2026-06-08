@@ -1,0 +1,790 @@
+*ignition-dataset.txt*                       Ignition system.dataset functions
+
+SYSTEM.DATASET                                       *ignition-system.dataset*
+
+  |ignition-system.dataset.addColumn|
+  |ignition-system.dataset.addRow|
+  |ignition-system.dataset.addRows|
+  |ignition-system.dataset.appendDataset|
+  |ignition-system.dataset.clearDataset|
+  |ignition-system.dataset.dataSetToHTML|
+  |ignition-system.dataset.deleteRow|
+  |ignition-system.dataset.deleteRows|
+  |ignition-system.dataset.filterColumns|
+  |ignition-system.dataset.formatDates|
+  |ignition-system.dataset.fromCSV|
+  |ignition-system.dataset.getColumnHeaders|
+  |ignition-system.dataset.setValue|
+  |ignition-system.dataset.sort|
+  |ignition-system.dataset.toCSV|
+  |ignition-system.dataset.toDataSet|
+  |ignition-system.dataset.toExcel|
+  |ignition-system.dataset.updateRow|
+
+------------------------------------------------------------------------------
+system.dataset.addColumn()                 *ignition-system.dataset.addColumn*
+
+  Takes a dataset and returns a new dataset with a new column added or
+  inserted into it. If the columnIndex argument is omitted, the column will
+  be appended to the end of the dataset.
+
+  Syntax: >
+    system.dataset.addColumn(dataset, [colIndex], col, colName, colType)
+<
+
+  Parameters: ~
+    {dataset}   (Dataset)    The starting dataset. Please be aware that this
+                             dataset will not actually be modified (datasets
+                             are immutable), but rather will be the starting
+                             point for creating a new dataset.
+    {colIndex}  (Integer)    The index (starting at 0) at which to insert the
+                             new column. Will throw an IndexError if less
+                             than zero or greater than the length of the
+                             dataset. If omitted, the new column will be
+                             appended to the end. [optional]
+    {col}       (List[Any])  A Python sequence representing the data for the
+                             new column. Its length must equal the number of
+                             rows in the dataset.
+    {colName}   (String)     The name of the column.
+    {colType}   (Type)       The type of the of the column. The type can be a
+                             Python builtin type, such as str , int, float,
+                             or a Java class, such as java.util.Date.
+
+  Returns: ~
+    Dataset - A new dataset with the new column inserted or appended.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example will work on a Button component on a Vision window, given two Vision bar charts with
+    # default values. The script takes the dataset from Bar Chart 1, adds a column of integers called
+    # Center Area to the end of the existing data, and displays the new dataset in Bar Chart 2.
+    
+    ds1 = event.source.parent.getComponent('Bar Chart 1').data
+    colCount = ds1.getColumnCount()
+    columnName = "Center Area"
+    columnData = []
+    for i in range(ds1.getRowCount()):
+     columnData.append(i* 10)
+    
+    ds2 = system.dataset.addColumn(ds1, colCount, columnData, columnName, int)
+    event.source.parent.getComponent('Bar Chart 2').data = ds2
+<
+
+------------------------------------------------------------------------------
+system.dataset.addRow()                       *ignition-system.dataset.addRow*
+
+  Takes a dataset and returns a new dataset with a new row added or inserted
+  into it. If the rowIndex argument is omitted, the row will be appended to
+  the end of the dataset.
+
+  Syntax: >
+    system.dataset.addRow(dataset, [rowIndex], row)
+<
+
+  Parameters: ~
+    {dataset}   (Dataset)    The starting dataset. Please be aware that this
+                             dataset will not actually be modified (datasets
+                             are immutable), but rather will be the starting
+                             point for creating a new dataset.
+    {rowIndex}  (Integer)    The index (starting at 0) at which to insert the
+                             new row. Will throw an IndexError if less than
+                             zero or greater than the length of the dataset.
+                             If omitted, the new row will be appended to the
+                             end. [optional]
+    {row}       (List[Any])  A Python list representing the data for the new
+                             row. Its length must equal the number of columns
+                             in the dataset.
+
+  Returns: ~
+    Dataset - A new dataset with the new row inserted or appended.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example would add a new option to a Vision Dropdown List by adding a row to its underlying dataset.
+    # Notice how the last line assigns the return value of the addRow function to the dropdown's data property.
+    
+    # This script should be on a button that is a sibling to a Dropdown List component named "Dropdown".
+    dropdown = event.source.parent.getComponent("Dropdown")
+    newRow = [5, "New Option"]
+    dropdown.data = system.dataset.addRow(dropdown.data, newRow)
+<
+
+------------------------------------------------------------------------------
+system.dataset.addRows()                     *ignition-system.dataset.addRows*
+
+  Takes a dataset and returns a new dataset with new rows added or inserted
+  into it. If the rowIndex argument is omitted, the rows will be appended to
+  the end of the dataset.
+
+  Syntax: >
+    system.dataset.addRows(dataset, [rowIndex], rows)
+<
+
+  Parameters: ~
+    {dataset}   (Dataset)    The starting dataset. Please be aware that this
+                             dataset will not actually be modified (datasets
+                             are immutable), but rather will be the starting
+                             point for creating a new dataset.
+    {rowIndex}  (Integer)    The index (starting at 0) at which to insert the
+                             new row. Will throw an IndexError if less than
+                             zero or greater than the length of the dataset.
+                             If omitted, the new row will be appended to the
+                             end. [optional]
+    {rows}      (List[Any])  A Python sequence of sequences representing the
+                             data for the new rows. The length of each
+                             sequence must equal the number of columns in the
+                             dataset.
+
+  Returns: ~
+    Dataset - A new dataset with the new rows inserted or appended.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example adds new options to a Vision Dropdown List by adding a row to its underlying dataset.
+    # Note that the last line assigns the return value of the addRows function to the dropdown's data property.
+    
+    dropdown = event.source.parent.getComponent("Dropdown")
+    newRow = [[5, "New Option"], [6, "Another New Option"]]
+    dropdown.data = system.dataset.addRows(dropdown.data, newRow)
+<
+
+------------------------------------------------------------------------------
+system.dataset.appendDataset()         *ignition-system.dataset.appendDataset*
+
+  Takes two different datasets and returns a new dataset with the second
+  dataset appended to the first. Will throw an error if the number and types
+  of columns do not match.
+
+  Syntax: >
+    system.dataset.appendDataset(dataset1, dataset2)
+<
+
+  Parameters: ~
+    {dataset1}  (Dataset)  The dataset that will come first in the returned
+                           dataset.
+    {dataset2}  (Dataset)  The second dataset that will be appended to the
+                           end in the returned dataset.
+
+  Returns: ~
+    Dataset - A new dataset that is a combination of the original two
+    datasets.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example pulls in the datasets from two different Vision table components,
+    # combines them, then writes the results to a third table.
+    # The two source datasets must have the same number and types of columns.
+    
+    data1 = event.source.parent.getComponent('Table 1').data
+    data2 = event.source.parent.getComponent('Table 2').data
+    comboData = system.dataset.appendDataset(data1, data2)
+    event.source.parent.getComponent('Table 3').data = comboData
+<
+
+------------------------------------------------------------------------------
+system.dataset.clearDataset()           *ignition-system.dataset.clearDataset*
+
+  Takes a dataset and returns a new dataset with all of the same column names
+  and types, but no rows.
+
+  Syntax: >
+    system.dataset.clearDataset(dataset)
+<
+
+  Parameters: ~
+    {dataset}  (Dataset)  The starting dataset.
+
+  Returns: ~
+    Dataset - A new dataset with no rows.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example pulls in the dataset from a Vision Table component, clears it, then writes the empty dataset back to the table.
+    
+    data = event.source.parent.getComponent('Table').data
+    event.source.parent.getComponent('Table').data = system.dataset.clearDataset(data)
+<
+
+------------------------------------------------------------------------------
+system.dataset.dataSetToHTML()         *ignition-system.dataset.dataSetToHTML*
+
+  Formats the contents of a dataset as an HTML page, returning the results as
+  a string. Uses the <table> element to create a data table page.
+
+  Syntax: >
+    system.dataset.dataSetToHTML(showHeaders, dataset, title)
+<
+
+  Parameters: ~
+    {showHeaders}  (Boolean)  If true, the HTML table will include a header
+                              row.
+    {dataset}      (Dataset)  The dataset to export.
+    {title}        (String)   The title for the HTML page.
+
+  Returns: ~
+    String - The HTML page as a string.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    <HTML><HEAD><TITLE>Table Data</TITLE></HEAD>
+    
+    <BODY>
+    
+    <TABLE border='1'>
+    
+    <TR>
+    
+        <TH>Col 1</TH>
+    
+        <TH>Col 2</TH>
+    
+        <TH>Col 3</TH>
+    
+    </TR>
+    
+    <TR>
+    
+        <TD align='right'>58</TD>
+    
+        <TD align='left'>Test Row 3</TD>
+    
+        <TD align='right'>27.524042612227795</TD>
+    
+    </TR>
+    
+    <TR>
+    
+        <TD align='right'>87</TD>
+    
+        <TD align='left'>Test Row 10</TD>
+    
+        <TD align='right'>43.48674729787205</TD>
+    
+    </TR>
+    
+    <TR>
+    
+        <TD align='right'>29</TD>
+    
+        <TD align='left'>Test Row 15</TD>
+    
+        <TD align='right'>82.46334440414927</TD>
+    
+    </TR>
+    
+    <TR>
+    
+        <TD align='right'>3</TD>
+    
+        <TD align='left'>Test Row 120</TD>
+    
+        <TD align='right'>15.07317567946509</TD>
+    
+    </TR>
+    
+    
+    
+    </TABLE>
+    
+    </BODY></HTML>
+<
+
+------------------------------------------------------------------------------
+system.dataset.deleteRow()                 *ignition-system.dataset.deleteRow*
+
+  Takes a dataset and returns a new dataset with the specified rowIndex
+  removed.
+
+  Syntax: >
+    system.dataset.deleteRow(dataset, rowIndex)
+<
+
+  Parameters: ~
+    {dataset}   (Dataset)  The starting dataset. Please be aware that this
+                           dataset will not actually be modified (datasets
+                           are immutable), but rather will be the starting
+                           point for creating a new dataset.
+    {rowIndex}  (Integer)  The index (starting at 0) of the row to delete.
+                           Will throw an IndexError if out of bounds. The
+                           maximum bounds is defined by subtracting one from
+                           the number of rows in the dataset.
+
+  Returns: ~
+    Dataset - A new dataset with the specified row removed.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example would remove the selected row from a Vision List component, by re-assigning the List's data property to the new dataset returned by the deleteRow function.
+    
+    myList = event.source.parent.getComponent("List")
+    row = myList.selectedIndex
+    if row != -1: # make sure there is something selected
+       myList.data = system.dataset.deleteRow(myList.data, row)
+<
+
+------------------------------------------------------------------------------
+system.dataset.deleteRows()               *ignition-system.dataset.deleteRows*
+
+  Takes a dataset and returns a new dataset with one or more rows removed.
+
+  Syntax: >
+    system.dataset.deleteRows(dataset, rowIndices)
+<
+
+  Parameters: ~
+    {dataset}     (Dataset)        The starting dataset. Please be aware that
+                                   this dataset will not actually be modified
+                                   (datasets are immutable), but rather will
+                                   be the starting point for creating a new
+                                   dataset.
+    {rowIndices}  (List[Integer])  The indices (starting at 0) of the rows to
+                                   delete. Will throw an IndexError if any
+                                   element is less than zero or greater than
+                                   the number of rows in the dataset - 1.
+
+  Returns: ~
+    Dataset - A new dataset with the specified rows removed.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example would remove several rows from a Vision Table component, by re-assigning the Table's data property to the new dataset returned by the deleteRows function.
+    
+    ds = event.source.parent.getComponent('Table').data
+    rows = [0,2,3,4]
+    ds = system.dataset.deleteRows(ds, rows)
+    event.source.parent.getComponent('Table').data = ds
+<
+
+------------------------------------------------------------------------------
+system.dataset.filterColumns()         *ignition-system.dataset.filterColumns*
+
+  Takes a dataset and returns a view of the dataset containing only the
+  columns found within the given list of columns.
+
+  Syntax: >
+    system.dataset.filterColumns(dataset, columns)
+<
+
+  Parameters: ~
+    {dataset}  (Dataset / PyDataset)           The starting dataset.
+    {columns}  (List[Integer] / List[String])  A list of columns to keep in
+                                               the returned dataset. The
+                                               columns may be in integer
+                                               index form (starting at 0), or
+                                               the name of the columns as
+                                               strings. If a value passed to
+                                               this parameter is not in a
+                                               list, then an empty dataset
+                                               will be returned.
+
+  Returns: ~
+    Dataset - A new dataset containing the filtered columns. The order of
+    columns in this dataset is determined by the column order provided to the
+    columns parameter.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example takes the dataset from a two column Bar Chart and displays a subset of the data in two separate tables.
+    # This is performed in a button component actionPerformed script.
+    
+    chartData = event.source.parent.getComponent('Bar Chart').data
+    
+    north = [0, 1] # Label and North Area columns (using column index)
+    south = ["Label", "South Area"] # Label and South Area columns (using column names)
+    
+    filteredData = system.dataset.filterColumns(chartData, north)
+    event.source.parent.getComponent('NorthTable').data = filteredData
+    
+    filteredData = system.dataset.filterColumns(chartData, south)
+    event.source.parent.getComponent('SouthTable').data = filteredData
+<
+
+------------------------------------------------------------------------------
+system.dataset.formatDates()             *ignition-system.dataset.formatDates*
+
+  Returns a new dataset replacing date typed columns with string typed
+  columns. The new columns will match the formatting specified by the
+  dateFormat parameter.
+
+  Syntax: >
+    system.dataset.formatDates( dataset, dateFormat, [locale] )
+<
+
+  Parameters: ~
+    {dataset}     (Dataset / PyDataset)  The starting dataset to format.
+    {dateFormat}  (String)               A valid Java DateFormat string,
+                                         representing how the date should be
+                                         formatted. For example: "yyyy-MM-dd
+                                         HH:mm :ss ". Refer to Data Type
+                                         Formatting Reference for more
+                                         information on the valid characters.
+    {locale}      (Locale)               The Locale to use for formatting.
+                                         The Locale parameter accepts any
+                                         valid Java Locale object, which can
+                                         be found here . The Java Locale
+                                         class must be imported, and the
+                                         Locale must be defined in all caps.
+                                         See the second example below for an
+                                         idea of how that works. If no locale
+                                         is provided, the systemâs locale
+                                         will be used. [optional]
+
+  Returns: ~
+    Dataset - A new dataset, containing the formatted dates.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example takes the dataset from a Vision Table component and formats the dates to look like Fri, Jan 22, 2018.
+    # Reference the table's existing dataset
+    data = event.source.parent.getComponent('Table').data
+    
+    # Apply formatting, and store the results in a new variable
+    formattedData = system.dataset.formatDates(data, "EEE, MMM d, yyyy")
+    
+    # Write back to the table
+    event.source.parent.getComponent('Table').data = formattedData
+<
+
+------------------------------------------------------------------------------
+system.dataset.fromCSV()                     *ignition-system.dataset.fromCSV*
+
+  Converts a dataset stored in a CSV formatted string to a dataset that can
+  be immediately assignable to a dataset property in your project. Usually
+  this is used in conjunction with system.file.readFileAsString when reading
+  in a CSV file that was exported using system.dataset.toCSV . The CSV string
+  must be formatted in a specific way:
+
+  Syntax: >
+    system.dataset.fromCSV( csv )
+<
+
+  Parameters: ~
+    {csv}  (String)  A string holding a CSV dataset in the format outlined
+                     above.
+
+  Returns: ~
+    Dataset - A new dataset.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # In this example it is assumed that the CSV file being read was a dataset
+    #that was previously exported using system.dataset.toCSV with the forExport flag set to True:
+    # Specify file path.
+    file_path = "C:\\my_dataset.csv"
+    # Read in the file as a string.
+    data_string = system.file.readFileAsString(file_path)
+    # Convert the string to a dataset and store in a variable.
+    data = system.dataset.fromCSV(data_string)
+    # Assign the dataset to a table.
+    event.source.parent.getComponent('Table').data = data
+<
+
+------------------------------------------------------------------------------
+system.dataset.getColumnHeaders()   *ignition-system.dataset.getColumnHeaders*
+
+  Takes in a dataset and returns the headers as a Python list.
+
+  Syntax: >
+    system.dataset.getColumnHeaders(dataset)
+<
+
+  Parameters: ~
+    {dataset}  (Dataset)  The input dataset.
+
+  Returns: ~
+    List - A list of column header strings.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example fetches the dataset from a Vision table, and prints the table headers as a list.
+    # Fetch data from table component.
+    data = event.source.parent.getComponent('Table').data
+    # Print dataset headers.
+    print system.dataset.getColumnHeaders(data)
+<
+
+------------------------------------------------------------------------------
+system.dataset.setValue()                   *ignition-system.dataset.setValue*
+
+  Takes a dataset and returns a new dataset with one value altered.
+
+  Syntax: >
+    system.dataset.setValue(dataset, rowIndex, columnName, value)
+<
+
+  Parameters: ~
+    {dataset}     (Dataset)  The starting dataset. Will not be modified
+                             (datasets are immutable), but acts as the basis
+                             for the returned dataset.
+    {rowIndex}    (Integer)  The index of the row to set the value at
+                             (starting at 0).
+    {columnName}  (String)   The name of the column to set the value at. Case
+                             insensitive.
+    {value}       (Any)      The new value for the specified row/column.
+
+  Returns: ~
+    Dataset - A new dataset, with the new value set at the given location.
+
+  Syntax: >
+    system.dataset.setValue(dataset, rowIndex, columnIndex, value)
+<
+
+  Parameters: ~
+    {dataset}      (Dataset)  The starting dataset. Will not be modified
+                              (datasets are immutable), but acts as the basis
+                              for the returned dataset.
+    {rowIndex}     (Integer)  The index of the row to set the value at
+                              (starting at 0).
+    {columnIndex}  (Integer)  The index of the column to set the value at
+                              (starting at 0)
+    {value}        (Any)      The new value for the specified row/column.
+
+  Returns: ~
+    Dataset - A new dataset, with the new value set at the given location.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This snippet demonstrates how to take an initial dataset, set a new value on a new dataset, and then write back to the source of the initial dataset.
+    # In this case we're using a Table component from the Vision module.
+    # Fetch a reference to an existing dataset.
+    table = event.source.parent.getComponent("Table")
+    
+    # Make a new dataset with an updated value
+    newData = system.dataset.setValue(table.data, 3, "lname", 7)
+    
+    # Repalce the table's dataset with our new dataset
+    table.data = newData
+<
+
+------------------------------------------------------------------------------
+system.dataset.sort()                           *ignition-system.dataset.sort*
+
+  Takes a dataset and returns a sorted version of the dataset. The sort order
+  is determined by a single column. This works on numeric, as well as
+  alphanumeric columns. When sorting alphanumerically, contiguous numbers are
+  treated as a single number: you may recognize this as a "natural sort".
+
+  Syntax: >
+    system.dataset.sort(dataset, keyColumn [, ascending, naturalOrdering])
+<
+
+  Parameters: ~
+    {dataset}          (Dataset)           The dataset to sort.
+    {keyColumn}        (Integer / String)  The index of the column to sort
+                                           on.
+    {ascending}        (Boolean)           True for ascending order, False
+                                           for descending order. If omitted,
+                                           ascending order will be used.
+                                           [optional]
+    {naturalOrdering}  (Boolean)           True for natural ordering, False
+                                           for alphabetical ordering. Ignored
+                                           if the sort column is a directly
+                                           sortable data type. If omitted,
+                                           defaults to True (natural
+                                           ordering). [optional]
+
+  Returns: ~
+    Dataset - A new sorted dataset.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This code will take the data in a Vision Table component, sort it based on the column with index 1,
+    # and then reinsert the sorted data into the same Table.
+    
+    data = event.source.parent.getComponent('Table').data
+    newData = system.dataset.sort(data, 1)
+    event.source.parent.getComponent('Table').data = newData
+<
+
+------------------------------------------------------------------------------
+system.dataset.toCSV()                         *ignition-system.dataset.toCSV*
+
+  Formats the contents of a dataset as CSV (comma separated values),
+  returning the resulting CSV as a string. If the "forExport" flag is set,
+  then the format will be appropriate for parsing using the
+  system.dataset.fromCSV function.
+
+  Syntax: >
+    system.dataset.toCSV(dataset, showHeaders, forExport, localized)
+<
+
+  Parameters: ~
+    {dataset}      (Dataset)  The dataset to export to CSV.
+    {showHeaders}  (Boolean)  If set to true, a header row will be present in
+                              the CSV. Default is true.
+    {forExport}    (Boolean)  If set to true, extra header information will
+                              be present in the CSV data which is necessary
+                              for the CSV to be compatible with the fromCSV
+                              method. Overrides showHeaders. Default is
+                              false.
+    {localized}    (Boolean)  If set to true, the string representations of
+                              the values in the CSV data will be localized.
+                              Default is false.
+
+  Returns: ~
+    String - The CSV data as a string.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This snippet runs a SQL query against a database and turns the results into a CSV string. It would
+    # then store the resulting CSV to a file on the local hard drive.
+    
+    results = system.db.runNamedQuery("Fetch Records",{})
+    csv = system.dataset.toCSV(dataset = results, showHeaders = True, forExport = False)
+    filePath = "C:\\output\\results.csv"
+    system.file.writeFile(filePath, csv)
+<
+
+------------------------------------------------------------------------------
+system.dataset.toDataSet()                 *ignition-system.dataset.toDataSet*
+
+  This function is used to convert a PyDataset to a dataset. In addition it
+  can also create new datasets from a raw Python list. When creating a new
+  dataset, headers should have unique names. For more information on datasets
+  and PyDatasets, see the Datasets page.
+
+  Syntax: >
+    system.dataset.toDataSet(dataset)
+<
+
+  Parameters: ~
+    {dataset}  (PyDataset)  A PyDataset object to convert.
+
+  Returns: ~
+    Dataset - The newly created dataset.
+
+  Syntax: >
+    system.dataset.toDataSet(headers, data)
+<
+
+  Parameters: ~
+    {headers}  (List[String])  The column names for the dataset to create.
+    {data}     (List[Any])     A list of rows for the new dataset. Each row
+                               must have the same length as the headers list,
+                               and each value in a column must be the same
+                               type.
+
+  Returns: ~
+    Dataset - The newly created dataset.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example create a single column dataset.
+    header = ['myColumn']
+    rows = [[1], [2]]
+    dataset = system.dataset.toDataSet(header, rows)
+<
+
+------------------------------------------------------------------------------
+system.dataset.toExcel()                     *ignition-system.dataset.toExcel*
+
+  Formats the contents of one or more datasets as an Excel spreadsheet,
+  returning the results as a byte array. Each dataset specified will be added
+  as a worksheet in the Excel workbook.
+
+  Syntax: >
+    system.dataset.toExcel(showHeaders, dataset, [nullsEmpty], [sheetNames])
+<
+
+  Parameters: ~
+    {showHeaders}  (Boolean)        If True, the spreadsheet will include a
+                                    header row. If False, the header row will
+                                    be omitted.
+    {dataset}      (List[Dataset])  A sequence of one or more datasets, one
+                                    for each sheet in the resulting workbook.
+    {nullsEmpty}   (Boolean)        If True, the spreadsheet will leave cells
+                                    with NULL values empty, instead of
+                                    allowing Excel to provide a default value
+                                    like 0. Defaults to False. [optional]
+    {sheetNames}   (List[String])   Expects a list of strings, where each
+                                    string is a name for one of the datasets.
+                                    When used, there must be an equal number
+                                    of string names in sheetName as there are
+                                    datasets in the dataset parameter. Names
+                                    provided in this parameter may be
+                                    sanitized into acceptable Excel sheet
+                                    names. [optional]
+
+  Returns: ~
+    Array - A byte array representing an Excel workbook.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This snippet would run a SQL query against a database, and turn the results into a string that is XML that Excel can open.
+    # It then writes the string to a file on the local hard drive.
+    
+    results = system.db.runNamedQuery("Fetch Records",{})
+    spreadsheet = system.dataset.toExcel(True, [results])
+    filePath = "C:\\output\\results.xlsx"
+    system.file.writeFile(filePath, spreadsheet)
+<
+
+------------------------------------------------------------------------------
+system.dataset.updateRow()                 *ignition-system.dataset.updateRow*
+
+  Takes a dataset and returns a new dataset with a one row altered. To alter
+  the row, this function takes a Python dictionary to represent the changes
+  to make to the specified row. The keys in the dictionary are used to find
+  the columns to alter.
+
+  Syntax: >
+    system.dataset.updateRow(dataset, rowIndex, changes)
+<
+
+  Parameters: ~
+    {dataset}   (Dataset)                  The starting dataset. Will not be
+                                           modified (datasets are immutable),
+                                           but acts as the basis for the
+                                           returned dataset.
+    {rowIndex}  (Integer)                  The index of the row to update
+                                           (starting at 0).
+    {changes}   (Dictionary[String, Any])  A dictionary of changes to make.
+                                           The keys in the dictionary should
+                                           match column names in the dataset,
+                                           and their values will be used to
+                                           update the row.
+
+  Returns: ~
+    Dataset - A new dataset with the values at the specified row updated
+    according to the values in the dictionary.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example could be used to dynamically change the data that an Easy Chart displays.
+    # In this simple example, we assume that the chart is always configured to display a single tank's level.
+    # This script updates the pen being displayed using a dynamic tank number.
+    
+    # Generate new tag name and tag path.
+    tankNumber = 5
+    newName = "Tank %d Level" % tankNumber
+    newPath = "Tanks/Tank %d/Level" % tankNumber
+    
+    # Consolidate changes into a dictionary.
+    updates = {"NAME": newName, "TAG_PATH":newPath}
+    
+    # Update the Easy Chart.
+    chart = event.source.parent.getComponent("Easy Chart")
+    newPens = system.dataset.updateRow(chart.tagPens, 0, updates)
+    chart.tagPens = newPens
+<
+
+
+vim:tw=78:ft=help:norl:

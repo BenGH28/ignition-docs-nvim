@@ -1,0 +1,320 @@
+*ignition-dnp.txt*                               Ignition system.dnp functions
+
+SYSTEM.DNP                                               *ignition-system.dnp*
+
+  |ignition-system.dnp.demandPoll|
+  |ignition-system.dnp.directOperateAnalog|
+  |ignition-system.dnp.directOperateBinary|
+  |ignition-system.dnp.freezeAnalogs|
+  |ignition-system.dnp.freezeAtTimeAnalogs|
+  |ignition-system.dnp.freezeAtTimeCounters|
+  |ignition-system.dnp.freezeClearAnalogs|
+  |ignition-system.dnp.freezeClearCounters|
+  |ignition-system.dnp.freezeCounters|
+  |ignition-system.dnp.selectOperateAnalog|
+  |ignition-system.dnp.selectOperateBinary|
+  |ignition-system.dnp.synchronizeTime|
+
+------------------------------------------------------------------------------
+system.dnp.demandPoll()                       *ignition-system.dnp.demandPoll*
+
+  Issues a poll request for one or more classes.
+
+  Syntax: >
+    system.dnp.demandPoll(deviceName, classList)
+<
+
+  Parameters: ~
+    {deviceName}  (String)  The name of the DNP3 device instance.
+    {classList}   (List)    A List of classes (1, 2, 3) to issue polls.
+
+  Returns: ~
+    Nothing.
+
+  Scope: Gateway
+
+  Example: >
+    system.dnp.demandPoll("DNP3", [1])
+<
+
+------------------------------------------------------------------------------
+system.dnp.directOperateAnalog()     *ignition-system.dnp.directOperateAnalog*
+
+  Performs a Direct Operate command on an analog point.
+
+  Syntax: >
+    system.dnp.directOperateAnalog(deviceName, variation, index, value)
+<
+
+  Parameters: ~
+    {deviceName}  (String)   The name of the DNP3 device instance.
+    {variation}   (Integer)  The Group 41 variation to use during the
+                             operation.
+    {index}       (Integer)  The index of the analog point.
+    {value}       (Numeric)  The requested value.
+
+  Returns: ~
+    Nothing.
+
+  Scope: Gateway
+
+  Example: >
+    system.dnp.directOperateAnalog("DNP3", 1, 0, 3.14)
+<
+
+------------------------------------------------------------------------------
+system.dnp.directOperateBinary()     *ignition-system.dnp.directOperateBinary*
+
+  Performs a Direct Operate command on a binary point.
+
+  Syntax: >
+    system.dnp.directOperateBinary(deviceName, index, tcc, opType, count, onTime, offTime)
+<
+
+  Parameters: ~
+    {deviceName}  (String)   The name of the DNP3 device instance.
+    {index}       (Integer)  The index of the binary point.
+    {tcc}         (Integer)  Trip Close Code: 0=NUL, 1=CLOSE, 2=TRIP.
+    {opType}      (Integer)  Operation Type: 0=NUL, 1=PULSE_ON, 2=PULSE_OFF,
+                             3=LATCH_ON, 4=LATCH_OFF.
+    {count}       (Integer)  The number of times the outstation shall execute
+                             the operation.
+    {onTime}      (Integer)  Duration (in milliseconds) the output drive
+                             remains active.
+    {offTime}     (Integer)  Duration (in milliseconds) the output drive
+                             remains non-active.
+
+  Returns: ~
+    Nothing.
+
+  Scope: Gateway
+
+  Example: >
+    system.dnp.directOperateBinary("DNP3", 3, 1, 3, 2, 5000, 5000)
+<
+
+------------------------------------------------------------------------------
+system.dnp.freezeAnalogs()                 *ignition-system.dnp.freezeAnalogs*
+
+  Issues an Immediate Freeze command targeting one or more analog points.
+
+  Syntax: >
+    system.dnp.freezeAnalogs(deviceName, indexes)
+<
+
+  Parameters: ~
+    {deviceName}  (String)  The name of the DNP3 device instance.
+    {indexes}     (List)    The indices of the analog points to freeze.
+
+  Returns: ~
+    Nothing.
+
+  Scope: Gateway
+
+  Example: >
+    system.dnp.freezeAnalogs("Dnp3", [1, 3, 5])
+<
+
+------------------------------------------------------------------------------
+system.dnp.freezeAtTimeAnalogs()     *ignition-system.dnp.freezeAtTimeAnalogs*
+
+  Issues a Freeze at Time command targeting one or more analog points.
+
+  Syntax: >
+    system.dnp.freezeAtTimeAnalogs(deviceName, absoluteTime, intervalTime, indexes)
+<
+
+  Parameters: ~
+    {deviceName}    (String)  The name of the DNP3 device instance.
+    {absoluteTime}  (Long)    Absolute time (in milliseconds since epoch UTC)
+                              when the initial action should occur.
+    {intervalTime}  (Long)    Interval time (in milliseconds) between
+                              periodic actions.
+    {indexes}       (List)    The indices of the analog points to freeze.
+
+  Returns: ~
+    Nothing.
+
+  Scope: Gateway
+
+  Example: >
+    from time import *
+    
+    fiveMikes = (60 * 1000 * 5) + int(time() * 1000)
+    system.dnp.freezeAtTimeAnalogs("DNP3", fiveMikes, 0, [2, 4])
+<
+
+------------------------------------------------------------------------------
+system.dnp.freezeAtTimeCounters()   *ignition-system.dnp.freezeAtTimeCounters*
+
+  Issues a Freeze at Time command targeting one or more counters.
+
+  Syntax: >
+    system.dnp.freezeAtTimeCounters(deviceName, absoluteTime, intervalTime, indexes)
+<
+
+  Parameters: ~
+    {deviceName}    (String)  The name of the DNP3 device instance.
+    {absoluteTime}  (Long)    Absolute time (in milliseconds since epoch UTC)
+                              when the initial action should occur.
+    {intervalTime}  (Long)    Interval time (in milliseconds) between
+                              periodic actions.
+    {indexes}       (List)    The indices of the counters to freeze.
+
+  Returns: ~
+    Nothing.
+
+  Scope: Gateway
+
+  Example: >
+    from time import *
+    
+    fiveMikes = (60 * 1000 * 5) + int(time() * 1000)
+    system.dnp.freezeAtTimeCounters("DNP3", fiveMikes, 0, [2, 4])
+<
+
+------------------------------------------------------------------------------
+system.dnp.freezeClearAnalogs()       *ignition-system.dnp.freezeClearAnalogs*
+
+  Issues a Freeze and Clear command targeting one or more analog points.
+
+  Syntax: >
+    system.dnp.freezeClearAnalogs(deviceName, indexes)
+<
+
+  Parameters: ~
+    {deviceName}  (String)  The name of the DNP3 device instance.
+    {indexes}     (List)    The indices of the analog points to freeze.
+
+  Returns: ~
+    Nothing.
+
+  Scope: Gateway
+
+  Example: >
+    system.dnp.freezeClearAnalogs("DNP3", [1, 3, 5])
+<
+
+------------------------------------------------------------------------------
+system.dnp.freezeClearCounters()     *ignition-system.dnp.freezeClearCounters*
+
+  Issues a Freeze and Clear command targeting one or more counters.
+
+  Syntax: >
+    system.dnp.freezeClearCounters(deviceName, indexes)
+<
+
+  Parameters: ~
+    {deviceName}  (String)  The name of the DNP3 device instance.
+    {indexes}     (List)    The indices of the counters to freeze.
+
+  Returns: ~
+    Nothing.
+
+  Scope: Gateway
+
+  Example: >
+    system.dnp.freezeClearCounters("DNP3", [1, 3, 5])
+<
+
+------------------------------------------------------------------------------
+system.dnp.freezeCounters()               *ignition-system.dnp.freezeCounters*
+
+  Issues an Immediate Freeze command targeting one or more counters.
+
+  Syntax: >
+    system.dnp.freezeCounters(deviceName, indexes)
+<
+
+  Parameters: ~
+    {deviceName}  (String)  The name of the DNP3 device instance.
+    {indexes}     (List)    The indices of the counters to freeze.
+
+  Returns: ~
+    Nothing.
+
+  Scope: Gateway
+
+  Example: >
+    system.dnp.freezeCounters("DNP3", [1, 3, 5])
+<
+
+------------------------------------------------------------------------------
+system.dnp.selectOperateAnalog()     *ignition-system.dnp.selectOperateAnalog*
+
+  Performs a Select then Operate command on an analog point.
+
+  Syntax: >
+    system.dnp.selectOperateAnalog(deviceName, variation, index, value)
+<
+
+  Parameters: ~
+    {deviceName}  (String)   The name of the DNP3 device instance.
+    {variation}   (Integer)  The Group 41 variation to use during the
+                             operation.
+    {index}       (Integer)  The index of the analog point.
+    {value}       (Numeric)  The requested value.
+
+  Returns: ~
+    Nothing.
+
+  Scope: Gateway
+
+  Example: >
+    system.dnp.selectOperateAnalog("DNP3", 1, 0, 3.14)
+<
+
+------------------------------------------------------------------------------
+system.dnp.selectOperateBinary()     *ignition-system.dnp.selectOperateBinary*
+
+  Performs a Select then Operate command on a binary point.
+
+  Syntax: >
+    system.dnp.selectOperateBinary(deviceName, index, tcc, opType, count, onTime, offTime)
+<
+
+  Parameters: ~
+    {deviceName}  (String)   The name of the DNP3 device instance.
+    {index}       (Integer)  The index of the binary point.
+    {tcc}         (Integer)  Trip Close Code: 0=NUL, 1=CLOSE, 2=TRIP.
+    {opType}      (Integer)  Operation Type: 0=NUL, 1=PULSE_ON, 2=PULSE_OFF,
+                             3=LATCH_ON, 4=LATCH_OFF.
+    {count}       (Integer)  The number of times the outstation shall execute
+                             the operation.
+    {onTime}      (Integer)  Duration (in milliseconds) the output drive
+                             remains active.
+    {offTime}     (Integer)  Duration (in milliseconds) the output drive
+                             remains non-active.
+
+  Returns: ~
+    Nothing.
+
+  Scope: Gateway
+
+  Example: >
+    system.dnp.selectOperateBinary("DNP3", 3, 1, 3, 2, 5000, 5000)
+<
+
+------------------------------------------------------------------------------
+system.dnp.synchronizeTime()             *ignition-system.dnp.synchronizeTime*
+
+  Issues a Synchronize Time command using the current Ignition Gateway time.
+
+  Syntax: >
+    system.dnp.synchronizeTime(deviceName)
+<
+
+  Parameters: ~
+    {deviceName}  (String)  The name of the DNP3 device instance.
+
+  Returns: ~
+    Nothing.
+
+  Scope: Gateway
+
+  Example: >
+    system.dnp.synchronizeTime("DNP3")
+<
+
+
+vim:tw=78:ft=help:norl:

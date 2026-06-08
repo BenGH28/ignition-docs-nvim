@@ -1,0 +1,198 @@
+*ignition-file.txt*                             Ignition system.file functions
+
+SYSTEM.FILE                                             *ignition-system.file*
+
+  |ignition-system.file.fileExists|
+  |ignition-system.file.getTempFile|
+  |ignition-system.file.readFileAsBytes|
+  |ignition-system.file.readFileAsString|
+  |ignition-system.file.writeFile|
+
+------------------------------------------------------------------------------
+system.file.fileExists()                     *ignition-system.file.fileExists*
+
+  Checks to see if a file or folder at a given path exists.
+
+  Syntax: >
+    system.file.fileExists(filepath)
+<
+
+  Parameters: ~
+    {filepath}  (String)  The path of the file or folder to check.
+
+  Returns: ~
+    Boolean - True if the file/folder exists, false otherwise.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This basic example shows how the fileExists function is used in its simplest form:
+    if system.file.fileExists("C:\\temp_file.txt"):
+       system.vision.showMessage("Yes, the file exists")
+    else:
+       system.vision.showMessage("No, it doesn't exist")
+<
+
+------------------------------------------------------------------------------
+system.file.getTempFile()                   *ignition-system.file.getTempFile*
+
+  Creates a new temp file on the host machine with a certain extension,
+  returning the path to the file. The file is marked to be removed when the
+  Java VM exits.
+
+  Syntax: >
+    system.file.getTempFile(extension)
+<
+
+  Parameters: ~
+    {extension}  (String)  An extension, like ".txt", to append to the end of
+                           the temporary file.
+
+  Returns: ~
+    String - The path to the newly created temp file.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This code writes some data to a temporary file, and then opens that file.
+    # Assume that the data variable holds the contents of an Excel (xls) file.
+    
+    filename = system.file.getTempFile("xls")
+    system.file.writeFile(filename, data)
+    system.net.openURL("file://" + filename)
+<
+
+------------------------------------------------------------------------------
+system.file.readFileAsBytes()           *ignition-system.file.readFileAsBytes*
+
+  Opens the file found at path filename, and reads the entire file. Returns
+  the file as an array of bytes. Commonly this array of bytes is uploaded to
+  a database table with a column of type BLOB (Binary Large OBject). This
+  upload would be done through an INSERT or UPDATE SQL statement run through
+  the system.db.runPrepUpdate function. You could also write the bytes to
+  another file using the system.file.writeFile function, or send the bytes as
+  an email attachment using system.net.sendEmail.
+
+  Syntax: >
+    system.file.readFileAsBytes(filepath)
+<
+
+  Parameters: ~
+    {filepath}  (String)  The path of the file to read.
+
+  Returns: ~
+    List[Byte] - The contents of the file as an array of bytes.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This code would prompt the user to choose a file. If the user chooses a file, it would then read that file and upload it to a database table called Files into a BLOB column called file_data.
+    
+    path = system.file.openFile()
+    if path != None:
+       bytes = system.file.readFileAsBytes(path)
+       system.db.runPrepUpdate("INSERT INTO Files (file_data) VALUES (?)", [bytes])
+<
+
+------------------------------------------------------------------------------
+system.file.readFileAsString()         *ignition-system.file.readFileAsString*
+
+  Opens the file found at path filename, and reads the entire file. Returns
+  the file as a string. Common things to do with this string would be to load
+  it into the text property of a component, upload it to a database table, or
+  save it to another file using system.file.writeFile function.
+
+  Syntax: >
+    system.file.readFileAsString(filepath, [encoding])
+<
+
+  Parameters: ~
+    {filepath}  (String)  The path of the file to read.
+    {encoding}  (String)  The character encoding of the file to be read. Will
+                          throw an exception if the string does not represent
+                          a supported encoding. Common encodings are "UTF-8",
+                          "ISO-8859-1" and "US-ASCII". Default is your
+                          system's default. [optional]
+
+  Returns: ~
+    String - The contents of the file as a string.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This code would prompt the user to choose a text file. If the user chooses a file, it would then set a text area on the screen to display the file.
+    
+    path = system.file.openFile("txt")
+    if path != None:
+       contents = system.file.readFileAsString(path)
+       event.source.parent.getComponent("Text Area").text = contents
+<
+
+------------------------------------------------------------------------------
+system.file.writeFile()                       *ignition-system.file.writeFile*
+
+  Writes the given data to the file at file path filename. If the file
+  exists, the append argument determines whether or not it is overwritten
+  (the default) or appended to. The data argument can be either a string or
+  an array of bytes (commonly retrieved from a BLOB in a database or read
+  from another file using system.file.readFileAsBytes).
+
+  Syntax: >
+    system.file.writeFile(filepath, charData, [append], [encoding])
+<
+
+  Parameters: ~
+    {filepath}  (String)   The path of the file to write to.
+    {charData}  (String)   The character content to write to the file.
+    {append}    (Boolean)  If true, the file will be appended to if it
+                           already exists. If false, the file will be
+                           overwritten if it exists. The default is false.
+                           [optional]
+    {encoding}  (String)   The character encoding of the file to write. Will
+                           throw an exception if the string does not
+                           represent a supported encoding. Common encodings
+                           are "UTF-8", "ISO-8859-1" and "US-ASCII". Default
+                           is "UTF-8". [optional]
+
+  Returns: ~
+    Nothing
+
+  Syntax: >
+    system.file.writeFile(filepath, data, [append], [encoding])
+<
+
+  Parameters: ~
+    {filepath}  (String)   The path of the file to write to.
+    {data}      (Byte[])   The binary content to write to the file.
+    {append}    (Boolean)  If true, the file will be appended to if it
+                           already exists. If false, the file will be
+                           overwritten if it exists. The default is false.
+                           [optional]
+    {encoding}  (String)   The character encoding of the file to write. Will
+                           throw an exception if the string does not
+                           represent a supported encoding. Common encodings
+                           are "UTF-8", "ISO-8859-1" and "US-ASCII". Default
+                           is "UTF-8". [optional]
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This code downloads a BLOB from a database and saves it to a file.
+    
+    resultSet = system.db.runPrepQuery(
+        "SELECT file_data FROM Files WHERE id = ?",
+        [12]
+    )
+    
+    if len(resultSet) > 0:  # if the query returned anything...
+        data = resultSet[0][0]  # grab the BLOB at the 0th row and 0th column
+        filename = system.vision.saveFile("MyDownloadedFile.xyz")
+        if filename is not None:
+            system.file.writeFile(filename, data)
+<
+
+
+vim:tw=78:ft=help:norl:

@@ -1,0 +1,904 @@
+*ignition-util.txt*                             Ignition system.util functions
+
+SYSTEM.UTIL                                             *ignition-system.util*
+
+  |ignition-system.util.audit|
+  |ignition-system.util.execute|
+  |ignition-system.util.getGatewayStatus|
+  |ignition-system.util.getGlobals|
+  |ignition-system.util.getLogger|
+  |ignition-system.util.getModules|
+  |ignition-system.util.getProjectName|
+  |ignition-system.util.getProperty|
+  |ignition-system.util.getSessionInfo|
+  |ignition-system.util.getVersion|
+  |ignition-system.util.invokeAsynchronous|
+  |ignition-system.util.jsonDecode|
+  |ignition-system.util.jsonEncode|
+  |ignition-system.util.modifyTranslation|
+  |ignition-system.util.queryAuditLog|
+  |ignition-system.util.sendMessage|
+  |ignition-system.util.sendRequest|
+  |ignition-system.util.sendRequestAsync|
+  |ignition-system.util.setLoggingLevel|
+  |ignition-system.util.threadDump|
+  |ignition-system.util.translate|
+
+------------------------------------------------------------------------------
+system.util.audit()                               *ignition-system.util.audit*
+
+  Inserts a record into an audit profile.
+
+  Syntax: >
+    system.util.audit([action], [actionTarget], [actionValue], [auditProfile], [actor], [actorHost], [originatingSystem], [eventTimestamp], [originatingContext], [statusCode])
+<
+
+  Parameters: ~
+    {action}              (String)        What happened. Default is null.
+                                          [optional]
+    {actionTarget}        (String)        What the action happened to.
+                                          Default is null. [optional]
+    {actionValue}         (String)        The value of the action. Default is
+                                          no value. [optional]
+    {auditProfile}        (String)        Where the audit record should be
+                                          stored. Defaults to the projectâs
+                                          audit profile (if specified), or
+                                          the Gateway audit profile if
+                                          calling in the Gateway or
+                                          Perspective Session scope.
+                                          [optional]
+    {actor}               (String)        Who made the change. Will be
+                                          populated automatically if omitted,
+                                          assuming there is a known user.
+                                          [optional]
+    {actorHost}           (String)        The hostname of whoever made the
+                                          change. Will be populated
+                                          automatically if omitted.
+                                          [optional]
+    {originatingSystem}   (List[String])  An even-length list providing
+                                          additional context to the audit
+                                          event. Will be appended to the
+                                          automatically generated list.
+                                          Typically, the automatically
+                                          generated context looks like this:
+                                          sys:${gatewayName}:\project:${projectName}
+                                          If you provided [âcomponentâ,
+                                          âJoeâsButtonâ, âfieldâ,
+                                          âvalueâ] , you would get a
+                                          record with:
+                                          originatingSystem:sys:${gatewayName}:\project:${projectName}:
+                                          \component:JoeâsButton:\field:value.
+                                          If a string is provided, this
+                                          automatic context will not be used
+                                          and your provided string will be
+                                          written directly into the
+                                          originatingSystem column in the
+                                          audit profile. [optional]
+    {eventTimestamp}      (Date)          When the event happened. Will be
+                                          set to the current time if omitted.
+                                          [optional]
+    {originatingContext}  (Integer)       What scope the event originated
+                                          from: 1 means Gateway, 2 means
+                                          Designer, 4 means Client. Will be
+                                          set automatically if omitted.
+                                          [optional]
+    {statusCode}          (Integer)       A quality code to attach to the
+                                          object. Defaults to 0, indicating
+                                          no special meaning. [optional]
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Vision Client, and Perspective Session.
+
+  Example: >
+    # All of the parameters are optional, so you're free to only provide parameters you're interested in.
+    # In the very least provide just the action you wish to record, which gives the function a chance to look up all of the other parameters automatically.
+    system.util.audit("The user did a thing!")
+<
+
+------------------------------------------------------------------------------
+system.util.execute()                           *ignition-system.util.execute*
+
+  Executes the given commands via the operating system, in a separate
+  process. The commands argument is an array of strings. The first string is
+  the program to execute, with subsequent strings being the arguments to that
+  command.
+
+  Syntax: >
+    system.util.execute(commands)
+<
+
+  Parameters: ~
+    {commands}  (List[String])  A list containing the command (1st entry) and
+                                associated arguments (remaining entries) to
+                                execute.
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This function flushes the resolver cache.
+    system.util.execute(["ipconfig", "/flushdns"])
+<
+
+------------------------------------------------------------------------------
+system.util.getGatewayStatus()         *ignition-system.util.getGatewayStatus*
+
+  Returns a string that indicates the status of a Gateway. A status of
+  RUNNING means the Gateway is fully functional. If an exception occurs, the
+  function returns ERROR with the associated error message appended. This
+  function can be used to test the availability and operational state of a
+  remote Gateway.
+
+  Syntax: >
+    system.util.getGatewayStatus(gatewayAddress, [connectTimeoutMillis], [socketTimeoutMillis])
+<
+
+  Parameters: ~
+    {gatewayAddress}        (String)   The Gateway address to ping, in the
+                                       form of ADDR :PORT .
+    {connectTimeoutMillis}  (Integer)  The maximum time in milliseconds to
+                                       attempt to initially contact a
+                                       Gateway. [optional]
+    {socketTimeoutMillis}   (Integer)  The maximum time in milliseconds to
+                                       wait for a response from a Gateway
+                                       after initial connection has been
+                                       established. [optional]
+    {bypassCertValidation}  (Boolean)  If the target address is an HTTPS
+                                       address, and this parameter is True,
+                                       the system will bypass all SSL
+                                       certificate validation. This is not
+                                       recommended, though is sometimes
+                                       necessary for self-signed
+                                       certificates.
+
+  Returns: ~
+    String - A string that indicates the status of the Gateway. A status of
+    RUNNING means that the Gateway is fully functional.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    REMOTE_GATEWAY = "10.20.6.253:8088"
+    
+    def check_remote_gateway(address=REMOTE_GATEWAY):
+    
+        try:
+            status = system.util.getGatewayStatus(address)
+        except Exception as err:
+            print "Error checking Gateway status for {0}: {1}".format(address, err)
+            return
+    
+        if status == "RUNNING":
+            print "Central Gateway is available!"
+        else:
+            print "Central Gateway status: {0}".format(status)
+    
+    # Run asynchronously so the call doesn't block the calling thread (UI/gateway event thread).
+    system.util.invokeAsynchronous(check_remote_gateway)
+<
+
+------------------------------------------------------------------------------
+system.util.getGlobals()                     *ignition-system.util.getGlobals*
+
+  This method returns a dictionary that provides access to the legacy global
+  namespace. As of version 7.7.0, most new scripts use the modern style of
+  scoping, which makes the 'global' keyword act very differently. Most
+  importantly, the modern scoping rules mean that variables declared as
+  'global' are only global within that one module. The
+  system.util.getGlobals() method can be used to interact with older scripts
+  that used the old meaning of the 'global' keyword.
+
+  Syntax: >
+    system.util.getGlobals()
+<
+
+  Returns: ~
+    Dictionary[String, Any] - The global namespace, as a dictionary.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Read and print out global variable 'foo'
+    print system.util.getGlobals()['foo']
+<
+
+------------------------------------------------------------------------------
+system.util.getLogger()                       *ignition-system.util.getLogger*
+
+  Returns a Logger object that can be used to log messages to the console.
+  Each Logger has a name, which is typically structured hierarchically using
+  periods, indicating where in the project the Logger is used. You can use
+  any naming scheme you like, however a well-planned naming scheme makes
+  finding log entries and setting log levels much easier. Loggers can be
+  shared between scripts simply by giving them the same name. Six levels of
+  logging are available:
+
+  Syntax: >
+    system.util.getLogger(name)
+<
+
+  Parameters: ~
+    {name}  (String)  The name of a logger to create.
+
+  Returns: ~
+    LoggerEx - A new LoggerEx object used to log informational and error
+    messages.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This code would log a message with level info
+    logger = system.util.getLogger("myLogger")
+    logger.info("Hello, world.")
+<
+
+------------------------------------------------------------------------------
+system.util.getModules()                     *ignition-system.util.getModules*
+
+  Returns a dataset of information about each installed module. Each row
+  represents a single module.
+
+  Syntax: >
+    system.util.getModules()
+<
+
+  Returns: ~
+    Dataset - A dataset, where each row represents a module. Contains five
+    columns: Id, Name, Version, State (Running, Faulted, etc), and its
+    current License Status (Trial, Activated, etc.)
+
+  Scope: Gateway
+
+  Example: >
+    #Return the names of all installed modules
+    
+    results = system.util.getModules()
+    for row in range(results.rowCount):
+        names = results.getValueAt(row, "Name")
+        print names
+<
+
+------------------------------------------------------------------------------
+system.util.getProjectName()             *ignition-system.util.getProjectName*
+
+  Returns the name of the project that is currently being run. When run from
+  the Gateway scope from a resource that originates from a singular project
+  (reports, SFCs, etc.), will return that resources project.
+
+  Syntax: >
+    system.util.getProjectName()
+<
+
+  Returns: ~
+    String - The name of the currently running project.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This code would display the name of the currently running project
+    system.vision.showMessage("You are running project: %s" % system.util.getProjectName())
+<
+
+------------------------------------------------------------------------------
+system.util.getProperty()                   *ignition-system.util.getProperty*
+
+  Retrieves the value of a named system property. Some of the available
+  properties are:
+
+  Syntax: >
+    system.util.getProperty(propertyName)
+<
+
+  Parameters: ~
+    {propertyName}  (String)  The name of the system property to get.
+
+  Returns: ~
+    String - The value for the named property.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This script would store the contents of the Text Area component in the users home directory.
+    homeDir = system.util.getProperty("user.home")
+    sep = system.util.getProperty("file.separator")
+    path = "%s%smyfile.txt" %(homeDir, sep)
+    system.file.writeFile(path, event.source.parent.getComponent("Text Area").text)
+<
+
+------------------------------------------------------------------------------
+system.util.getSessionInfo()             *ignition-system.util.getSessionInfo*
+
+  Returns a PyDataSet holding information about all of the open Designer
+  sessions and Vision Clients. Optional regular-expression based filters can
+  be provided to filter the username or the username and the project
+  returned.
+
+  Syntax: >
+    system.util.getSessionInfo([usernameFilter], [projectFilter])
+<
+
+  Parameters: ~
+    {usernameFilter}  (String)  A regular-expression based filter string to
+                                restrict the list by username. [optional]
+    {projectFilter}   (String)  A regular-expression based filter string to
+                                restrict the list by project [optional]
+
+  Returns: ~
+    PyDataSet - A dataset representing the Gateway's current sessions.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This code would get the entire table of sessions and put it in an adjacent table
+    table = event.source.parent.getComponent("Table")
+    sessions = system.util.getSessionInfo()
+    table.data = system.db.toDataSet(sessions)
+<
+
+------------------------------------------------------------------------------
+system.util.getVersion()                     *ignition-system.util.getVersion*
+
+  Returns the Ignition version number that is currently being run.
+
+  Syntax: >
+    system.util.getVersion()
+<
+
+  Returns: ~
+    Version - The currently running Ignition version number, as a Version
+    object.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This code displays the name of the currently running Ignition version number.
+    system.vision.showMessage("You are running project: %s" % system.util.getVersion())
+<
+
+------------------------------------------------------------------------------
+system.util.invokeAsynchronous()     *ignition-system.util.invokeAsynchronous*
+
+  Invokes (calls) the given Python function on a different thread. This means
+  that calls to invokeAsynchronous will return immediately, and then the
+  given function will start executing asynchronously on a different thread.
+  This is useful for long-running data intensive functions, where running
+  them synchronously (in the GUI thread) would make the GUI non-responsive
+  for an unacceptable amount of time.
+
+  Syntax: >
+    system.util.invokeAsynchronous(function, [args], [kwargs], [description])
+<
+
+  Parameters: ~
+    {function}     (Callable)                 A Python function object that
+                                              will be invoked in a newly
+                                              created thread.
+    {args}         (List [Any])               A list or tuple of Python
+                                              objects that will be provided
+                                              to the called function as
+                                              arguments. Equivalent to the *
+                                              operator . [optional]
+    {kwargs}       (Dictionary[String, Any])  A dictionary of keyword
+                                              argument names to Python object
+                                              values that will be provided to
+                                              the called function as keyword
+                                              arguments. Equivalent to the **
+                                              operator . [optional]
+    {description}  (String)                   A description to use for the
+                                              asynchronous thread. Will be
+                                              displayed on the current
+                                              scope's diagnostic view for
+                                              scripts. For Vision and the
+                                              Designer, this would be the
+                                              "Scripts" tab of the
+                                              Diagnostics popup. For
+                                              Perspective and the Gateway
+                                              scope, this would be the
+                                              Gateway's Running Scripts page.
+                                              [optional]
+
+  Returns: ~
+    Thread - The executing Thread .
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This code would do some data-intensive processing, and then call
+    # back to the GUI to let it know that it is finished.
+    # We use default function parameters to pass the root container into these
+    # functions. (See a Python reference if you don't understand this)
+    
+    def longProcess(rootContainer = event.source.parent):
+       # Do something here with the database that takes a long time
+       results = ...( something )
+       # Now we'll send our results back to the UI
+       def sendBack(results = results, rootContainer = rootContainer):
+          rootContainer.resultsProperty = results
+       system.vision.invokeLater(sendBack)
+    
+    system.util.invokeAsynchronous(longProcess) #Note that this is 'longProcess' instead of 'longProcess()'
+<
+
+------------------------------------------------------------------------------
+system.util.jsonDecode()                     *ignition-system.util.jsonDecode*
+
+  Takes a JSON string and converts it into a Python object such as a list or
+  a dictionary. If the input is not valid JSON, a string is returned.
+
+  Syntax: >
+    system.util.jsonDecode(jsonString)
+<
+
+  Parameters: ~
+    {jsonString}  (String)  The JSON string to decode into a Python object.
+
+  Returns: ~
+    Any - The decoded Python object. See the table below for a listing of how
+    JSON objects are mapped to Python objects.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # The following example reads in a JSON string, and converts the string to a Python object.
+    # The example attempts to read the JSON string from a text file, but this could easily be modified to read data from a web server.
+    
+    # Read the JSON string
+    jsonString = system.file.readFileAsString("C:\tmp\\json.txt")
+    
+    # Decode the JSON string and store the results into a variable
+    obj = system.util.jsonDecode(jsonString)
+    
+    # Do something with the results. The code below prints the datatype of the results to the console.
+    print type(obj)
+<
+
+------------------------------------------------------------------------------
+system.util.jsonEncode()                     *ignition-system.util.jsonEncode*
+
+  Takes a Python object such as a list or dictionary and converts into a JSON
+  string.
+
+  Syntax: >
+    system.util.jsonEncode(pyObj, [indentFactor])
+<
+
+  Parameters: ~
+    {pyObj}         (Any)      The Python object to encode into JSON such as
+                               a Python list or dictionary.
+    {indentFactor}  (Integer)  The number of spaces to add to each level of
+                               indentation for prettyprinting. [optional]
+
+  Returns: ~
+    String - The encoded JSON string.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # The following example builds a Python dictionary, and converts it to a JSON string
+    
+    # Build the Python dictionary
+    employeeDict = {"employees":[{"firstName":"John", "lastName":"Doe"},{"firstName":"Anna", "lastName":"Smith"},{"firstName":"Peter", "lastName":"Jones"}]}
+    
+    # Convert the dictionary and store the resulting JSON string in a variable.
+    jsonString = system.util.jsonEncode(employeeDict)
+<
+
+------------------------------------------------------------------------------
+system.util.modifyTranslation()       *ignition-system.util.modifyTranslation*
+
+  This function allows you to add or modify a global translation.
+
+  Syntax: >
+    system.util.modifyTranslation(term, translation, [locale])
+<
+
+  Parameters: ~
+    {term}         (String)  The key term to translate.
+    {translation}  (String)  The translated value to store.
+    {locale}       (String)  If specified, the locale code (such as "es")
+                             identifying the language of the translation.
+                             Otherwise, the currently set language is
+                             used.[optional]
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This code adds or updates a translation into French
+    # for the world Hello. Note the u in front "AllÃ´!", which
+    # is needed for Python strings outside of the 7-bit ASCII
+    # range.
+    system.util.modifyTranslation("Hello", u"AllÃ´!", "fr")
+<
+
+------------------------------------------------------------------------------
+system.util.queryAuditLog()               *ignition-system.util.queryAuditLog*
+
+  Queries an audit profile for audit history. Returns the results as a
+  dataset.
+
+  Syntax: >
+    system.util.queryAuditLog(auditProfileName, [startDate], [endDate], [actorFilter], [actionFilter], [targetFilter], [valueFilter], [systemFilter], [contextFilter])
+<
+
+  Parameters: ~
+    {auditProfileName}  (String)   The name of the audit profile to pull the
+                                   history from.
+    {startDate}         (Date)     The earliest audit event to return. If
+                                   omitted, the current time - 8 hours will
+                                   be used. [optional]
+    {endDate}           (Date)     The latest audit event to return. If
+                                   omitted, the current time will be used.
+                                   [optional]
+    {actorFilter}       (String)   A filter string used to restrict the
+                                   results by actor. [optional]
+    {actionFilter}      (String)   A filter string used to restrict the
+                                   results by action. [optional]
+    {targetFilter}      (String)   A filter string used to restrict the
+                                   results by target. [optional]
+    {valueFilter}       (String)   A filter string used to restrict the
+                                   results by value. [optional]
+    {systemFilter}      (String)   A filter string used to restrict the
+                                   results by system. [optional]
+    {contextFilter}     (Integer)  A bitmask used to restrict the results by
+                                   context. 0x01 = Gateway, 0x02 = Designer,
+                                   0x04 = Client. [optional]
+
+  Returns: ~
+    Dataset - A dataset with the audit events from the specified profile that
+    match the filter arguments.
+
+  Syntax: >
+    system.util.queryAuditLog([auditProfileName], [startDate], [endDate], [actorFilter], [actionFilter], [targetFilter], [valueFilter], [systemFilter], [contextFilter])
+<
+
+  Parameters: ~
+    {auditProfileName}  (String)   The name of the audit profile to pull the
+                                   history from. [optional] Note: The project
+                                   must have an Audit Profile configured in
+                                   Project Properties. Otherwise this
+                                   parameter is mandatory.
+    {startDate}         (Date)     The earliest audit event to return. If
+                                   omitted, the current time - 8 hours will
+                                   be used. [optional]
+    {endDate}           (Date)     The latest audit event to return. If
+                                   omitted, the current time will be used.
+                                   [optional]
+    {actorFilter}       (String)   A filter string used to restrict the
+                                   results by actor. [optional]
+    {actionFilter}      (String)   A filter string used to restrict the
+                                   results by action. [optional]
+    {targetFilter}      (String)   A filter string used to restrict the
+                                   results by target. [optional]
+    {valueFilter}       (String)   A filter string used to restrict the
+                                   results by value. [optional]
+    {systemFilter}      (String)   A filter string used to restrict the
+                                   results by system. [optional]
+    {contextFilter}     (Integer)  A bitmask used to restrict the results by
+                                   context. 0x01 = Gateway, 0x02 = Designer,
+                                   0x04 = Client. [optional]
+
+  Returns: ~
+    Dataset - A dataset with the audit events from the specified profile that
+    match the filter arguments.
+
+  Scope: Gateway
+
+  Example: >
+    # This script queries an audit log, checks to see if a user john made any tag writes in the last 8 hours
+    # (since the startDate parameter is omitted), and writes the results to a table.
+    data = system.util.queryAuditLog(auditProfileName='AuditLog', actorFilter='john', actionFilter='tag write')
+    
+    event.source.parent.getComponent("Table").data = data
+<
+
+------------------------------------------------------------------------------
+system.util.sendMessage()                   *ignition-system.util.sendMessage*
+
+  This function sends a message to clients running under the Gateway or to a
+  project within the Gateway itself. To handle received messages, you must
+  set up event script message handlers within a project. These message
+  handlers run Jython code when a message is received. You can add message
+  handlers under the Message section of the client/Gateway event script
+  configuration dialogs.
+
+  Syntax: >
+    system.util.sendMessage(project, messageHandler, [payload], [scope], [clientSessionId], [user], [hasRole], [hostName], [remoteServers])
+<
+
+  Parameters: ~
+    {project}          (String)                   The name of the project
+                                                  containing the message
+                                                  handler.
+    {messageHandler}   (String)                   The name of the message
+                                                  handler that will fire upon
+                                                  receiving a message.
+    {payload}          (Dictionary[String, Any])  A dictionary which will get
+                                                  passed to the message
+                                                  handler. Use "payload" in
+                                                  the message handler to
+                                                  access dictionary
+                                                  variables. [optional]
+    {scope}            (String)                   Limits the scope of the
+                                                  message delivery to "C"
+                                                  (clients), "G" (Gateway),
+                                                  "CG" for clients and the
+                                                  Gateway, or "S" Session.
+                                                  Any combination of C, G,
+                                                  and S are available.
+                                                  Defaults to "CS" if the
+                                                  user name, role, or host
+                                                  name parameters are set,
+                                                  and to "CGS" if none of
+                                                  these parameters are set.
+                                                  [optional]
+    {clientSessionId}  (String)                   Limits the message delivery
+                                                  to a client with the
+                                                  specified session ID.
+                                                  [optional]
+    {user}             (String)                   Limits the message delivery
+                                                  to clients where the
+                                                  specified user has logged
+                                                  in. [optional]
+    {hasRole}          (String)                   Limits the message delivery
+                                                  to any client where the
+                                                  logged in user has the
+                                                  specified user role.
+                                                  [optional]
+    {hostName}         (String)                   Limits the message delivery
+                                                  to the client that has the
+                                                  specified network host
+                                                  name. [optional]
+    {remoteServers}    (List)                     A list of Strings
+                                                  representing Gateway Server
+                                                  names. The message will be
+                                                  delivered to each server in
+                                                  the list. Upon delivery,
+                                                  the message is distributed
+                                                  to the local Gateway and
+                                                  clients as per the other
+                                                  parameters. [optional]
+
+  Returns: ~
+    List - A List of strings containing information about each system that
+    was selected for delivery, where each List item is comma-delimited.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Simple message to both Client and Gateway handlers.
+    project="X"
+    # It's important that both Gateway and Client versions of this message handler have been created.
+    messageHandler="myMessageHandler"
+    scope="CG"
+    myDict = {'first': "Hello", 'second': "World"}
+    results=system.util.sendMessage(project,messageHandler,myDict,scope)
+    
+    # Assuming that there is one local client running project X, the results List will contain these Strings:
+    #type=Gateway,project=X,messageHandler=testHandler,filterParams={hostName=, clientSessionId=, scope=CG, user=, hasRole=},sendStatus=SENT
+    
+    #type=Client,sessionId=65F7A472,clientAddress=127.0.0.1,clientHostName=127.0.0.1,project=X,messageHandler=testHandler,filterParams={hostName=, clientSessionId=, scope=CG, user=, hasRole=},sendStatus=SENT
+<
+
+------------------------------------------------------------------------------
+system.util.sendRequest()                   *ignition-system.util.sendRequest*
+
+  This function sends a message to the Gateway, working in a similar manner
+  to the sendMessage function, except sendRequest expects a response to the
+  message. To handle received messages, you must set up Gateway Event Script
+  message handlers within a project. These message handlers run Jython code
+  when a message is received. You can then place a return at the end of the
+  code to return something to where the sendRequest was originally called
+  from. You can add message handlers under the "Message" section of the
+  Gateway Event Script configuration dialog.
+
+  Syntax: >
+    system.util.sendRequest(project, messageHandler, [payload], [remoteServer], [timeoutSec])
+<
+
+  Parameters: ~
+    {project}         (String)                   The name of the project
+                                                 containing the message
+                                                 handler.
+    {messageHandler}  (String)                   The name of the message
+                                                 handler that will fire upon
+                                                 receiving a message.
+    {payload}         (Dictionary[String, Any])  A dictionary which will get
+                                                 passed to the message
+                                                 handler. Use "payload" in
+                                                 the message handler to
+                                                 access dictionary variables.
+                                                 [optional]
+    {hostName}        (String)                   Limits the message delivery
+                                                 to the client that has the
+                                                 specified network host name.
+                                                 [optional]
+    {remoteServer}    (String)                   A string representing a
+                                                 target Gateway Server name.
+                                                 The message will be
+                                                 delivered to the remote
+                                                 Gateway over the Gateway
+                                                 Network. Upon delivery, the
+                                                 message is distributed to
+                                                 the local Gateway and
+                                                 clients as per the other
+                                                 parameters. [optional]
+    {timeoutSec}      (String)                   The number of seconds before
+                                                 the sendRequest call times
+                                                 out. [optional]
+
+  Returns: ~
+    Object - The return from the message handler.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Request sent to the message handler 'test' which then saves the return value to returnValue and prints it.
+    returnValue = system.util.sendRequest(project='ACME', messageHandler='test', payload={'hoursOn':15})
+    print returnValue
+<
+
+------------------------------------------------------------------------------
+system.util.sendRequestAsync()         *ignition-system.util.sendRequestAsync*
+
+  This function sends a message to the Gateway and expects a response. Works
+  in a similar manner to the sendRequest function, except sendRequestAsync
+  will send the request and then immediately return a handle for it. The
+  Request handle has the following methods:
+
+  Syntax: >
+    system.util.sendRequestAsync(project, messageHandler, [payload], [remoteServer], [timeoutSec], [onSuccess], [onError])
+<
+
+  Parameters: ~
+    {project}         (String)                   The name of the project
+                                                 containing the message
+                                                 handler.
+    {messageHandler}  (String)                   The name of the message
+                                                 handler that will fire upon
+                                                 receiving a message.
+    {payload}         (Dictionary[String, Any])  A dictionary which will get
+                                                 passed to the message
+                                                 handler. Use "payload" in
+                                                 the message handler to
+                                                 access dictionary variables.
+                                                 [optional]
+    {hostName}        (String)                   Limits the message delivery
+                                                 to the client that has the
+                                                 specified network host name.
+                                                 [optional]
+    {remoteServer}    (String)                   A string representing the
+                                                 target Gateway server name.
+                                                 The message will be
+                                                 delivered to the remote
+                                                 Gateway over the Gateway
+                                                 Network. Upon delivery, the
+                                                 message is distributed to
+                                                 the local Gateway and
+                                                 clients as per the other
+                                                 parameters. [optional]
+    {timeoutSec}      (String)                   The number of seconds before
+                                                 the sendRequest call times
+                                                 out. [optional]
+    {onSuccess}       (Callable)                 Should take one argument,
+                                                 which will be the result
+                                                 from the message handler.
+                                                 Callback functions will be
+                                                 executed on the GUI thread,
+                                                 similar to
+                                                 system.vision.invokeLater .
+                                                 [optional]
+    {onError}         (Callable)                 Should take one argument,
+                                                 which will be the exception
+                                                 encountered. Callback
+                                                 functions will be executed
+                                                 on the GUI thread, similar
+                                                 to system.vision.invokeLater
+                                                 . [optional]
+
+  Returns: ~
+    Request Handle - The Request object that can be used while waiting for
+    the message handler callback.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This will call the message handler 'test', and will return a handle into myHandle.
+    # We then call get() on myHandle, which will block the script and will wait for a return or throw an exception on failure.
+    myHandle = system.util.sendRequestAsync(project='ACME', messageHandler='test', payload={'number':55})
+    myHandle.get()
+<
+
+------------------------------------------------------------------------------
+system.util.setLoggingLevel()           *ignition-system.util.setLoggingLevel*
+
+  Sets the logging level on the given logger. This can be a logger you
+  create, or a logger already defined in the system.
+
+  Syntax: >
+    system.util.setLoggingLevel(loggerName, loggerLevel)
+<
+
+  Parameters: ~
+    {loggerName}   (String)  The unique name of the logger to change the
+                             logging level on, for example "Tags.Client".
+    {loggerLevel}  (String)  The level you want to change to logger to:
+                             "trace", "debug", "info", "warn" or "error".
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    system.util.setLoggingLevel("Reporting", "debug") # This would set the logger called Reporting to the debug level.
+<
+
+------------------------------------------------------------------------------
+system.util.threadDump()                     *ignition-system.util.threadDump*
+
+  Creates a thread dump of the current running JVM.
+
+  Syntax: >
+    system.util.threadDump()
+<
+
+  Returns: ~
+    String - The dump of the current running JVM.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This script will take a thread dump of the current JVM, and write it to a Text Area component.
+    
+    event.source.parent.getComponent('Text Area').text = system.util.threadDump()
+<
+
+------------------------------------------------------------------------------
+system.util.translate()                       *ignition-system.util.translate*
+
+  This function allows you to retrieve the global translation of a term from
+  the translation database using the current locale.
+
+  Syntax: >
+    system.util.translate(term, [locale], [strict])
+<
+
+  Parameters: ~
+    {term}    (String)   The term to look up.
+    {locale}  (String)   Which locale to translate against. Useful when there
+                         are multiple locales defined for a single term. If
+                         omitted, the function attempts to use the current
+                         locale (as defined by the client, session, or
+                         Designer). [optional]
+    {strict}  (Boolean)  If false, the function will return the passed term
+                         (param 1) if it could not find a defined translation
+                         for the locale: meaning, if you pass a term that
+                         hasn't been configured, the function will just send
+                         the term back to you. If true, then the function
+                         will return a None when it fails to find a defined
+                         translation. Default is false. [optional]
+
+  Returns: ~
+    String - The translated term.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This script will take a term written into a Text Field component, translate it using the translation database,
+    # and then write it back to the same Text Field.
+    # it uses the current locale since none is specified.
+    
+    text = event.source.parent.getComponent('Text Field').text
+    translation = system.util.translate(text)
+    event.source.parent.getComponent('Text Field').text = translation
+<
+
+
+vim:tw=78:ft=help:norl:

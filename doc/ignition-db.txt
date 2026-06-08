@@ -1,0 +1,1009 @@
+*ignition-db.txt*                                 Ignition system.db functions
+
+SYSTEM.DB                                                 *ignition-system.db*
+
+  |ignition-system.db.addDatasource|
+  |ignition-system.db.beginNamedQueryTransaction|
+  |ignition-system.db.beginTransaction|
+  |ignition-system.db.clearQueryCache|
+  |ignition-system.db.closeTransaction|
+  |ignition-system.db.commitTransaction|
+  |ignition-system.db.createSProcCall|
+  |ignition-system.db.execQuery|
+  |ignition-system.db.execSProcCall|
+  |ignition-system.db.execScalar|
+  |ignition-system.db.execUpdate|
+  |ignition-system.db.execUpdateAsync|
+  |ignition-system.db.getConnectionInfo|
+  |ignition-system.db.getConnections|
+  |ignition-system.db.removeDatasource|
+  |ignition-system.db.rollbackTransaction|
+  |ignition-system.db.runPrepQuery|
+  |ignition-system.db.runPrepUpdate|
+  |ignition-system.db.runScalarPrepQuery|
+  |ignition-system.db.runSFPrepUpdate|
+  |ignition-system.db.setDatasourceConnectURL|
+  |ignition-system.db.setDatasourceEnabled|
+  |ignition-system.db.setDatasourceMaxConnections|
+
+------------------------------------------------------------------------------
+system.db.addDatasource()                   *ignition-system.db.addDatasource*
+
+  Adds a new database connection in Ignition.
+
+  Syntax: >
+    system.db.addDatasource(jdbcDriver, name, description, [connectUrl], [username], [password], [props], [validationQuery], [maxConnections])
+<
+
+  Parameters: ~
+    {jdbcDriver}       (String)   The name of the JDBC driver configuration
+                                  to use. Available options are based off the
+                                  JDBC driver configurations on the the
+                                  Gateway.
+    {name}             (String)   The data source name.
+    {description}      (String)   Description of the data source. [optional]
+    {connectUrl}       (String)   Default is the connect URL for JDBC driver.
+                                  [optional]
+    {username}         (String)   Username to login to the data source with.
+                                  [optional]
+    {password}         (String)   Password for the login. [optional]
+    {props}            (String)   The extra connection parameters. [optional]
+    {validationQuery}  (String)   Default is the validation query for the
+                                  JDBC driver. [optional]
+    {maxConnections}   (Integer)  Default is 8. [optional]
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    system.db.addDatasource(jdbcDriver="myJDBCDriver", name="NewDatabase",
+    connectURL="jdbc:mysql://localhost:3306/test", username="root",
+    password="password", props="zeroDateTimeBehavior=convertToNull;")
+<
+
+------------------------------------------------------------------------------
+system.db.beginNamedQueryTransaction() *ignition-system.db.beginNamedQueryTransaction*
+
+  Begins a new database transaction using Named Queries . Database
+  transactions are used to execute multiple queries in an atomic fashion.
+  After executing queries, you must either commit the transaction to have
+  your changes take effect or rollback the transaction, which will make all
+  operations since the last commit not take place. The transaction is given a
+  new unique string code, which is then returned. You can then use this code
+  as the tx argument for other system.db .* function calls to execute various
+  types of queries using this transaction.
+
+  Syntax: >
+    system.db.beginNamedQueryTransaction([database], [isolationLevel], [timeout])
+<
+
+  Parameters: ~
+    {database}        (String)   The name of the database connection to
+                                 create a transaction in. If omitted, uses
+                                 the project's default connection.
+    {isolationLevel}  (Integer)  The transaction isolation level to use. Use
+                                 one of the four constants:
+                                 system.db.READ_COMMITTED ,
+                                 system.db.READ_UNCOMMITTED ,
+                                 system.db.REPEATABLE_READ , or
+                                 system.db.SERIALIZABLE . If omitted, uses
+                                 system.db.READ_COMMITTED . [optional]
+    {timeout}         (Integer)  The amount of time, in milliseconds, that
+                                 this connection is allowed to remain open
+                                 without being used. Timeout counter is reset
+                                 any time a query or call is executed against
+                                 the transaction, or when committed or
+                                 rolled-back. If omitted, defaults to 30,000.
+                                 [optional]
+
+  Returns: ~
+    String - The new transaction ID. You'll use this ID as the "tx" argument
+    for all other calls to have them execute against this transaction.
+
+  Syntax: >
+    system.db.beginNamedQueryTransaction(project, database, [isolationLevel], [timeout])
+<
+
+  Parameters: ~
+    {project}         (String)   The name of the project that contains the
+                                 named query.
+    {database}        (String)   The name of the database connection to
+                                 create a transaction in.
+    {isolationLevel}  (Integer)  The transaction isolation level to use. Use
+                                 one of the four constants:
+                                 system.db.READ_COMMITTED,
+                                 system.db.READ_UNCOMMITTED,
+                                 system.db.REPEATABLE_READ, or
+                                 system.db.SERIALIZABLE. If omitted, uses
+                                 system.db.READ_COMMITTED. [optional]
+    {timeout}         (Integer)  The amount of time, in milliseconds, that
+                                 this connection is allowed to remain open
+                                 without being used. Timeout counter is reset
+                                 any time a query or call is executed against
+                                 the transaction, or when committed or
+                                 rolled-back. If omitted, defaults to 30,000.
+                                 [optional]
+
+  Returns: ~
+    String - The new transaction ID. You'll use this ID as the "tx" argument
+    for all other calls to have them execute against this transaction.
+
+  Scope: Vision Client
+
+  Example: >
+    # This example starts a transaction and checks a screen to see if the transaction should be completed or reversed (rolled back).
+    # The example assumes you have several components on screen, including a Checkbox and two input components, and a Named Query that takes in an ID and a string value.
+    
+    # Get details from the screen: Numeric Text Field, Text Field, Checkbox
+    idEntry = event.source.parent.getComponent('ID Field').intValue
+    valueEntry = event.source.parent.getComponent('Value Field').text
+    shouldRollback = event.source.parent.getComponent('CheckBox').selected
+    
+    # Begin the transaction.
+    datasource = "MYSQL"
+    isolationLevel = system.db.READ_COMMITTED
+    timeout = 60000
+    txNumber = system.db.beginNamedQueryTransaction(datasource, isolationLevel, timeout)
+    
+    # Start by running a Named Query against the transaction.
+    namedQueryPath = "InsertQueries/AddValues"
+    params = {"id":idEntry, "value":valueEntry}
+    system.db.runNamedQuery(namedQueryPath, params, txNumber)
+    
+    # Check the window to see if the user selected to cancel the transaction.
+    if shouldRollback:
+        # cancel the transaction
+        system.db.rollbackTransaction(txNumber)
+        print "Transaction rolled back"
+    else:
+        # complete the transaction
+        system.db.commitTransaction(txNumber)
+        print "Transaction committed"
+    
+    # Close the transaction now that we are done.
+    system.db.closeTransaction(txNumber)
+<
+
+------------------------------------------------------------------------------
+system.db.beginTransaction()             *ignition-system.db.beginTransaction*
+
+  Begins a new database transaction for using run* and runPrep* queries.
+  Database transactions are used to execute multiple queries in an atomic
+  fashion. After executing queries, you must either commit the transaction to
+  have your changes take effect, or rollback the transaction which will make
+  all operations since the last commit not take place. The transaction is
+  given a new unique string code, which is then returned. You can then use
+  this code as the tx argument for other system.db.* function calls to
+  execute various types of queries using this transaction.
+
+  Syntax: >
+    system.db.beginTransaction(database, isolationLevel, timeout)
+<
+
+  Parameters: ~
+    {database}        (String)   The name of the database connection to
+                                 create a transaction in.
+    {isolationLevel}  (Integer)  The transaction isolation level to use. Use
+                                 one of the four constants:
+                                 system.db.READ_COMMITTED
+                                 system.db.READ_UNCOMMITTED
+                                 system.db.REPEATABLE_READ
+                                 system.db.SERIALIZABLE
+    {timeout}         (Long)     The amount of time, in milliseconds, that
+                                 this connection is allowed to remain open
+                                 without being used. Timeout counter is reset
+                                 any time a query or call is executed against
+                                 the transaction, or when committed or
+                                 rolled-back.
+
+  Returns: ~
+    String - The new transaction ID. You'll use this ID as the "tx" argument
+    for all other calls to have them execute against this transaction.
+
+  Syntax: >
+    system.db.beginTransaction(database, isolationLevel, timeout)
+<
+
+  Parameters: ~
+    {database}        (String)            The name of the database connection
+                                          to create a transaction in. Use ""
+                                          for the project's default
+                                          connection.
+    {isolationLevel}  (Integer/Constant)  The transaction isolation level to
+                                          use. Use one of the four constants:
+                                          system.db.READ_COMMITTED
+                                          system.db.READ_UNCOMMITTED
+                                          system.db.REPEATABLE_READ
+                                          system.db.SERIALIZABLE
+    {timeout}         (Long)              The amount of time, in
+                                          milliseconds, that this connection
+                                          is allowed to remain open without
+                                          being used. Timeout counter is
+                                          reset any time a query or call is
+                                          executed against the transaction,
+                                          or when committed or rolled-back.
+
+  Returns: ~
+    String - The new transaction ID. You'll use this ID as the "tx" argument
+    for all other calls to have them execute against this transaction.
+
+  Scope: Gateway
+
+  Example: >
+    # This example starts a transaction with a 5 second timeout against the project's default database, using the default isolation level. Then it executes a series of update calls, and commits and closes the transaction.
+    
+    txId = system.db.beginTransaction(timeout=5000)
+    status=2
+    
+    for machineId in range(8):
+       system.db.runPrepUpdate("UPDATE MachineStatus SET status=? WHERE ID=?",
+          args=[status, machineId], tx=txId)
+    
+    system.db.commitTransaction(txId)
+    system.db.closeTransaction(txId)
+<
+
+------------------------------------------------------------------------------
+system.db.clearQueryCache()               *ignition-system.db.clearQueryCache*
+
+  This clears the caches for specified Named Queries in a project, or all
+  Named Queries if no arguments are provided.
+
+  Syntax: >
+    system.db.clearQueryCache(project, path)
+<
+
+  Parameters: ~
+    {project}  (String)  The project that contains the named query whose
+                         cache needs to be cleared. An error will be thrown
+                         if no local project is found.
+    {path}     (String)  The path to the named query whose cache needs to be
+                         cleared.
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    projectName = "myProject"
+    namedQueryPath = "folder/selectFromInventory"
+    
+    system.db.clearQueryCache(projectName, namedQueryPath)
+<
+
+------------------------------------------------------------------------------
+system.db.closeTransaction()             *ignition-system.db.closeTransaction*
+
+  Closes the transaction with the given ID. You must commit or rollback the
+  transaction before you close it. Closing the transaction will return its
+  database connection to the pool. The transaction ID will no longer be
+  valid.
+
+  Syntax: >
+    system.db.closeTransaction(tx)
+<
+
+  Parameters: ~
+    {tx}  (String)  The transaction ID.
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example starts a transaction with a 5 second timeout against the project's default database, using the default isolation level. Then it executes a series of update calls,
+    # and commits and closes the transaction.
+    
+    txId = system.db.beginTransaction(timeout=5000)
+    status=2
+    
+    for machineId in range(8):
+       system.db.runPrepUpdate("UPDATE MachineStatus SET status=? WHERE ID=?",
+          args=[status, machineId], tx=txId)
+    
+    system.db.commitTransaction(txId)
+    system.db.closeTransaction(txId)
+<
+
+------------------------------------------------------------------------------
+system.db.commitTransaction()           *ignition-system.db.commitTransaction*
+
+  Performs a commit for the given transaction. This will make all statements
+  executed against the transaction since its beginning or since the last
+  commit or rollback take effect in the database. Until you commit a
+  transaction, any changes that the transaction makes will not be visible to
+  other connections.
+
+  Syntax: >
+    system.db.commitTransaction(tx)
+<
+
+  Parameters: ~
+    {tx}  (String)  The transaction ID.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example starts a transaction with a 5 second timeout against the project's default database, using the default isolation level. Then it executes a series of update calls,
+    # and commits and closes the transaction.
+    
+    txId = system.db.beginTransaction(timeout=5000)
+    status=2
+    
+    for machineId in range(8):
+       system.db.runPrepUpdate("UPDATE MachineStatus SET status=? WHERE ID=?",
+          args=[status, machineId], tx=txId)
+    
+    system.db.commitTransaction(txId)
+    system.db.closeTransaction(txId)
+<
+
+------------------------------------------------------------------------------
+system.db.createSProcCall()               *ignition-system.db.createSProcCall*
+
+  Creates an SProcCall object, which is a stored procedure call context. This
+  is an object that is used to configure a call to a stored procedure. Once
+  configured, you'd use system.db.execSProcCall to call the stored procedure.
+  The call context object then holds any results from the stored procedure.
+  The SProcCall object has the following functions used for registering
+  parameters:
+
+  Syntax: >
+    system.db.createSProcCall(procedureName, database, [tx], [skipAudit])
+<
+
+  Parameters: ~
+    {procedureName}  (String)   The named of the stored procedure to call.
+    {database}       (String)   The name of the database connection to
+                                execute against.
+    {tx}             (String)   A transaction identifier. If omitted, the
+                                call will be executed in its own transaction.
+    {skipAudit}      (Boolean)  A flag which, if set to true, will cause the
+                                procedure call to skip the audit system.
+                                Useful for some queries that have fields
+                                which won't fit into the audit log.
+
+  Returns: ~
+    SProcCall - A stored procedure call context, which can be configured and
+    then used as the argument to system.db.execSProcCall.
+
+  Syntax: >
+    system.db.createSProcCall(procedureName, [database], [tx], [skipAudit])
+<
+
+  Parameters: ~
+    {procedureName}  (String)   The named of the stored procedure to call.
+    {database}       (String)   The name of the database connection to
+                                execute against. If omitted or "", the
+                                project's default database connection will be
+                                used. [optional]
+    {tx}             (String)   A transaction identifier. If omitted, the
+                                call will be executed in its own transaction.
+                                [optional]
+    {skipAudit}      (Boolean)  A flag which, if set to true, will cause the
+                                procedure call to skip the audit system.
+                                Useful for some queries that have fields
+                                which won't fit into the audit log.
+                                [optional]
+
+  Returns: ~
+    SProcCall - A stored procedure call context, which can be configured and
+    then used as the argument to system.db.execSProcCall.
+
+  Scope: Gateway
+
+  Example: >
+    # This example calls a stored procedure named "start_batch" against the current project's default database connection that had no input or output parameters, and did not return any values or results:
+    
+    call = system.db.createSProcCall("start_batch")
+    system.db.execSProcCall(call)
+<
+
+------------------------------------------------------------------------------
+system.db.execQuery()                           *ignition-system.db.execQuery*
+
+  Executes a select query from a Named Query resource.
+
+  Syntax: >
+    system.db.execQuery(path, [parameters], [tx], [project])
+<
+
+  Parameters: ~
+    {path}        (String)      The full path of the named query.
+    {parameters}  (Dictionary)  A dictionary of parameters for the query.
+                                [optional]
+    {tx}          (String)      A transaction ID, obtained from
+                                beginNamedQueryTransaction . If not
+                                specified, will not be part of a transaction.
+                                [optional]
+    {project}     (String)      A project name that the query exists in.
+                                [optional] Note : If no project is specified
+                                when run in the Gateway scope, an associated
+                                project or the Gateway scripting project will
+                                be used.
+
+  Returns: ~
+    Dataset - The result of the query.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example runs without any of the optional parameters in the Project scope.
+    
+    # Request the Named Query to execute.
+    system.db.execQuery("folderName/myNamedQuery")
+<
+
+------------------------------------------------------------------------------
+system.db.execSProcCall()                   *ignition-system.db.execSProcCall*
+
+  Executes a stored procedure call. The one parameter to this function is an
+  SProcCall - a stored procedure call context. See the description of
+  system.db.createSProcCall for more information and examples.
+
+  Syntax: >
+    system.db.execSProcCall(callContext)
+<
+
+  Parameters: ~
+    {callContext}  (SProcCall)  A stored procedure call context, with any
+                                input, output, and/or return value parameters
+                                correctly configured. Use
+                                system.db.createSProcCall to create a call
+                                context.
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+------------------------------------------------------------------------------
+system.db.execScalar()                         *ignition-system.db.execScalar*
+
+  Executes a scalar query from a Named Query resource.
+
+  Syntax: >
+    system.db.execScalar(path, [parameters], [tx], [project])
+<
+
+  Parameters: ~
+    {path}        (String)      The full path of the named query.
+    {parameters}  (Dictionary)  A dictionary of parameters for the query.
+                                [optional]
+    {tx}          (String)      A transaction ID, obtained from
+                                beginNamedQueryTransaction . If not
+                                specified, will not be part of a transaction.
+                                [optional]
+    {project}     (String)      A project name that the query exists in.
+                                [optional] Note : If no project is specified
+                                when run in the Gateway scope, an associated
+                                project or the Gateway scripting project will
+                                be used.
+
+  Returns: ~
+    Any - The scalar result of the query, as either a single value or None if
+    no rows were returned.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example runs without any of the optional parameters in the Project scope.
+    
+    # Request the Named Query to execute.
+    system.db.execScalar("folderName/myNamedQuery")
+<
+
+------------------------------------------------------------------------------
+system.db.execUpdate()                         *ignition-system.db.execUpdate*
+
+  Executes an update query from a Named Query resource. If the Named Query is
+  through a Store and Forward system, use system.db.execUpdateAsync instead.
+
+  Syntax: >
+    system.db.execUpdate(path, [parameters], [tx], [getKey], [project])
+<
+
+  Parameters: ~
+    {path}        (String)      The full path of the Named Query.
+    {parameters}  (Dictionary)  A dictionary supplying parameters for the
+                                query. [optional]
+    {tx}          (String)      A transaction ID, obtained from
+                                [beginNamedQueryTransaction](appendix/scripting-functions/system-db/system-db-beginNamedQueryTransaction.md)
+                                . If not specified, will not be part of a
+                                transaction. [optional]
+    {getKey}      (Boolean)     If True, the primary key of the row inserted
+                                or updated in an update query will be
+                                returned. Default value is False. [optional]
+    {project}     (String)      A project name that the query exists in.
+                                [optional] Note : If no project is specified
+                                when run in the Gateway scope, an associated
+                                project or the Gateway scripting project will
+                                be used.
+
+  Returns: ~
+    Integer - The result of the query. The result will be either the number
+    of rows affected or the key value that was generated, depending on the
+    value of the getKey parameter.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example runs a Named Query without any optional parameters in the Project scope.
+    
+    # Request the Named Query to execute.
+    system.db.execUpdate("folderName/myNamedQuery")
+<
+
+------------------------------------------------------------------------------
+system.db.execUpdateAsync()               *ignition-system.db.execUpdateAsync*
+
+  Executes an update query from a Named Query resource through the Store and
+  Forward system.
+
+  Syntax: >
+    system.db.execUpdateAsync(path, [parameters], [project])
+<
+
+  Parameters: ~
+    {path}        (String)      The full path of the Named Query.
+    {parameters}  (Dictionary)  A dictionary of parameters for the query.
+                                [optional]
+    {project}     (String)      A project name that the query exists in.
+                                [optional] Note : If no project is specified
+                                when run in the Gateway scope, an associated
+                                project or the Gateway scripting project will
+                                be used.
+
+  Returns: ~
+    Boolean - Returns a boolean flag indicating of True if successfully sent
+    to the Store and Forward system.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example runs a Named Query in the Gateway scope.
+    
+    # Request the Named Query to execute.
+    system.db.execUpdateAsync("folderName/myNamedQuery", "ProjectName")
+<
+
+------------------------------------------------------------------------------
+system.db.getConnectionInfo()           *ignition-system.db.getConnectionInfo*
+
+  Returns a dataset of information about a single database connection, as
+  specified by the name argument.
+
+  Syntax: >
+    system.db.getConnectionInfo(name)
+<
+
+  Parameters: ~
+    {name}  (String)  The name of the database connection to find information
+                      about. Will use the current project's default database
+                      connection if a name is not specified.
+
+  Returns: ~
+    Dataset - A dataset containing information about the named database
+    connection, or an empty dataset if the connection wasn't found. If a
+    populated dataset is returned, the following data will be given:
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example checks the database connection type and selects a query format that matches.
+    
+    connectionInfo = system.db.getConnectionInfo()
+    dbType = connectionInfo.getValueAt(0, "DBType")
+    if dbType == "MYSQL":
+        # mysql format for a column with a space in the name
+        query = "SELECT `amps value` FROM pumps"
+    else:
+        # mssql format for a column with a space in the name
+        query = "SELECT [amps value] FROM pumps"
+<
+
+------------------------------------------------------------------------------
+system.db.getConnections()                 *ignition-system.db.getConnections*
+
+  Returns a dataset of information about each configured database connection.
+  Each row represents a single connection.
+
+  Syntax: >
+    system.db.getConnections()
+<
+
+  Returns: ~
+    Dataset - A dataset, where each row represents a database connection.The
+    dataset contains the following:
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+------------------------------------------------------------------------------
+system.db.removeDatasource()             *ignition-system.db.removeDatasource*
+
+  Removes a database connection from Ignition.
+
+  Syntax: >
+    system.db.removeDatasource(name)
+<
+
+  Parameters: ~
+    {name}  (String)  The name of the database connection in Ignition.
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This results in the connection named MySQL being removed.
+    system.db.removeDatasource("MySQL")
+<
+
+------------------------------------------------------------------------------
+system.db.rollbackTransaction()       *ignition-system.db.rollbackTransaction*
+
+  Performs a rollback on the given connection. This will make all statements
+  executed against this transaction since its beginning or since the last
+  commit or rollback undone.
+
+  Syntax: >
+    system.db.rollbackTransaction(tx)
+<
+
+  Parameters: ~
+    {tx}  (String)  The transaction ID.
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example uses a for-loop to run multiple queries in a single Transaction, and rollback if an error occurs.
+    
+    # Create some variables for use later.
+    txId = system.db.beginTransaction(timeout=5000)
+    status=2
+    query = "UPDATE MachineStatus SET status=? WHERE ID=?"
+    errors = False  # A flag to denote if we ran into a problem with a query during the transaction.
+    
+    for machineId in range(8):
+        try:
+            system.db.runPrepUpdate(query,  args=[status, machineId], tx=txId)
+        except:
+            errors = True
+            break
+    # If we encountered an error...
+    if errors:
+        # ...then rollback the transaction
+        system.db.rollbackTransaction(txId)
+    else:
+        # Otherwise, commit it.
+        system.db.commitTransaction(txId)
+    # In either case, close the transaction when we're done.
+    system.db.closeTransaction(txId)
+<
+
+------------------------------------------------------------------------------
+system.db.runPrepQuery()                     *ignition-system.db.runPrepQuery*
+
+  Runs a prepared statement against the database, returning the results in a
+  PyDataSet. Prepared statements differ from regular queries in that they can
+  use a special placeholder, the question-mark character (?), in the query
+  where any dynamic arguments would go, and then use an array of values to
+  provide real information for those arguments. Make sure that the length of
+  your argument array matches the number of question-mark placeholders in
+  your query.
+
+  Syntax: >
+    system.db.runPrepQuery(query, args, database, [tx])
+<
+
+  Parameters: ~
+    {query}     (String)    A query (typically a SELECT) to run as a prepared
+                            statement with placeholders (?) denoting where
+                            the arguments go.
+    {args}      (Object[])  A list of arguments. Will be used in order to
+                            match each placeholder (?) found in the query.
+    {database}  (String)    The name of the database connection to execute
+                            against.
+    {tx}        (String)    A transaction identifier. If omitted, the query
+                            will be executed in its own transaction.
+                            [optional]
+
+  Returns: ~
+    PyDataSet - The results of the query as a PyDataSet
+
+  Syntax: >
+    system.db.runPrepQuery(query, args, [database], [tx] )
+<
+
+  Parameters: ~
+    {query}     (String)    A query (typically a SELECT) to run as a prepared
+                            statement with placeholders (?) denoting where
+                            the arguments go.
+    {args}      (Object[])  A list of arguments. Will be used in order to
+                            match each placeholder (?) found in the query.
+    {database}  (String)    The name of the database connection to execute
+                            against. If omitted or "", the project's default
+                            database connection will be used. [optional]
+    {tx}        (String)    A transaction identifier. If omitted, the query
+                            will be executed in its own transaction.
+                            [optional]
+
+  Returns: ~
+    PyDataSet - The results of the query as a PyDataSet
+
+  Scope: Gateway
+
+  Example: >
+    # This example searches for all records in a LogEntry table where the message contained a user-entered search term.
+    
+    search = event.source.parent.getComponent("SearchFor").text
+    # Wrap the term in % signs for LIKE-style matching
+    search = '%' + search + '%'
+    
+    results= system.db.runPrepQuery("SELECT * FROM LogEntry WHERE EntryText LIKE ?", [search])
+    event.source.parent.getComponent("Table").data = results
+<
+
+------------------------------------------------------------------------------
+system.db.runPrepUpdate()                   *ignition-system.db.runPrepUpdate*
+
+  Runs a prepared statement against the database, returning the number of
+  rows that were affected. Prepared statements differ from regular queries in
+  that they can use a special placeholder, the question-mark character (?),
+  in the query where any dynamic arguments would go, and then use an array of
+  values to provide real information for those arguments. Make sure that the
+  length of your argument array matches the number of question-mark
+  placeholders in your query. This call should be used for UPDATE, INSERT,
+  and DELETE queries.
+
+  Syntax: >
+    system.db.runPrepUpdate( query, args, database, [tx], [getKey], [skipAudit])
+<
+
+  Parameters: ~
+    {query}      (String)    A query (typically an UPDATE, INSERT, or DELETE)
+                             to run as a prepared statement with placeholders
+                             (?) denoting where the arguments go.
+    {args}       (Object[])  A list of arguments. Will be used in order to
+                             match each placeholder (?) found in the query.
+    {database}   (String)    The name of the database connection to execute
+                             against.
+    {tx}         (String)    Optional, A transaction identifier. If omitted,
+                             the update will be executed in its own
+                             transaction. [optional]
+    {getKey}     (Boolean)   Optional, A flag indicating whether or not the
+                             result should be the number of rows returned
+                             (getKey=0) or the newly generated key value that
+                             was created as a result of the update
+                             (getKey=1). Not all databases support automatic
+                             retrieval of generated keys. [optional]
+    {skipAudit}  (Boolean)   Optional, A flag which, if set to true, will
+                             cause the prep update to skip the audit system.
+                             Useful for some queries that have fields which
+                             won't fit into the audit log. [optional]
+
+  Returns: ~
+    Integer - The number of rows affected by the query, or the key value that
+    was generated, depending on the value of the getKey flag.
+
+  Syntax: >
+    system.db.runPrepUpdate(query, args, [database], [tx], [getKey], [skipAudit])
+<
+
+  Parameters: ~
+    {query}      (String)    A query (typically an UPDATE, INSERT, or DELETE)
+                             to run as a prepared statement with placeholders
+                             (?) denoting where the arguments go.
+    {args}       (Object[])  A list of arguments. Will be used in order to
+                             match each placeholder (?) found in the query.
+    {database}   (String)    Optional, The name of the database connection to
+                             execute against. If omitted or "", the project's
+                             default database connection will be used.
+                             [optional]
+    {tx}         (String)    Optional, A transaction identifier. If omitted,
+                             the update will be executed in its own
+                             transaction. [optional]
+    {getKey}     (Boolean)   Optional, A flag indicating whether or not the
+                             result should be the number of rows returned
+                             (getKey=0) or the newly generated key value that
+                             was created as a result of the update
+                             (getKey=1). Not all databases support automatic
+                             retrieval of generated keys. [optional]
+    {skipAudit}  (Boolean)   Optional, A flag which, if set to true, will
+                             cause the prep update to skip the audit system.
+                             Useful for some queries that have fields which
+                             won't fit into the audit log. [optional]
+
+  Returns: ~
+    Integer - The number of rows affected by the query, or the key value that
+    was generated, depending on the value of the getKey flag.
+
+  Scope: Gateway
+
+  Example: >
+    # This example gathers some user entered text and inserts it into the database.
+    
+    userText = event.source.parent.getComponent("TextArea").text
+    userName = system.security.getUsername()
+    system.db.runPrepUpdate("INSERT INTO Comments (Name, UserComment) VALUES (?,?)", [userName, userText])
+<
+
+------------------------------------------------------------------------------
+system.db.runScalarPrepQuery()         *ignition-system.db.runScalarPrepQuery*
+
+  Runs a prepared statement against a database connection just like the
+  system.db.runPrepQuery function, but only returns the value from the first
+  row and column. If no results are returned from the query, the special
+  value None is returned.
+
+  Syntax: >
+    system.db.runScalarPrepQuery(query, args, database, [tx])
+<
+
+  Parameters: ~
+    {query}     (String)     A SQL query (typically a SELECT) to run as a
+                             prepared statement with placeholders (?)
+                             denoting where the arguments go, that should be
+                             designed to return one row and one column.
+    {args}      (List[Any])  A list of arguments. Will be used in order to
+                             match each placeholder (?) found in the query.
+    {database}  (String)     The name of the database connection to execute
+                             against.
+    {tx}        (String)     A transaction identifier. If omitted, the query
+                             will be executed in its own transaction.
+                             [optional]
+
+  Returns: ~
+    Any - The value from the first row and first column of the results.
+    Returns None if no rows were returned.
+
+  Syntax: >
+    system.db.runScalarPrepQuery(query, args, [database], [tx])
+<
+
+  Parameters: ~
+    {query}     (String)     A SQL query (typically a SELECT) to run as a
+                             prepared statement with placeholders (?)
+                             denoting where the arguments go, that should be
+                             designed to return one row and one column.
+    {args}      (List[Any])  A list of arguments. Will be used in order to
+                             match each placeholder (?) found in the query.
+    {database}  (String)     The name of the database connection to execute
+                             against. If omitted or "", the project's default
+                             database connection will be used. [optional]
+    {tx}        (String)     A transaction identifier. If omitted, the query
+                             will be executed in its own transaction.
+                             [optional]
+
+  Returns: ~
+    Any - The value from the first row and first column of the results.
+    Returns None if no rows were returned.
+
+  Scope: Gateway
+
+  Example: >
+    # This example searches for the user id of someone based on a typed in username.
+    name = event.source.parent.getComponent("User Search").text
+    
+    result = system.db.runScalarPrepQuery("SELECT user_id FROM users WHERE username = ?", [name])
+    event.source.parent.getComponent("Text Field").data = result
+<
+
+------------------------------------------------------------------------------
+system.db.runSFPrepUpdate()               *ignition-system.db.runSFPrepUpdate*
+
+  Runs a prepared statement query through the Store and Forward system and to
+  multiple data sources at the same time. Prepared statements differ from
+  regular queries in that they can use a special placeholder, the
+  question-mark character (?) in the query where any dynamic arguments would
+  go, and then use an array of values to provide real information for those
+  arguments. Make sure that the length of your argument array matches the
+  number of question-mark placeholders in your query. This call should be
+  used for UPDATE, INSERT, and DELETE queries.
+
+  Syntax: >
+    system.db.runSFPrepUpdate(query, args, data sources)
+<
+
+  Parameters: ~
+    {query}        (String)    A query (typically an UPDATE, INSERT, or
+                               DELETE) to run as a prepared statement, with
+                               placeholders (?) denoting where the arguments
+                               go.
+    {args}         (Object[])  A list of arguments. Will be used in order to
+                               match each placeholder (?) found in the query.
+    {datasources}  (String[])  List of data sources to run the query through.
+
+  Returns: ~
+    Boolean - Returns true if successfully sent to store-and-forward system.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Example 1: Run through single data source
+    print system.db.runSFPrepUpdate("INSERT INTO recipes (name, sp1, sp2, sp3) VALUES (?,?,?,?)", ['A Name', 1032, 234, 1], datasources=["MySQLDatasource"])
+<
+
+------------------------------------------------------------------------------
+system.db.setDatasourceConnectURL() *ignition-system.db.setDatasourceConnectURL*
+
+  Changes the connect URL for a given database connection.
+
+  Syntax: >
+    system.db.setDatasourceConnectURL(name, connectUrl)
+<
+
+  Parameters: ~
+    {name}        (String)  The name of the database connection in Ignition.
+    {connectUrl}  (String)  The new connect URL.
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Example:
+    
+    system.db.setDatasourceConnectURL("MySQL", "jdbc:mysql://localhost:3306/test")
+<
+
+------------------------------------------------------------------------------
+system.db.setDatasourceEnabled()     *ignition-system.db.setDatasourceEnabled*
+
+  Enables/disables a given database connection.
+
+  Syntax: >
+    system.db.setDatasourceEnabled(name, enabled)
+<
+
+  Parameters: ~
+    {name}     (String)   The name of the database connection in Ignition.
+    {enabled}  (Boolean)  Enables/disables a given database connection.
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Enable the database named "MySQL"
+    
+    system.db.setDatasourceEnabled("MySQL", 1)
+<
+
+------------------------------------------------------------------------------
+system.db.setDatasourceMaxConnections() *ignition-system.db.setDatasourceMaxConnections*
+
+  Sets the Max Active and Max Idle parameters of a given database connection.
+
+  Syntax: >
+    system.db.setDatasourceMaxConnections(name, maxConnections)
+<
+
+  Parameters: ~
+    {name}            (String)   The name of the database connection in
+                                 Ignition.
+    {maxConnections}  (Integer)  Sets the Max Active and Max Idle parameters
+                                 of a given database connection.
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Example 1: Enable a connection
+    system.db.setDatasourceMaxConnections("MySQL", 20)
+<
+
+
+vim:tw=78:ft=help:norl:

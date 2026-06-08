@@ -1,0 +1,343 @@
+*ignition-sfc.txt*                               Ignition system.sfc functions
+
+SYSTEM.SFC                                               *ignition-system.sfc*
+
+  |ignition-system.sfc.cancelChart|
+  |ignition-system.sfc.getRunningCharts|
+  |ignition-system.sfc.getVariables|
+  |ignition-system.sfc.pauseChart|
+  |ignition-system.sfc.redundantCheckpoint|
+  |ignition-system.sfc.resumeChart|
+  |ignition-system.sfc.setVariable|
+  |ignition-system.sfc.setVariables|
+  |ignition-system.sfc.startChart|
+
+------------------------------------------------------------------------------
+system.sfc.cancelChart()                     *ignition-system.sfc.cancelChart*
+
+  Cancels the execution of a running chart instance. Any running steps will
+  be told to stop, and the SFC chart will enter Canceling state. Will throw a
+  KeyError if the ID does not match any running chart instance.
+
+  Syntax: >
+    system.sfc.cancelChart(id)
+<
+
+  Parameters: ~
+    {id}  (String)  The ID of the chart instance to cancel.
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # The following attempts to stop an SFC but will alert the user if the id of the chart is not currently running.
+    id = 'Some long string value. It can be obtained using system.sfc.getRunningCharts()'
+    try:
+        system.sfc.cancelChart(id)
+    except:
+        system.vision.showMessage("Could not stop the SFC")
+<
+
+------------------------------------------------------------------------------
+system.sfc.getRunningCharts()           *ignition-system.sfc.getRunningCharts*
+
+  Retrieves information about running charts. Can search all running charts,
+  or be filtered charts at a specific path. This function will return charts
+  that are in a Paused state.
+
+  Syntax: >
+    system.sfc.getRunningCharts([chartPath])
+<
+
+  Parameters: ~
+    {chartPath}  (String)  The path to a chart to filter on: i.e.,
+                           "folder/chartName". If specified, only charts at
+                           the path will be included in the returned dataset.
+                           If omitted, the function will return data for all
+                           active charts.
+
+  Returns: ~
+    Dataset - A dataset with information on the active chart. Contains the
+    following columns:
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example will check for all running charts, and return a formatted string detailing each chart instance.
+    
+    # Check for all running charts. The path may be specified as a string to filter the results.
+    data = system.sfc.getRunningCharts()
+    # Create a string to append chart data to. The "\n" is a new line character.
+    chartData = "The following charts are running:\n"
+    
+    # Iterate through each chart
+    for row in range(data.rowCount):
+    
+        # Extract the instanceId and chartPath values from the current row
+        runningChartId = data.getValueAt(row, "instanceId")
+        runningChartPath = data.getValueAt(row, "chartPath")
+    
+        # Append a string to chartData with the values extracted above
+        chartData += "Id: %s, Path: %s\n" % (runningChartId, runningChartPath)
+    
+    # Print the string of chart Id's and Paths
+    print chartData
+<
+
+------------------------------------------------------------------------------
+system.sfc.getVariables()                   *ignition-system.sfc.getVariables*
+
+  Get the variables in a chart instance's scope. Commonly used to check the
+  value of a Chart Parameter, or determine how long the chart has been
+  running for.
+
+  Syntax: >
+    system.sfc.getVariables(instanceId)
+<
+
+  Parameters: ~
+    {instanceId}  (String)  The instance identifier of the chart.
+
+  Returns: ~
+    PyChartScope - Effectively a Python dictionary of variables, Step scopes
+    for active steps are found under the "activeSteps" key. In addition to
+    those keys, Chart Parameters will also be included in the dictionary as
+    keys. More information on this object can be found in our Javadocs .
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example will show the chart path and start time of a single chart in a messageBox.
+    # We can make use of the SFC Monitor component to give the users the ability to pick a single running chart
+    
+    # Fetch the ID of a running chart. In this case, we used the Instance ID property on a SFC Monitor component
+    id = event.source.parent.getComponent('SFC Monitor').instanceId
+    
+    # Retrieve the variables from the chart
+    chartVars = system.sfc.getVariables(id)
+    
+    # Show the path and starttime of the chart in a messageBox
+    system.vision.showMessage("Chart Path: %s has been running since %s" % (chartVars["chartPath"], chartVars["startTime"]))
+<
+
+------------------------------------------------------------------------------
+system.sfc.pauseChart()                       *ignition-system.sfc.pauseChart*
+
+  Pauses a running chart instance. Any running steps will be told to pause,
+  and the chart will enter Pausing state. Will throw a KeyError if the ID
+  does not match any running chart instance.
+
+  Syntax: >
+    system.sfc.pauseChart(id)
+<
+
+  Parameters: ~
+    {id}  (String)  The ID of the chart instance to pause
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # The following attempts to pause a SFC.
+    id = 'Some long string value. It can be obtained using system.sfc.getRunningCharts()'
+    
+    system.sfc.cancelChart(id)
+<
+
+------------------------------------------------------------------------------
+system.sfc.redundantCheckpoint()     *ignition-system.sfc.redundantCheckpoint*
+
+  Synchronizes chart and step variables of the specified chart instance
+  across a redundant cluster, allowing the chart instance to continue where
+  it left off if a redundant failover occurs. Check out redundancy sync for
+  more information.
+
+  Syntax: >
+    system.sfc.redundantCheckpoint(instanceId)
+<
+
+  Parameters: ~
+    {instanceId}  (String)  The instance identifier of the chart.
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # This example will create a redundant checkpoint in case the primary Gateway in the redundant pair fails.
+    instanceId = "The ID of the chart you want to synchronize across the redundant pair"
+    
+    system.sfc.redundantCheckpoint(instanceId)
+<
+
+------------------------------------------------------------------------------
+system.sfc.resumeChart()                     *ignition-system.sfc.resumeChart*
+
+  Resumes a chart that was paused. Steps which were previously paused will be
+  resumed, and chart will enter Resuming state. Will throw a KeyError if the
+  ID does not match any running chart instance.
+
+  Syntax: >
+    system.sfc.resumeChart(id)
+<
+
+  Parameters: ~
+    {id}  (String)  The ID of the chart instance to resume.
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # The following attempts to resume a paused SFC.
+    id = "The ID of the SFC you want to resume"
+    
+    system.sfc.resumeChart(id)
+<
+
+------------------------------------------------------------------------------
+system.sfc.setVariable()                     *ignition-system.sfc.setVariable*
+
+  Sets a variable inside a currently running SFC chart .
+
+  Syntax: >
+    system.sfc.setVariable(instanceId, [stepId], variableName, variableValue)
+<
+
+  Parameters: ~
+    {instanceId}     (String)  The instance identifier of the chart.
+    {stepId}         (String)  The id for a step inside of a chart. If
+                               omitted the function will target a chart
+                               scoped variable. [optional]
+    {variableName}   (String)  The name of the variable to set.
+    {variableValue}  (Object)  The value for the variable to be set to.
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # The following passes the chart instance ID and step ID to a client message Handler. The message handler can then wait
+    # for user input, and then write back to the step variables.
+    
+    # The example assumes there is a chart scoped variable called confirmEndchart, and a step scoped variable called "messageSent".
+    
+    # Get the instanceId of the current chart
+    chartID = chart.get("instanceId")
+    
+    # Get the id of the step
+    stepID = step.get("id")
+    
+    # Create a payload to pass to the client.
+    # Include the instanceId and stepId so the script from the message handler knows which
+    # chart and step to write to
+    payload = {"chartID" : chartID, "stepID" : stepID}
+    
+    # Send the message
+    system.util.sendMessage(project="SFC", messageHandler="SFCMessage", payload=payload)
+    
+    ############
+    
+    # The following script would be placed on a client message handler. This receives the payload,
+    # and sets a variable on either the chart or step depending on user selection
+    
+    # Read items out of the payload
+    id = payload['chartID']
+    stepId = payload['stepID']
+    
+    # Ask the user to end the chart
+    if system.vision.showConfirm("Would you like to end the process"):
+        #If yes, end the chart. confirmEndChart is chart scoped, so only 3 parameters are passed
+        system.sfc.setVariable(id, "confirmEndChart", True)
+    else:
+        #If no, reset the step.messageSent variable so that the user will be prompted again
+        #messageSent is step scoped, so 4 parameters are passed
+        system.sfc.setVariable(id, stepId, "messageSent", False)
+<
+
+------------------------------------------------------------------------------
+system.sfc.setVariables()                   *ignition-system.sfc.setVariables*
+
+  Sets any number of variables inside a currently running chart.
+
+  Syntax: >
+    system.sfc.setVariables(instanceId, [stepId], variableMap)
+<
+
+  Parameters: ~
+    {instanceId}    (String)                   The instance identifier of the
+                                               chart.
+    {stepId}        (String)                   The id for a step inside of a
+                                               cart. If omitted the function
+                                               will target a chart scoped
+                                               variable. [optional]
+    {variablesMap}  (Dictionary[String, Any])  A dictionary containing the
+                                               name :value pairs of the
+                                               variables to set.
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # Get the instance ID from the selected chart on a SFC Monitor component
+    id = event.source.parent.getComponent('SFC Monitor').instanceId
+    
+    # Create a Python dictionary of values. This example assumes there are variables on the
+    # chart named chartParam and counter. The script will set these to 1, and 0 respectively
+    dict = {"chartParam":1, "counter":0}
+    
+    # Set the variables on the chart
+    system.sfc.setVariables( id, dict)
+<
+
+------------------------------------------------------------------------------
+system.sfc.startChart()                       *ignition-system.sfc.startChart*
+
+  Starts a new instance of a chart. The chart must be set to "Callable"
+  execution mode.
+
+  Syntax: >
+    system.sfc.startChart(projectName, chartPath, parameters)
+<
+
+  Parameters: ~
+    {projectName}  (String)                   The name of the project that
+                                              the chart was created in. The
+                                              project that this function is
+                                              called in will be used if no
+                                              name is provided, or if the
+                                              function is called from outside
+                                              a project, the default Gateway
+                                              project name will be used.
+    {chartPath}    (String)                   The path to the chart, for
+                                              example
+                                              "ChartFolder/ChartName".
+    {parameters}   (Dictionary[String, Any])  A dictionary of arguments. Each
+                                              key-value pair in the
+                                              dictionary becomes a variable
+                                              in the chart scope and will
+                                              override any default.
+
+  Returns: ~
+    String - The unique ID of this chart.
+
+  Scope: Gateway, Vision Client, Perspective Session
+
+  Example: >
+    # The following will start an SFC with a dictionary of values to use inside the chart
+    args= {"var1":10, "Var2":15,"Var3":1}
+    path = "ChartFolder/ChartName"
+    sfcID = system.sfc.startChart(path, args)
+<
+
+
+vim:tw=78:ft=help:norl:
