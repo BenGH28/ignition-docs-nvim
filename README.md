@@ -20,7 +20,7 @@ Browse and search all `system.*` scripting functions directly inside Neovim with
 ```lua
 {
   "BenGH28/ignition-docs-nvim",
-  -- no config needed — just adds the help files to your runtimepath
+  lazy = false,  -- required so help files are available immediately
 }
 ```
 
