@@ -399,7 +399,7 @@ system.vision.desktop()                       *ignition-system.vision.desktop*
                         refer to the primary desktop.
 
   Returns: ~
-    WindowUtilities - A copy of system.vision ( WindowUtilities ) that will
+    VisionUtilities - A copy of system.vision ( VisionUtilities ) that will
     be relative to the desktop named by the given handle.
 
   Scope: Vision Client
@@ -588,7 +588,8 @@ system.vision.getAvailableLocales() *ignition-system.vision.getAvailableLocales*
 <
 
   Returns: ~
-    List - A list of Java Locale objects.
+    List - A list of strings, each representing a locale defined in the
+    translation system.
 
   Scope: Vision Client
 
@@ -1067,7 +1068,7 @@ system.vision.getScreens()                 *ignition-system.vision.getScreens*
         pyData.append([screen[0], screen[1], screen[2]])
     
     # Push data to 'Table'.
-    event.source.parent.getComponent('Table').data = system.dataset.toDataSet(["screen","width","height"], pyData)
+    event.source.parent.getComponent('Table').data = system.dataset.toDataset(["screen","width","height"], pyData)
 <
 
 ------------------------------------------------------------------------------
@@ -1133,7 +1134,7 @@ system.vision.getSystemFlags()         *ignition-system.vision.getSystemFlags*
     print myList
     
     headers = ["Designer Flag", "Preview Flag", "Client Flag", "Webstart Flag", "Applet Flag", "Fullscreen Flag", "SSL Flag", "Mobile Flag", "Staging Flag"]
-    data = system.dataset.toDataSet(headers, [myList])
+    data = system.dataset.toDataset(headers, [myList])
     table = event.source.parent.getComponent("Table")
     table.data = data
 <

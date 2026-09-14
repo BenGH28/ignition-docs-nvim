@@ -10,12 +10,13 @@ MODULES                                                     *ignition-modules*
 
   |ignition-system.alarm|                        system.alarm
   |ignition-system.bacnet|                       system.bacnet
+  |ignition-system.config|                       system.config
   |ignition-system.dataset|                      system.dataset
   |ignition-system.date|                         system.date
   |ignition-system.db|                           system.db
   |ignition-system.device|                       system.device
-  |ignition-system.dnp3|                         system.dnp3
   |ignition-system.dnp|                          system.dnp
+  |ignition-system.dnp3|                         system.dnp3
   |ignition-system.eam|                          system.eam
   |ignition-system.eventstream|                  system.eventstream
   |ignition-system.file|                         system.file

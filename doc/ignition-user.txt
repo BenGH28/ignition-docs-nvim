@@ -711,7 +711,7 @@ system.user.getScheduledUsers()       *ignition-system.user.getScheduledUsers*
                             date and time will be used. [optional]
 
   Returns: ~
-    List - List of all Users (as User objects) scheduled for the given date,
+    List - List of all users (as User objects) scheduled for the given date,
     taking schedule adjustments into account. Refer also to the PyUser class.
 
   Scope: Gateway, Vision Client, Perspective Session

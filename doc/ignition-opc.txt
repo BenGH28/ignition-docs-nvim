@@ -79,7 +79,7 @@ system.opc.browseServer()                   *ignition-system.opc.browseServer*
   Returns: ~
     List - A list of OPCBrowseElement objects.
 
-  Scope: Gateway, Perspective Session
+  Scope: Gateway
 
   Example: >
     # Print the name of all devices on Ignition OPC UA

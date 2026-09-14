@@ -213,7 +213,7 @@ system.roster.removeUsers()               *ignition-system.roster.removeUsers*
 
   Parameters: ~
     {rosterName}  (String)  The name of the roster to modify.
-    {users}       (List)    A list of user objects that will be removed from
+    {users}       (List)    A list of User objects that will be removed from
                             the roster. User objects can be created with the
                             system.user.getUser and system.user.addUser
                             functions.

@@ -328,7 +328,7 @@ system.util.getSessionInfo()             *ignition-system.util.getSessionInfo*
                                 restrict the list by project [optional]
 
   Returns: ~
-    PyDataSet - A dataset representing the Gateway's current sessions.
+    Dataset - A dataset representing the Gateway's current sessions.
 
   Scope: Gateway, Vision Client, Perspective Session
 
@@ -336,7 +336,7 @@ system.util.getSessionInfo()             *ignition-system.util.getSessionInfo*
     # This code would get the entire table of sessions and put it in an adjacent table
     table = event.source.parent.getComponent("Table")
     sessions = system.util.getSessionInfo()
-    table.data = system.db.toDataSet(sessions)
+    table.data = system.db.toDataset(sessions)
 <
 
 ------------------------------------------------------------------------------
@@ -499,10 +499,14 @@ system.util.modifyTranslation()       *ignition-system.util.modifyTranslation*
   Parameters: ~
     {term}         (String)  The key term to translate.
     {translation}  (String)  The translated value to store.
-    {locale}       (String)  If specified, the locale code (such as "es")
-                             identifying the language of the translation.
-                             Otherwise, the currently set language is
-                             used.[optional]
+    {locale}       (String)  If specified, the locale identifying the
+                             language of the translation, such as "es" or
+                             "es-ES" . Accepts both the BCP-47 language tag
+                             (recommended) and the legacy underscore formats.
+                             Make sure to use locale codes for either format,
+                             and not language names, such as "Spanish" .
+                             Otherwise, the currently set language is used.
+                             [optional]
 
   Returns: ~
     Nothing
@@ -872,11 +876,15 @@ system.util.translate()                       *ignition-system.util.translate*
 
   Parameters: ~
     {term}    (String)   The term to look up.
-    {locale}  (String)   Which locale to translate against. Useful when there
-                         are multiple locales defined for a single term. If
-                         omitted, the function attempts to use the current
-                         locale (as defined by the client, session, or
-                         Designer). [optional]
+    {locale}  (String)   Which locale to translate against, such as "it" or
+                         "en-IE" . Accepts both the BCP-47 language tag
+                         (recommended) and the legacy underscore formats.
+                         Make sure to use locale codes for either format, and
+                         not language names, such as "Italian" . Useful when
+                         there are multiple locales defined for a single
+                         term. If omitted, the function attempts to use the
+                         current locale (as defined by the client, session,
+                         or Designer). [optional]
     {strict}  (Boolean)  If false, the function will return the passed term
                          (param 1) if it could not find a defined translation
                          for the locale: meaning, if you pass a term that

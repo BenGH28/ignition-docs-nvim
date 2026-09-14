@@ -149,8 +149,8 @@ system.db.beginNamedQueryTransaction() *ignition-system.db.beginNamedQueryTransa
     
     # Start by running a Named Query against the transaction.
     namedQueryPath = "InsertQueries/AddValues"
-    params = {"id":idEntry, "value":valueEntry}
-    system.db.runNamedQuery(namedQueryPath, params, txNumber)
+    parames = {"id":idEntry, "value":valueEntry}
+    system.db.execQuery(namedQueryPath, params, txNumber)
     
     # Check the window to see if the user selected to cancel the transaction.
     if shouldRollback:

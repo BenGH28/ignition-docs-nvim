@@ -17,7 +17,7 @@ SYSTEM.DATASET                                       *ignition-system.dataset*
   |ignition-system.dataset.setValue|
   |ignition-system.dataset.sort|
   |ignition-system.dataset.toCSV|
-  |ignition-system.dataset.toDataSet|
+  |ignition-system.dataset.toDataset|
   |ignition-system.dataset.toExcel|
   |ignition-system.dataset.updateRow|
 
@@ -461,8 +461,7 @@ system.dataset.fromCSV()                     *ignition-system.dataset.fromCSV*
   Converts a dataset stored in a CSV formatted string to a dataset that can
   be immediately assignable to a dataset property in your project. Usually
   this is used in conjunction with system.file.readFileAsString when reading
-  in a CSV file that was exported using system.dataset.toCSV . The CSV string
-  must be formatted in a specific way:
+  in a CSV file that was exported using system.dataset.toCSV .
 
   Syntax: >
     system.dataset.fromCSV( csv )
@@ -478,8 +477,9 @@ system.dataset.fromCSV()                     *ignition-system.dataset.fromCSV*
   Scope: Gateway, Vision Client, Perspective Session
 
   Example: >
-    # In this example it is assumed that the CSV file being read was a dataset
-    #that was previously exported using system.dataset.toCSV with the forExport flag set to True:
+    # This example assumes the CSV file being read was a dataset exported
+    # using system.dataset.toCSV with the forExport flag set to True
+    
     # Specify file path.
     file_path = "C:\\my_dataset.csv"
     # Read in the file as a string.
@@ -651,25 +651,14 @@ system.dataset.toCSV()                         *ignition-system.dataset.toCSV*
 <
 
 ------------------------------------------------------------------------------
-system.dataset.toDataSet()                 *ignition-system.dataset.toDataSet*
+system.dataset.toDataset()                 *ignition-system.dataset.toDataset*
 
-  This function is used to convert a PyDataset to a dataset. In addition it
-  can also create new datasets from a raw Python list. When creating a new
-  dataset, headers should have unique names. For more information on datasets
-  and PyDatasets, see the Datasets page.
-
-  Syntax: >
-    system.dataset.toDataSet(dataset)
-<
-
-  Parameters: ~
-    {dataset}  (PyDataset)  A PyDataset object to convert.
-
-  Returns: ~
-    Dataset - The newly created dataset.
+  This function is used to create new datasets from raw Python lists. When
+  creating a new dataset, headers should have unique names. For more
+  information on datasets and PyDatasets, see the Datasets page.
 
   Syntax: >
-    system.dataset.toDataSet(headers, data)
+    system.dataset.toDataset(headers, data)
 <
 
   Parameters: ~
@@ -688,7 +677,7 @@ system.dataset.toDataSet()                 *ignition-system.dataset.toDataSet*
     # This example create a single column dataset.
     header = ['myColumn']
     rows = [[1], [2]]
-    dataset = system.dataset.toDataSet(header, rows)
+    dataset = system.dataset.toDataset(header, rows)
 <
 
 ------------------------------------------------------------------------------

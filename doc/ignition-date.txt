@@ -60,8 +60,9 @@ system.date.add()                                   *ignition-system.date.add*
 
   Parameters: ~
     {date}   (Date)     The starting date.
-    {value}  (Integer)  The number of units to add, or subtract if the value
-                        is negative.
+    {value}  (Integer)  The number of units to add or subtract. Positive
+                        values will add specified units, and negative values
+                        will subtracts specified units.
 
   Returns: ~
     Date - A new date object offset by the integer passed to the function.
@@ -69,7 +70,7 @@ system.date.add()                                   *ignition-system.date.add*
   Scope: Gateway, Vision Client, Perspective Session
 
   Example: >
-    # This example would add two days to the date passed in.
+    # This example adds two days to the date passed in.
     
     today = system.date.now()
     twoDaysFromToday = system.date.addDays(today, 2)

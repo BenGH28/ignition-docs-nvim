@@ -1,0 +1,556 @@
+*ignition-config.txt*                         Ignition system.config functions
+
+SYSTEM.CONFIG                                         *ignition-system.config*
+
+  |ignition-system.config.copy|
+  |ignition-system.config.create|
+  |ignition-system.config.delete|
+  |ignition-system.config.getActiveMode|
+  |ignition-system.config.getModes|
+  |ignition-system.config.getResource|
+  |ignition-system.config.getResources|
+  |ignition-system.config.getResourceTypes|
+  |ignition-system.config.move|
+  |ignition-system.config.rename|
+  |ignition-system.config.replace|
+
+------------------------------------------------------------------------------
+system.config.copy()                             *ignition-system.config.copy*
+
+  Copies a resource to a new name and/or collection. When using this
+  function, either the newName or newCollection parameter must be defined.
+
+  Syntax: >
+    system.config.copy(*moduleId, typeId, [name], [collection], [newName], [newCollection], signature, [actor])
+<
+
+  Parameters: ~
+    {*moduleId}       (String)  The module ID portion of the resource type
+                                identifier.
+    {*typeId}         (String)  The type ID portion of the resource type
+                                identifier.
+    {*name}           (String)  The name of the resource. Required for named
+                                resources, but must be omitted for singleton
+                                resources. [Optional]
+    {*collection}     (String)  The collection containing the resource. If
+                                omitted, uses the active definition.
+                                [Optional]
+    {*newName}        (String)  The new name for the copied resource.
+                                Required if not changing collection for named
+                                resource types. [Optional]
+    {*newCollection}  (String)  The new collection for the copied resource.
+                                Required if not changing name for singleton
+                                resource types. [Optional]
+    {*signature}      (String)  The hex-encoded signature of the resource.
+    {*actor}          (String)  A string identifying the actor performing the
+                                operation. If not specified, an identifier
+                                will be automatically generated. [Optional]
+
+  Returns: ~
+    PyResource - A PyResource containing the specified parameter attributes
+    of an existing Gateway resource, which can also be read as plain Python
+    properties.
+
+  Scope: Gateway
+
+  Example: >
+    # This example takes a database connection from the core collection and
+    # copies it into a collection called "dev".
+    
+    # Get the required signature argument from your resource using system.config.getResource()
+    moduleId = "ignition"
+    typeId = "database-connection"
+    name = "MySQL"
+    
+    # Use the getResource() function
+    myResource = system.config.getResource(moduleId=moduleId, typeId=typeId, name=name)
+    
+    # Declare the new collection location variable and the resource signature
+    newCollection = "dev"
+    signature = myResource.signature
+    
+    # Use the copy() function
+    system.config.copy(moduleId=moduleId, typeId=typeId, name=name, newCollection=newCollection, signature=signature)
+<
+
+------------------------------------------------------------------------------
+system.config.create()                         *ignition-system.config.create*
+
+  Creates a new resource of the specified type.
+
+  Syntax: >
+    system.config.create(*moduleId, typeId, [name], [collection], [config], [backupConfig], [files], [description], [enabled], [attributes], [actor])
+<
+
+  Parameters: ~
+    {*moduleId}      (String)      The module ID portion of the resource type
+                                   identifier.
+    {*typeId}        (String)      The type ID portion of the resource type
+                                   identifier.
+    {*name}          (String)      The name of the resource. Required for
+                                   named resources, but must be omitted for
+                                   singleton resources. [Optional]
+    {*collection}    (String)      The collection containing the resource. If
+                                   omitted, uses the active definition.
+                                   [Optional]
+    {*config}        (Dictionary)  A dictionary representing the resoure
+                                   configuration, matching the resource
+                                   type's JSON schema. If not provided, the
+                                   files argument must be provided.
+                                   [Optional]
+    {*backupConfig}  (Dictionary)  A dictionary representing the backup
+                                   configuration for resources that support
+                                   backup data. [Optional]
+    {*files}         (Dictionary)  A dictionary of additional files to
+                                   include with the resource. Keys are
+                                   filenames, values can be byte arrays,
+                                   strings, lists, or dictionaries. If not
+                                   provided, the config argument must be
+                                   provided. [Optional]
+    {*description}   (String)      A description for the resource. [Optional]
+    {*enabled}       (Boolean)     Whether the resource should be enabled. If
+                                   omitted, the resource will be enabled when
+                                   created. [Optional]
+    {*attributes}    (Dictionary)  A dictionary of resource attributes to
+                                   set. [Optional]
+    {*actor}         (String)      A string identifying the actor performing
+                                   the operation. If not specified, an
+                                   identifier will be automatically
+                                   generated. [Optional]
+
+  Returns: ~
+    PyResource - A PyResource containing the specified parameter attributes
+    of your newly created Gateway resource, which can also be read as plain
+    Python properties.
+
+  Scope: Gateway
+
+  Example: >
+    # This example creates a new database connection within the active collection.
+    # Declare our create() variables
+    moduleId = "ignition"
+    typeId = "databasse-connection"
+    name = "coolSQL"
+    config = {
+      "connectURL": "jdbc:mysql://localhost:3306/test",
+      "connectionProps": "zeroDateTimeBehavior\u003dCONVERT_TO_NULL;connectTimeout\u003d120000;socketTimeout\u003d120000;useSSL\u003dfalse;allowPublicKeyRetrieval\u003dtrue;rewriteBatchedStatements\u003dtrue;disableMariaDbDriver",
+      "connectionResetParams": "",
+      "defaultTransactionLevel": "DEFAULT",
+      "driver": "MySQL",
+      "evictionRate": -1,
+      "evictionTests": 3,
+      "evictionTime": 1800000,
+      "failoverMode": "STANDARD",
+      "failoverProfile": "",
+      "includeSchemaInTableName": false,
+      "poolInitSize": 0,
+      "poolMaxActive": 8,
+      "poolMaxIdle": 8,
+      "poolMaxWait": 5000,
+      "poolMinIdle": 0,
+      "slowQueryLogThreshold": 60000,
+      "testOnBorrow": true,
+      "testOnReturn": false,
+      "testWhileIdle": false,
+      "translator": "MYSQL",
+      "username": "root",
+      "validationQuery": "SELECT 1",
+      "validationSleepTime": 10000
+    }
+    
+    # Call the create() function
+    system.config.create(moduleId=moduleId, typeId=typeId, name=name, config=config)
+<
+
+------------------------------------------------------------------------------
+system.config.delete()                         *ignition-system.config.delete*
+
+  Deletes a resource of the specified type.
+
+  Syntax: >
+    system.config.delete(*moduleId, typeId, [name], [collection], signature, [force], [actor])
+<
+
+  Parameters: ~
+    {*moduleId}    (String)   The module ID portion of the resource type
+                              identifier.
+    {*typeId}      (String)   The type ID portion of the resource type
+                              identifier.
+    {*name}        (String)   The name of the resource. Required for named
+                              resources, but must be omitted for singleton
+                              resources. [Optional]
+    {*collection}  (String)   The collection containing the resource. If
+                              omitted, uses the active definition. [Optional]
+    {*signature}   (String)   The hex-encoded signature of the resource.
+    {*force}       (Boolean)  If true, deletes the resource even if other
+                              resources reference it. If omitted, default is
+                              false. [Optional]
+    {*actor}       (String)   A string identifying the actor performing the
+                              operation. If not specified, an identifier will
+                              be automatically generated. [Optional]
+
+  Returns: ~
+    Nothing
+
+  Scope: Gateway
+
+  Example: >
+    # This example deletes a specified database connection resource.
+    
+    # Get the required signature argument from your resource using system.config.getResource()
+    moduleId = "ignition"
+    typeId = "database-connection"
+    name = "coolSQL"
+    
+    # Use the getResource() function
+    myResource = system.config.getResource(moduleId=moduleId, typeId=typeId, name=name)
+    
+    # Declare the resource signature variable
+    signature = myResource.signature
+    
+    # Use the delete() function
+    system.config.delete(moduleId=moduleId, typeId=typeId, name=name, signature=signature)
+<
+
+------------------------------------------------------------------------------
+system.config.getActiveMode()           *ignition-system.config.getActiveMode*
+
+  Returns the current deployment mode , or None if no mode is explicitly
+  active.
+
+  Syntax: >
+    system.config.getActiveMode()
+<
+
+  Returns: ~
+    String - The active collection, as a string.
+
+  Scope: Gateway
+
+  Example: >
+    # This example will return the active collection and print it to a label component on the same view.
+    activeCollection = system.config.getActiveMode()
+    
+    self.getSibling("Label").props.text = activeCollection
+<
+
+------------------------------------------------------------------------------
+system.config.getModes()                     *ignition-system.config.getModes*
+
+  Returns a list of all available resource collection modes.
+
+  Syntax: >
+    system.config.getModes()
+<
+
+  Returns: ~
+    List - A list of strings, containing all the available deployment modes
+    on the Gateway.
+
+  Scope: Gateway
+
+  Example: >
+    # This example will return all the available deployment modes on the Gateway and print them to a label component on the same view.
+    myModes = system.config.getModes()
+    
+    self.getSibling("Label").props.text = myModes
+<
+
+------------------------------------------------------------------------------
+system.config.getResource()               *ignition-system.config.getResource*
+
+  Returns a single resource.
+
+  Syntax: >
+    system.config.getResource(*moduleId, typeId, name, collection)
+<
+
+  Parameters: ~
+    {*moduleId}    (String)  The module ID portion of the resource type
+                             identifier.
+    {*typeId}      (String)  The type ID portion of the resource type
+                             identifier.
+    {*name}        (String)  The name of the resource. Required for named
+                             resources, but must be omitted for singleton
+                             resources.
+    {*collection}  (String)  The collection containing the resource. If
+                             omitted, uses the active definition.
+
+  Returns: ~
+    PyResource - The specified Gateway resource, as a PyResource that can be
+    read as plain Python properties.
+
+  Scope: Gateway
+
+  Example: >
+    # This example retrieves a database connection resource and prints the resource's signature to a label on the same view.
+    moduleId = "ignition"
+    typeId = "database-connection"
+    name = "MySQL"
+    
+    # Call the getResource() function
+    myResource = system.config.getResource(moduleId=moduleId, typeId=typeId, name=name)
+    
+    # Get the resource signature and print it to a Label
+    signature = myResource.signature
+    
+    self.getSibling("Label").props.text = signature
+<
+
+------------------------------------------------------------------------------
+system.config.getResources()             *ignition-system.config.getResources*
+
+  Returns all resources of the specified type.
+
+  Syntax: >
+    system.config.getResources(*moduleId, typeId)
+<
+
+  Parameters: ~
+    {moduleId}  (String)  The module ID portion of the resource type
+                          identifier.
+    {typeId}    (String)  The type ID portion of the resource type
+                          identifier.
+
+  Returns: ~
+    List - A List of all the resources of the specified type, as a
+    PyResource.
+
+  Scope: Gateway
+
+  Example: >
+    # This example will return all available database connections on the Gateway and
+    # print them to a label on the same view.
+    moduleId = "ignition"
+    typeId = "database-connection"
+    
+    allDBConnections = system.config.getResources(moduleId = moduleId, typeId = typeId)
+    
+    self.getSibling("Label").props.text = str(allDBConnections)
+<
+
+------------------------------------------------------------------------------
+system.config.getResourceTypes()     *ignition-system.config.getResourceTypes*
+
+  Returns a list of all registered resource types.
+
+  Syntax: >
+    system.config.getResourceTypes()
+<
+
+  Returns: ~
+    List - A list of tuples containing all the currently registered resource
+    types on the Gateway.
+
+  Scope: Gateway
+
+  Example: >
+    # This example will return all registered resource types on the Gateway and
+    # print them to a Label on the same view.
+    allMyResources = system.config.getResourceTypes()
+    
+    self.getSibling("Label").props.text = str(allMyResources)
+<
+
+------------------------------------------------------------------------------
+system.config.move()                             *ignition-system.config.move*
+
+  Moves a resource to a different collection. The move operation changes
+  which collection a resource belongs to, but does not allow renaming. Use
+  the rename() operation to change a resource's name.
+
+  Syntax: >
+    system.config.move(*moduleId, typeId, [name], [collection], newCollection, signature, [actor])
+<
+
+  Parameters: ~
+    {*moduleId}       (String)  The module ID portion of the resource type
+                                identifier.
+    {*typeId}         (String)  The type ID portion of the resource type
+                                identifier.
+    {*name}           (String)  The name of the resource. Required for named
+                                resources, but must be omitted for singleton
+                                resources. [Optional]
+    {*collection}     (String)  The collection containing the resource. If
+                                omitted, uses the active definition.
+                                [Optional]
+    {*newCollection}  (String)  The new collection for the resource to move
+                                to.
+    {*signature}      (String)  The hex-encoded signature of the resource.
+    {*actor}          (String)  A string identifying the actor performing the
+                                operation. If not specified, an identifier
+                                will be automatically generated. [Optional]
+
+  Returns: ~
+    PyResource - The Gateway resource that was moved, which can also be read
+    as plain Python properties.
+
+  Scope: Gateway
+
+  Example: >
+    # This example takes an existing database connection and moves to into a collection called "dev".
+    # Use the getResource() function to retrieve the resource signature
+    moduleId = "ignition"
+    typeId = "database-connection"
+    name = "MySQL"
+    
+    myResource = system.config.getResource(moduleId=moduleId, typeId=typeId, name=name)
+    
+    newCollection = "dev"
+    signature = myResource.signature
+    
+    system.config.move(moduleId=moduleId, typeId=typeId, name=name, newCollection=newCollection, signature=signature)
+<
+
+------------------------------------------------------------------------------
+system.config.rename()                         *ignition-system.config.rename*
+
+  Renames the specified resource within its current collection. Use the
+  move() function to transfer resources between collections.
+
+  Syntax: >
+    system.config.rename(*moduleId, typeId, [name], [collection], newName, [references], [actor])
+<
+
+  Parameters: ~
+    {*moduleId}    (String)  The module ID portion of the resource type
+                             identifier.
+    {*typeId}      (String)  The type ID portion of the resource type
+                             identifier.
+    {*name}        (String)  The name of the resource. Required for named
+                             resources, but must be omitted for singleton
+                             resources. [Optional]
+    {*collection}  (String)  The collection containing the resource. If
+                             omitted, uses the active definition. [Optional]
+    {*newName}     (String)  The new name for the resource.
+    {*references}  (String)  How Ignition should handle references from other
+                             resources to the current value of the resource
+                             that is being renamed. Valid options are: ABORT:
+                             Aborts the renaming operation. UPDATE: Updates
+                             resources to use the new resource name. IGNORE:
+                             Ignores any references to the old name and
+                             proceeds with the renaming operation. [Optional]
+    {*actor}       (String)  A string identifying the actor performing the
+                             operation. If not specified, an identifier will
+                             be automatically generated. [Optional]
+
+  Returns: ~
+    PyResource - The resource that was renamed, as a PyResource that can also
+    be read as plain Python properties.
+
+  Scope: Gateway
+
+  Example: >
+    # This example renames an existing database connection called "MySQL" to "coolSQL".
+    # Declare our parameter variables
+    moduleId = "ignition"
+    typeId = "database-connection"
+    name = "MySQL"
+    newName = "coolSQL"
+    
+    # Call the rename() function
+    system.config.rename(moduleId=moduleId, typeId=typeId, name=name, newName=newName)
+<
+
+------------------------------------------------------------------------------
+system.config.replace()                       *ignition-system.config.replace*
+
+  Replaces an existing resource completely with a new configuration. The
+  resource must already exist.
+
+  Syntax: >
+    system.config.replace(*moduleId, typeId, [name], [collection], signature, [config], [backupConfig], [files], [description], [enabled], [attributes], [actor])
+<
+
+  Parameters: ~
+    {*moduleId}      (String)      The module ID portion of the resource type
+                                   identifier.
+    {*typeId}        (String)      The type ID portion of the resource type
+                                   identifier.
+    {*name}          (String)      The name of the resource. Required for
+                                   named resources, but must be omitted for
+                                   singleton resources. [Optional]
+    {*collection}    (String)      The collection containing the resource. If
+                                   omitted, uses the active definition.
+                                   [Optional]
+    {*signature}     (String)      The hex-encoded signature of the resource.
+    {*config}        (Dictionary)  A dictionary representing the resoure
+                                   configuration, matching the resource
+                                   type's JSON schema. If not provided, the
+                                   files argument must be provided.
+                                   [Optional]
+    {*backupConfig}  (Dictionary)  A dictionary representing the backup
+                                   configuration for resources that support
+                                   backup data. [Optional]
+    {*files}         (Dictionary)  A dictionary of additional files to
+                                   include with the resource. Keys are
+                                   filenames, values can be byte arrays,
+                                   strings, lists, or dictionaries. If not
+                                   provided, the config argument must be
+                                   provided. [Optional]
+    {*description}   (String)      A description for the resource. [Optional]
+    {*enabled}       (Boolean)     Whether the replacement resource should be
+                                   enabled. If omitted, the resource will be
+                                   in the same state after its configuration
+                                   is replaced. [Optional]
+    {*attributes}    (Dictionary)  A dictionary of resource attributes to
+                                   set. [Optional]
+    {*actor}         (String)      A string identifying the actor performing
+                                   the operation. If not specified, an
+                                   identifier will be automatically
+                                   generated. [Optional]
+
+  Returns: ~
+    PyResource - The newly configured resource, as a PyResource that can also
+    be read as plain Python properties.
+
+  Scope: Gateway
+
+  Example: >
+    # This example will replace our existing "MySQL" database connection configuration with a configuration that
+    # uses a different schema in the Connect URL and "Sticky" Failover Mode.
+    
+    # Get the required signature using getResource()
+    # Declare required variables for getResource()
+    moduleId = "ignition"
+    typeId = "database-connection"
+    name = "MySQL"
+    
+    myResource = system.config.getResource(moduleId=moduleId, typeId=typeId, name=name)
+    signature = myResource.signature
+    
+    # Use the information we got for the replace() function
+    # Declare the rest of the required variables for replace()
+    config = {
+      "connectURL": "jdbc:mysql://localhost:3306/devDB",
+      "connectionProps": "zeroDateTimeBehavior\u003dCONVERT_TO_NULL;connectTimeout\u003d120000;socketTimeout\u003d120000;useSSL\u003dfalse;allowPublicKeyRetrieval\u003dtrue;rewriteBatchedStatements\u003dtrue;disableMariaDbDriver",
+      "connectionResetParams": "",
+      "defaultTransactionLevel": "DEFAULT",
+      "driver": "MySQL",
+      "evictionRate": -1,
+      "evictionTests": 3,
+      "evictionTime": 1800000,
+      "failoverMode": "STICKY",
+      "failoverProfile": "",
+      "includeSchemaInTableName": false,
+      "poolInitSize": 0,
+      "poolMaxActive": 8,
+      "poolMaxIdle": 8,
+      "poolMaxWait": 5000,
+      "poolMinIdle": 0,
+      "slowQueryLogThreshold": 60000,
+      "testOnBorrow": true,
+      "testOnReturn": false,
+      "testWhileIdle": false,
+      "translator": "MYSQL",
+      "username": "root",
+      "validationQuery": "SELECT 1",
+      "validationSleepTime": 10000
+    }
+    
+    # Call the replace() function
+    system.config.replace(moduleId=moduleId, typeId=typeId, name=name, signature=signature, config=config)
+<
+
+
+vim:tw=78:ft=help:norl:

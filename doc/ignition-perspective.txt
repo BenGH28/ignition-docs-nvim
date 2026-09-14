@@ -106,7 +106,7 @@ system.perspective.alterLogging()   *ignition-system.perspective.alterLogging*
     {remoteLoggingEnabled}  (Boolean)  Will enable remote logging if True.
                                        Remote logging will send log events
                                        from the Session to the Gateway under
-                                       the perspective.client logger if they
+                                       the Perspective.Client logger if they
                                        meet the remoteLevel logging level
                                        requirement. [optional]
     {level}                 (String)   The desired Session logging level.
@@ -567,26 +567,26 @@ system.perspective.logout()               *ignition-system.perspective.logout*
 ------------------------------------------------------------------------------
 system.perspective.navigate()           *ignition-system.perspective.navigate*
 
-  Navigate the session to a specified view or mounted page.
+  Navigate a Session to a specified view or mounted page.
 
   Syntax: >
-    system.perspective.navigate(page, [url], [view], [params], [sessionId], [pageId], [newTab])
+    system.perspective.navigate(page, url, view, [params], [sessionId], [pageId], [newTab])
 <
 
   Parameters: ~
     {page}       (String)                      The URL of a Perspective page
                                                to navigate to. The path can
                                                include an optional leading
-                                               slash: "new-page" and
-                                               "/new-page" both result cause
-                                               the session to navigate to the
-                                               "new-page" page. See Page URLs
-                                               .
+                                               slash, so "new-page" and
+                                               "/new-page" both navigate the
+                                               Session to the "new-page"
+                                               page. See Page URLs for more
+                                               information.
     {url}        (String)                      The URL of a web address to
                                                navigate to. If the page or
                                                view parameters are specified,
                                                then this parameter is
-                                               ignored. [optional]
+                                               ignored.
     {view}       (String)                      If specified, will navigate to
                                                a specific view. Navigating to
                                                a view with this parameter
@@ -597,7 +597,6 @@ system.perspective.navigate()           *ignition-system.perspective.navigate*
                                                the previous view. If the page
                                                parameter is specified, then
                                                this parameter is ignored.
-                                               [optional]
     {params}     (Dictionary[String, String])  Used only in conjunction with
                                                the view parameter, Dictionary
                                                of values to pass to any
@@ -607,7 +606,7 @@ system.perspective.navigate()           *ignition-system.perspective.navigate*
                                                target. If omitted, the
                                                current Session will be used
                                                automatically. When targeting
-                                               a different session, then the
+                                               a different Session, then the
                                                pageId parameter must be
                                                included in the call.
                                                [optional]
