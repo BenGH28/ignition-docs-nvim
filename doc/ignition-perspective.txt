@@ -150,7 +150,7 @@ system.perspective.authenticationChallenge() *ignition-system.perspective.authen
   Parameters: ~
     {sessionId}  (String)   Identifier of the Session to target. If omitted,
                             the current Session will be used automatically.
-                            When targeting a different session, then the
+                            When targeting a different Session, then the
                             pageId parameter must be included in the call.
                             [optional]
     {pageId}     (String)   Identifier of the page to target. If omitted, the
@@ -177,20 +177,21 @@ system.perspective.authenticationChallenge() *ignition-system.perspective.authen
                             [optional]
     {payload}    (Any)      An opaque payload object that may contain any
                             information. This object will be passed to the
-                            onAuthenticationChallengeCompleted session event
+                            onAuthenticationChallengeCompleted Session event
                             script. The payload should be a JSON-encodable
                             data structure. [optional]
     {framing}    (String)   A string representing the type of framing that
-                            should be used. A value of âselfâ indicates
-                            that the same window should be used. A value of
-                            ânewâ indicates that a new tab should be
-                            used. A value of âembeddedâ indicates that an
-                            embedded iframe should be used. If omitted, the
-                            default value of âselfâ (same window) is
-                            used. [optional] Note: Mobile and workstation
-                            clients do not support "new" and will fall back
-                            to "self". Mobile clients do not support
-                            "embedded" and will fall back to "self".
+                            should be used. self : Indicates that the same
+                            window should be used. new : Indicates that a new
+                            tab should be used. embedded : Indicates that an
+                            embedded Iframe should be used. Some IdPs may
+                            require Content-Security-Policy or other
+                            configuration changes to display the login page
+                            in the Session's Iframe. If omitted, the default
+                            value of self (same window) is used. [optional]
+                            Note: Perspective Workstation Sessions do not
+                            support new and will fall back to self . Mobile
+                            Sessions only support self .
 
   Returns: ~
     Nothing

@@ -146,83 +146,101 @@ system.historian.queryAggregatedPoints() *ignition-system.historian.queryAggrega
   historical node.
 
   Syntax: >
-    system.historian.queryAggregatedPoints(paths, startTime, endTime, [aggregates], [columnNames], [returnFormat], [returnSize])
+    system.historian.queryAggregatedPoints(paths, startTime, endTime, [aggregates], [columnNames], [returnFormat], [returnSize], [extendedProperties])
 <
 
   Parameters: ~
-    {paths}                (List)     A list of historical paths to query
-                                      aggregated data points for. See Path
-                                      Syntax for more information on
-                                      recommended syntax.
-    {startTime}            (Date)     A start time to query aggregated data
-                                      points for.
-    {endTime}              (Date)     An end time to query aggregated data
-                                      points for.
-    {aggregates}           (List)     A list of aggregate functions to apply
-                                      to the query. [Optional] Available
-                                      aggregates include: Average :
-                                      Time-weighted average SimpleAverage :
-                                      Sum/count Sum : Sum of values Minimum :
-                                      Minimum value Maximum : Maximum value
-                                      MinMax : Both min and max LastValue :
-                                      Value at window boundary Range : Max
-                                      minus min Count : Count of good,
-                                      non-interpolated values CountOn :
-                                      Transitions to true CountOff :
-                                      Transitions to false DurationOn :
-                                      Seconds value was true DurationOff :
-                                      Seconds value was false Variance :
-                                      Statistical variance StdDev : Standard
-                                      deviation PctGood : Percentage time
-                                      good quality PctBad : Percentage time
-                                      bad quality
-    {fillModes}            (List)     Changed in 8.3.9 This parameter was
-                                      removed in 8.3.9, but still exists in
-                                      Ignition to maintain backwards
-                                      compatibility. A list of fill modes to
-                                      apply to the query. The fill mode will
-                                      override the tag's stored interpolation
-                                      mode at query time. For example, if a
-                                      tag stores with analog mode (linear),
-                                      but you want to query as discrete
-                                      (prev), specify fillModes=['PREV'].
-                                      This parameter is only functional with
-                                      the Core Historian and the Internal
-                                      Historian. [Optional] Available options
-                                      include: DERIVED : Use tag's stored
-                                      interpolation mode (linear for analog,
-                                      prev for discrete) LINEAR : Linear PREV
-                                      : Repeat last known value NULL : Fill
-                                      with nulls NONE : Exclude missing
-                                      windows
-    {columnNames}          (List)     A list of alias column names for the
-                                      returned dataset. [Optional]
-    {returnFormat}         (String)   The desired return format for the
-                                      query. [Optional] Available options
-                                      include: WIDE : One value per path per
-                                      row: [path1_val, path2_val, ...,
-                                      timestamp] (default) TALL : One value
-                                      per row: [path, value, quality,
-                                      timestamp] CALCULATION : Calculated
-                                      result per path aggregate
-    {returnSize}           (Integer)  The maximum number of results to
-                                      return. [Optional]
-    {includeBounds}        (Boolean)  Changed in 8.3.9 This parameter was
-                                      removed in 8.3.9, but still exists in
-                                      Ignition to maintain backwards
-                                      compatibility. Whether to include the
-                                      bounds in the query results. [Optional]
-    {excludeObservations}  (Boolean)  Changed in 8.3.9 This parameter was
-                                      removed in 8.3.9, but still exists in
-                                      Ignition to maintain backwards
-                                      compatibility. Whether to exclude
-                                      observed aggregated data points in the
-                                      query results. When applied, observed
-                                      values, such as periodic samples from
-                                      Tag Group evaluations will be filtered
-                                      out, while source values, such as tag
-                                      changes from devices will remain in the
-                                      returned dataset. [Optional]
+    {paths}                (List)        A list of historical paths to query
+                                         aggregated data points for. See Path
+                                         Syntax for more information on
+                                         recommended syntax.
+    {startTime}            (Date)        A start time to query aggregated
+                                         data points for.
+    {endTime}              (Date)        An end time to query aggregated data
+                                         points for.
+    {aggregates}           (List)        A list of aggregate functions to
+                                         apply to the query. [Optional]
+                                         Available aggregates include:
+                                         Average : Time-weighted average
+                                         SimpleAverage : Sum/count Sum : Sum
+                                         of values Minimum : Minimum value
+                                         Maximum : Maximum value MinMax :
+                                         Both min and max LastValue : Value
+                                         at window boundary Range : Max minus
+                                         min Count : Count of good,
+                                         non-interpolated values CountOn :
+                                         Transitions to true CountOff :
+                                         Transitions to false DurationOn :
+                                         Seconds value was true DurationOff :
+                                         Seconds value was false Variance :
+                                         Statistical variance StdDev :
+                                         Standard deviation PctGood :
+                                         Percentage time good quality PctBad
+                                         : Percentage time bad quality
+    {fillModes}            (List)        Changed in 8.3.9 This parameter was
+                                         removed in 8.3.9, but still exists
+                                         in Ignition to maintain backwards
+                                         compatibility. A list of fill modes
+                                         to apply to the query. The fill mode
+                                         will override the tag's stored
+                                         interpolation mode at query time.
+                                         For example, if a tag stores with
+                                         analog mode (linear), but you want
+                                         to query as discrete (prev), specify
+                                         fillModes=['PREV']. This parameter
+                                         is only functional with the Core
+                                         Historian and the Internal
+                                         Historian. [Optional] Available
+                                         options include: DERIVED : Use tag's
+                                         stored interpolation mode (linear
+                                         for analog, prev for discrete)
+                                         LINEAR : Linear PREV : Repeat last
+                                         known value NULL : Fill with nulls
+                                         NONE : Exclude missing windows
+    {columnNames}          (List)        A list of alias column names for the
+                                         returned dataset. [Optional]
+    {returnFormat}         (String)      The desired return format for the
+                                         query. [Optional] Available options
+                                         include: WIDE : One value per path
+                                         per row: [path1_val, path2_val, ...,
+                                         timestamp] (default) TALL : One
+                                         value per row: [path, value,
+                                         quality, timestamp] CALCULATION :
+                                         Calculated result per path aggregate
+    {returnSize}           (Integer)     The maximum number of results to
+                                         return. [Optional]
+    {includeBounds}        (Boolean)     Changed in 8.3.9 This parameter was
+                                         removed in 8.3.9, but still exists
+                                         in Ignition to maintain backwards
+                                         compatibility. Whether to include
+                                         the bounds in the query results.
+                                         [Optional]
+    {excludeObservations}  (Boolean)     Changed in 8.3.9 This parameter was
+                                         removed in 8.3.9, but still exists
+                                         in Ignition to maintain backwards
+                                         compatibility. Whether to exclude
+                                         observed aggregated data points in
+                                         the query results. When applied,
+                                         observed values, such as periodic
+                                         samples from Tag Group evaluations
+                                         will be filtered out, while source
+                                         values, such as tag changes from
+                                         devices will remain in the returned
+                                         dataset. [Optional]
+    {extendedProperties}   (Dictionary)  New in 8.3.10 A dictionary of
+                                         extended query properties for the
+                                         SQL Historian only . This parameter
+                                         supports the scan class validation
+                                         execution (validateSExec) as a
+                                         boolean, allowing you to to either
+                                         enable or disable validateSExec.
+                                         Disabling validateSExec with
+                                         extendedProperties={'validateSExec':
+                                         'false'} can help prevent stale
+                                         boundary points from being
+                                         generated, and therefore reduce
+                                         unexpected aggregates. Default is
+                                         true. [Optional]
 
   Returns: ~
     Dataset - A dataset representing the aggregated values for the specified

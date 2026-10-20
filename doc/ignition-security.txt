@@ -9,20 +9,21 @@ SYSTEM.SECURITY                                     *ignition-system.security*
 system.security.getUserRoles()         *ignition-system.security.getUserRoles*
 
   Fetches the roles for a user from the Gateway. This may not be the
-  currently logged in user. Requires the password for that user. If the
-  authentication profile name is omitted, then the current project's default
-  authentication profile is used.
+  currently logged in user. Requires the password for that user. If the User
+  Source name is omitted as the authentication profile identifier, then the
+  current project's default User Source is used.
 
   Syntax: >
     system.security.getUserRoles(username, password, [authProfile], [timeout])
 <
 
   Parameters: ~
-    {username}     (String)   The username to fetch roles for
-    {password}     (String)   The password for the user
-    {authProfile}  (String)   The name of the authentication profile to run
-                              against. Optional. Leaving this out will use
-                              the project's default profile. [optional]
+    {username}     (String)   The username to fetch roles for.
+    {password}     (String)   The password for the user.
+    {authProfile}  (String)   The name of the authentication profile (User
+                              Source) to run against. Optional. Leaving this
+                              out will use the project's default profile.
+                              [optional]
     {timeout}      (Integer)  Timeout for client-to-gateway communication.
                               Default is 60,000ms. [optional]
 
@@ -37,9 +38,9 @@ system.security.getUserRoles()         *ignition-system.security.getUserRoles*
   Parameters: ~
     {username}     (String)  The username to fetch roles for.
     {password}     (String)  The password for the user.
-    {authProfile}  (String)  The name of the authentication profile to run
-                             against. Leaving this out will use the project's
-                             default profile. [optional]
+    {authProfile}  (String)  The name of the authentication profile (User
+                             Source) to run against. Leaving this out will
+                             use the project's default profile. [optional]
 
   Returns: ~
     Tuple - A list of the roles that this user has, if the user authenticates
@@ -61,9 +62,9 @@ system.security.getUserRoles()         *ignition-system.security.getUserRoles*
 ------------------------------------------------------------------------------
 system.security.validateUser()         *ignition-system.security.validateUser*
 
-  Tests credentials (username and password) against an authentication
-  profile. Returns a boolean based upon whether or not the authentication
-  profile accepts the credentials. If the authentication profile name is
+  Tests credentials (username and password) against an authentication profile
+  (User Source). Returns a boolean based upon whether or not the
+  authentication profile accepts the credentials. If the User Source name is
   omitted, then the current project's default authentication profile is used.
 
   Syntax: >
@@ -71,11 +72,11 @@ system.security.validateUser()         *ignition-system.security.validateUser*
 <
 
   Parameters: ~
-    {username}     (String)   The username to validate
-    {password}     (String)   The password for the user
-    {authProfile}  (String)   The name of the authentication profile to run
-                              against. Leaving this out will use the
-                              project's default profile. [optional]
+    {username}     (String)   The username to validate.
+    {password}     (String)   The password for the user.
+    {authProfile}  (String)   The name of the authentication profile (User
+                              Source) to run against. Leaving this out will
+                              use the project's default profile. [optional]
     {timeout}      (Integer)  Timeout for Client-to-Gateway communication.
                               Default is 60,000ms. [optional]
 
@@ -90,9 +91,10 @@ system.security.validateUser()         *ignition-system.security.validateUser*
   Parameters: ~
     {username}     (String)  The username to validate.
     {password}     (String)  The password for the user.
-    {authProfile}  (String)  The name of the authentication profile to run
-                             against. Optional. Leaving this out will use the
-                             project's default profile. [optional]
+    {authProfile}  (String)  The name of the authentication profile (User
+                             Source) to run against. Optional. Leaving this
+                             out will use the project's default profile.
+                             [optional]
 
   Returns: ~
     Boolean - False if the user failed to authenticate; True if the

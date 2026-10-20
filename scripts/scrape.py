@@ -3,7 +3,7 @@
 Scrape Ignition 8.3 scripting function docs and write vim help files to ../doc/.
 
 Usage:
-    pip install requests beautifulsoup4
+    pip install requests beautifulsoup4 lxml
     python scrape.py
 """
 
@@ -47,7 +47,9 @@ def fetch(path: str) -> BeautifulSoup:
     log(f"  GET {url}")
     resp = get_session().get(url, timeout=30)
     resp.raise_for_status()
-    return BeautifulSoup(resp.text, "html.parser")
+    # The site serves minified HTML that omits optional end tags (</td>, </tr>);
+    # html.parser doesn't infer them and nests cells, so use lxml.
+    return BeautifulSoup(resp.text, "lxml")
 
 
 # ---------------------------------------------------------------------------
