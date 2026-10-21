@@ -70,7 +70,7 @@ system.mongodb.deleteMany()               *ignition-system.mongodb.deleteMany*
 
   Returns: ~
     PyDictionary result - Result of delete action formatted as a PyDictionary
-    with keys âacknowledgedâ and âdeleteCountâ.
+    with keys ‘acknowledged’ and ‘deleteCount’.
 
   Scope: Gateway, Perspective Session
 
@@ -102,7 +102,7 @@ system.mongodb.deleteOne()                 *ignition-system.mongodb.deleteOne*
 
   Returns: ~
     PyDictionary result - Result of delete action formatted as a PyDictionary
-    with keys âacknowledgedâ and âdeleteCountâ.
+    with keys ‘acknowledged’ and ‘deleteCount’.
 
   Scope: Gateway, Perspective Session
 
@@ -297,8 +297,8 @@ system.mongodb.listConnectorInfo() *ignition-system.mongodb.listConnectorInfo*
 
   Returns: ~
     List[PyDictionary] connectors - A list of PyDictionaries containing
-    MongoDB Connector descriptors. Descriptor contains keys for ânameâ,
-    âdescriptionâ, âstatusâ, and âerrorâ (if present).
+    MongoDB Connector descriptors. Descriptor contains keys for ‘name’,
+    ‘description’, ‘status’, and ‘error’ (if present).
 
   Scope: Gateway, Perspective Session
 
@@ -334,8 +334,8 @@ system.mongodb.replaceOne()               *ignition-system.mongodb.replaceOne*
 
   Returns: ~
     PyDictionary result - Result of replace action formatted as a
-    PyDictionary with keys âacknowledgedâ, âmodifiedCountâ,
-    âmatchedCountâ, and âupsertedIdâ.
+    PyDictionary with keys ‘acknowledged’, ‘modifiedCount’, ‘matchedCount’,
+    and ‘upsertedId’.
 
   Scope: Gateway, Perspective Session
 
@@ -387,8 +387,8 @@ system.mongodb.updateMany()               *ignition-system.mongodb.updateMany*
 
   Returns: ~
     PyDictionary result - Result of update action formatted as a PyDictionary
-    with keys âacknowledgedâ, âmodifiedCountâ, âmatchedCountâ,
-    and âupsertedIdâ.
+    with keys ‘acknowledged’, ‘modifiedCount’, ‘matchedCount’, and
+    ‘upsertedId’.
 
   Scope: Gateway, Perspective Session
 
@@ -433,8 +433,8 @@ system.mongodb.updateOne()                 *ignition-system.mongodb.updateOne*
 
   Returns: ~
     PyDictionary result - Result of update action formatted as a PyDictionary
-    with keys âacknowledgedâ, âmodifiedCountâ, âmatchedCountâ,
-    and âupsertedIdâ.
+    with keys ‘acknowledged’, ‘modifiedCount’, ‘matchedCount’, and
+    ‘upsertedId’.
 
   Scope: Gateway, Perspective Session
 

@@ -435,7 +435,7 @@ system.dataset.formatDates()             *ignition-system.dataset.formatDates*
                                          Locale must be defined in all caps.
                                          See the second example below for an
                                          idea of how that works. If no locale
-                                         is provided, the systemâs locale
+                                         is provided, the system’s locale
                                          will be used. [optional]
 
   Returns: ~

@@ -1018,239 +1018,75 @@ system.perspective.togglePopup()     *ignition-system.perspective.togglePopup*
 <
 
   Parameters: ~
-    {id}                                                                                        (String)                       A
-                                                                                                                               unique
-                                                                                                                               popup
-                                                                                                                               string.
-                                                                                                                               Will
-                                                                                                                               be
-                                                                                                                               used
-                                                                                                                               to
-                                                                                                                               close
-                                                                                                                               the
-                                                                                                                               popup
-                                                                                                                               from
-                                                                                                                               other
-                                                                                                                               popup
-                                                                                                                               or
-                                                                                                                               script
-                                                                                                                               actions.
-    {view}                                                                                      (String)                       The
-                                                                                                                               path
-                                                                                                                               to
-                                                                                                                               the
-                                                                                                                               view
-                                                                                                                               to
-                                                                                                                               use
-                                                                                                                               in
-                                                                                                                               the
-                                                                                                                               popup.
-    {params - Dictionary of key-value pairs to us as input parameters to the View. [optional]}  (Dictionary[String, Any])
-    {title}                                                                                     (String)                       Text
-                                                                                                                               to
-                                                                                                                               display
-                                                                                                                               in
-                                                                                                                               the
-                                                                                                                               title
-                                                                                                                               bar.
-                                                                                                                               Defaults
-                                                                                                                               to
-                                                                                                                               an
-                                                                                                                               empty
-                                                                                                                               string.
-                                                                                                                               [optional]
-    {position}                                                                                  (Dictionary[String, Integer])  Dictionary
-                                                                                                                               of
-                                                                                                                               key-value
-                                                                                                                               pairs
-                                                                                                                               to
-                                                                                                                               use
-                                                                                                                               for
-                                                                                                                               position.
-                                                                                                                               Possible
-                                                                                                                               position
-                                                                                                                               keys
-                                                                                                                               are:
-                                                                                                                               left,
-                                                                                                                               top,
-                                                                                                                               right,
-                                                                                                                               bottom,
-                                                                                                                               width,
-                                                                                                                               height.
-                                                                                                                               Defaults
-                                                                                                                               to
-                                                                                                                               the
-                                                                                                                               center
-                                                                                                                               of
-                                                                                                                               the
-                                                                                                                               window.
-                                                                                                                               [optional]
-    {showCloseIcon}                                                                             (Boolean)                      Will
-                                                                                                                               show
-                                                                                                                               the
-                                                                                                                               close
-                                                                                                                               icon
-                                                                                                                               if
-                                                                                                                               True.
-                                                                                                                               Defaults
-                                                                                                                               to
-                                                                                                                               True.
-                                                                                                                               [optional]
-    {draggable}                                                                                 (Boolean)                      Will
-                                                                                                                               allow
-                                                                                                                               the
-                                                                                                                               popup
-                                                                                                                               to
-                                                                                                                               be
-                                                                                                                               dragged
-                                                                                                                               if
-                                                                                                                               True.
-                                                                                                                               Defaults
-                                                                                                                               to
-                                                                                                                               True.
-                                                                                                                               [optional]
-    {resizable}                                                                                 (Boolean)                      Will
-                                                                                                                               allow
-                                                                                                                               the
-                                                                                                                               popup
-                                                                                                                               to
-                                                                                                                               be
-                                                                                                                               resized
-                                                                                                                               if
-                                                                                                                               True.
-                                                                                                                               Defaults
-                                                                                                                               to
-                                                                                                                               False.
-                                                                                                                               [optional]
-    {modal}                                                                                     (Boolean)                      Will
-                                                                                                                               make
-                                                                                                                               the
-                                                                                                                               popup
-                                                                                                                               modal
-                                                                                                                               if
-                                                                                                                               True.
-                                                                                                                               A
-                                                                                                                               modal
-                                                                                                                               popup
-                                                                                                                               is
-                                                                                                                               the
-                                                                                                                               only
-                                                                                                                               view
-                                                                                                                               the
-                                                                                                                               user
-                                                                                                                               can
-                                                                                                                               interact
-                                                                                                                               with.
-                                                                                                                               Defaults
-                                                                                                                               to
-                                                                                                                               False.
-                                                                                                                               [optional]
-    {overlayDismiss}                                                                            (Boolean)                      Will
-                                                                                                                               allow
-                                                                                                                               the
-                                                                                                                               user
-                                                                                                                               to
-                                                                                                                               dismiss
-                                                                                                                               and
-                                                                                                                               close
-                                                                                                                               a
-                                                                                                                               modal
-                                                                                                                               popup
-                                                                                                                               by
-                                                                                                                               clicking
-                                                                                                                               outside
-                                                                                                                               of
-                                                                                                                               it
-                                                                                                                               if
-                                                                                                                               True.
-                                                                                                                               Defaults
-                                                                                                                               to
-                                                                                                                               False.
-                                                                                                                               [optional]
-    {sessionId}                                                                                 (String)                       Identifier
-                                                                                                                               of
-                                                                                                                               the
-                                                                                                                               Session
-                                                                                                                               to
-                                                                                                                               target.
-                                                                                                                               If
-                                                                                                                               omitted,
-                                                                                                                               the
-                                                                                                                               current
-                                                                                                                               Session
-                                                                                                                               will
-                                                                                                                               be
-                                                                                                                               used
-                                                                                                                               automatically.
-                                                                                                                               When
-                                                                                                                               targeting
-                                                                                                                               a
-                                                                                                                               different
-                                                                                                                               session,
-                                                                                                                               then
-                                                                                                                               the
-                                                                                                                               pageId
-                                                                                                                               parameter
-                                                                                                                               must
-                                                                                                                               be
-                                                                                                                               included
-                                                                                                                               in
-                                                                                                                               the
-                                                                                                                               call.
-                                                                                                                               [optional]
-    {pageId}                                                                                    (String)                       Identifier
-                                                                                                                               of
-                                                                                                                               the
-                                                                                                                               page
-                                                                                                                               to
-                                                                                                                               target.
-                                                                                                                               If
-                                                                                                                               omitted,
-                                                                                                                               the
-                                                                                                                               current
-                                                                                                                               Page
-                                                                                                                               will
-                                                                                                                               be
-                                                                                                                               used
-                                                                                                                               automatically.
-                                                                                                                               [optional]
-    {viewportBound}                                                                             (Boolean)                      If
-                                                                                                                               True,
-                                                                                                                               popups
-                                                                                                                               will
-                                                                                                                               be
-                                                                                                                               "shifted"
-                                                                                                                               to
-                                                                                                                               open
-                                                                                                                               within
-                                                                                                                               the
-                                                                                                                               bounds
-                                                                                                                               of
-                                                                                                                               the
-                                                                                                                               viewport.
-                                                                                                                               If
-                                                                                                                               the
-                                                                                                                               popup
-                                                                                                                               would
-                                                                                                                               be
-                                                                                                                               larger
-                                                                                                                               than
-                                                                                                                               the
-                                                                                                                               viewport,
-                                                                                                                               then
-                                                                                                                               it
-                                                                                                                               will
-                                                                                                                               be
-                                                                                                                               resized
-                                                                                                                               to
-                                                                                                                               fit
-                                                                                                                               within
-                                                                                                                               the
-                                                                                                                               bounds.
-                                                                                                                               Default
-                                                                                                                               is
-                                                                                                                               False.
-                                                                                                                               [optional]
+    {id}              (String)                       A unique popup string.
+                                                     Will be used to close
+                                                     the popup from other
+                                                     popup or script actions.
+    {view}            (String)                       The path to the view to
+                                                     use in the popup.
+    {params}          (Dictionary[String, Any])      Dictionary of key-value
+                                                     pairs to us as input
+                                                     parameters to the View.
+                                                     [optional]
+    {title}           (String)                       Text to display in the
+                                                     title bar. Defaults to
+                                                     an empty string.
+                                                     [optional]
+    {position}        (Dictionary[String, Integer])  Dictionary of key-value
+                                                     pairs to use for
+                                                     position. Possible
+                                                     position keys are: left,
+                                                     top, right, bottom,
+                                                     width, height. Defaults
+                                                     to the center of the
+                                                     window. [optional]
+    {showCloseIcon}   (Boolean)                      Will show the close icon
+                                                     if True. Defaults to
+                                                     True. [optional]
+    {draggable}       (Boolean)                      Will allow the popup to
+                                                     be dragged if True.
+                                                     Defaults to True.
+                                                     [optional]
+    {resizable}       (Boolean)                      Will allow the popup to
+                                                     be resized if True.
+                                                     Defaults to False.
+                                                     [optional]
+    {modal}           (Boolean)                      Will make the popup
+                                                     modal if True. A modal
+                                                     popup is the only view
+                                                     the user can interact
+                                                     with. Defaults to False.
+                                                     [optional]
+    {overlayDismiss}  (Boolean)                      Will allow the user to
+                                                     dismiss and close a
+                                                     modal popup by clicking
+                                                     outside of it if True.
+                                                     Defaults to False.
+                                                     [optional]
+    {sessionId}       (String)                       Identifier of the
+                                                     Session to target. If
+                                                     omitted, the current
+                                                     Session will be used
+                                                     automatically. When
+                                                     targeting a different
+                                                     session, then the pageId
+                                                     parameter must be
+                                                     included in the call.
+                                                     [optional]
+    {pageId}          (String)                       Identifier of the page
+                                                     to target. If omitted,
+                                                     the current Page will be
+                                                     used automatically.
+                                                     [optional]
+    {viewportBound}   (Boolean)                      If True, popups will be
+                                                     "shifted" to open within
+                                                     the bounds of the
+                                                     viewport. If the popup
+                                                     would be larger than the
+                                                     viewport, then it will
+                                                     be resized to fit within
+                                                     the bounds. Default is
+                                                     False. [optional]
 
   Returns: ~
     Nothing

@@ -128,7 +128,9 @@ def fetch(path: str) -> BeautifulSoup:
     resp.raise_for_status()
     # The site serves minified HTML that omits optional end tags (</td>, </tr>);
     # html.parser doesn't infer them and nests cells, so use lxml.
-    return BeautifulSoup(resp.text, "lxml")
+    # Pass bytes, not resp.text: the response has no charset header, so requests
+    # would decode the UTF-8 as Latin-1. BeautifulSoup reads the <meta charset>.
+    return BeautifulSoup(resp.content, "lxml")
 
 
 # ---------------------------------------------------------------------------
@@ -242,14 +244,37 @@ def section_for_heading(heading: str) -> str | None:
 
 
 def parse_params_table(table: Tag) -> list[Param]:
-    """Parse a parameters table: (type, name, description) or (name, description)."""
+    """
+    Parse a parameters table, finding columns by their header text
+    ("Type", "Parameter", "Description").
+
+    Tables without a "Parameter" column are not parameter lists even when they
+    sit under a parameters heading (e.g. system.net.httpClient's method tables,
+    system.alarm's state code tables), so they yield nothing.
+    """
+    rows = [
+        [text_of(cell) for cell in row.find_all(["td", "th"])]
+        for row in table.find_all("tr")
+    ]
+    if not rows:
+        return []
+    header = [text.lower() for text in rows[0]]
+    if "parameter" not in header:
+        return []
+
+    def column(row: list[str], name: str) -> str:
+        index = header.index(name) if name in header else None
+        return row[index] if index is not None and index < len(row) else ""
+
     params = []
-    for row in table.find_all("tr")[1:]:  # skip header row
-        cells = [text_of(cell) for cell in row.find_all(["td", "th"])]
-        if len(cells) >= 3:
-            params.append(Param(type=cells[0], name=cells[1], description=cells[2]))
-        elif len(cells) == 2:
-            params.append(Param(type="", name=cells[0], description=cells[1]))
+    for row in rows[1:]:
+        name = column(row, "parameter")
+        description = column(row, "description")
+        # Some pages put the description in the name cell, as "name - description".
+        if not description and " - " in name:
+            name, description = name.split(" - ", 1)
+        if name:
+            params.append(Param(name=name, type=column(row, "type"), description=description))
     return params
 
 

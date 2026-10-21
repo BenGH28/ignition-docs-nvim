@@ -41,7 +41,7 @@ system.util.audit()                               *ignition-system.util.audit*
     {actionValue}         (String)        The value of the action. Default is
                                           no value. [optional]
     {auditProfile}        (String)        Where the audit record should be
-                                          stored. Defaults to the projectâs
+                                          stored. Defaults to the project’s
                                           audit profile (if specified), or
                                           the Gateway audit profile if
                                           calling in the Gateway or
@@ -62,12 +62,11 @@ system.util.audit()                               *ignition-system.util.audit*
                                           Typically, the automatically
                                           generated context looks like this:
                                           sys:${gatewayName}:\project:${projectName}
-                                          If you provided [âcomponentâ,
-                                          âJoeâsButtonâ, âfieldâ,
-                                          âvalueâ] , you would get a
-                                          record with:
+                                          If you provided [“component”,
+                                          “Joe’sButton”, “field”, “value”] ,
+                                          you would get a record with:
                                           originatingSystem:sys:${gatewayName}:\project:${projectName}:
-                                          \component:JoeâsButton:\field:value.
+                                          \component:Joe’sButton:\field:value.
                                           If a string is provided, this
                                           automatic context will not be used
                                           and your provided string will be
@@ -515,10 +514,10 @@ system.util.modifyTranslation()       *ignition-system.util.modifyTranslation*
 
   Example: >
     # This code adds or updates a translation into French
-    # for the world Hello. Note the u in front "AllÃ´!", which
+    # for the world Hello. Note the u in front "Allô!", which
     # is needed for Python strings outside of the 7-bit ASCII
     # range.
-    system.util.modifyTranslation("Hello", u"AllÃ´!", "fr")
+    system.util.modifyTranslation("Hello", u"Allô!", "fr")
 <
 
 ------------------------------------------------------------------------------

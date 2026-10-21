@@ -198,13 +198,13 @@ system.twilio.sendPhoneCall()           *ignition-system.twilio.sendPhoneCall*
                               for making the calls.
     {toNumber}     (String)   The phone number of the recipient.
     {message}      (String)   The message text to use in the call.
-    {voice}        (String)   The voice-to-text algorithm to use. âmanâ
-                              and âwomanâ are the basic Twilio
-                              voice-to-text algorithms, but Twilio also
-                              supports using Amazonâs and Googleâs
-                              voice-to-text algorithms, though pricing may
-                              vary depending on your Twilio subscription.
-                              Defaults to âmanâ. [optional]
+    {voice}        (String)   The voice-to-text algorithm to use. “man” and
+                              “woman” are the basic Twilio voice-to-text
+                              algorithms, but Twilio also supports using
+                              Amazon’s and Google’s voice-to-text algorithms,
+                              though pricing may vary depending on your
+                              Twilio subscription. Defaults to “man”.
+                              [optional]
     {language}     (String)   The language code for the language to use for
                               text-to-speech generation. Defaults to en-US if
                               no language is configured. [optional]

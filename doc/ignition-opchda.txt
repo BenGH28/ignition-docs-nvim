@@ -190,7 +190,7 @@ system.opchda.isServerAvailable()   *ignition-system.opchda.isServerAvailable*
 
   Example: >
     # This example will check to see if there is an OPC HDA server called "ServerName" available.
-    system.opchda.isServerAvailable(âServerNameâ)
+    system.opchda.isServerAvailable(“ServerName”)
 <
 
 ------------------------------------------------------------------------------
