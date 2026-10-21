@@ -1,16 +1,31 @@
 #!/usr/bin/env python3
 """
-Scrape Ignition 8.3 scripting function docs and write vim help files to ../doc/.
+Scrape the Ignition 8.3 scripting function docs and write them as vim help files.
+
+How it works:
+    1. Fetch the scripting-functions index page and collect the module links
+       (system.tag, system.db, ...).
+    2. Fetch each module page and collect its function links.
+    3. Fetch and parse every function page into a `Function`.
+    4. Render one help file per module (doc/ignition-<module>.txt) plus the
+       index (doc/ignition.txt).
+
+If the docs site changes its markup, the places to look are
+`discover_modules`, `discover_functions` and `parse_function_page`.
 
 Usage:
     pip install requests beautifulsoup4 lxml
-    python scrape.py
+    python scripts/scrape.py [--out DIR] [--workers N] [--verbose]
+    nvim --headless -c "helptags doc/" -c "quit"
 """
 
+import argparse
 import re
 import sys
+import textwrap
 import threading
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass, field
 from pathlib import Path
 
 import requests
@@ -18,34 +33,98 @@ from bs4 import BeautifulSoup, Tag
 
 BASE_URL = "https://docs.inductiveautomation.com"
 ROOT_PATH = "/docs/8.3/appendix/scripting-functions"
-OUT_DIR = Path(__file__).parent.parent / "doc"
-MAX_WORKERS = 10
+DEFAULT_OUT_DIR = Path(__file__).resolve().parent.parent / "doc"
+DEFAULT_WORKERS = 10
+REQUEST_TIMEOUT = 30  # seconds
 
-_local = threading.local()
+# Vim help files are 78 columns wide (see the modeline written at the bottom).
+WIDTH = 78
+SEPARATOR = "-" * WIDTH
+MODELINE = "vim:tw=78:ft=help:norl:"
+
+
+# ---------------------------------------------------------------------------
+# Data model
+# ---------------------------------------------------------------------------
+
+
+@dataclass
+class Param:
+    name: str
+    type: str  # empty when the docs table has no type column
+    description: str
+
+
+@dataclass
+class Syntax:
+    """One call signature. Overloaded functions have several."""
+
+    signature: str = ""
+    params: list[Param] = field(default_factory=list)
+    returns: str = ""
+
+
+@dataclass
+class Function:
+    name: str  # fully qualified, e.g. "system.tag.readBlocking"
+    description: str = ""
+    syntaxes: list[Syntax] = field(default_factory=list)
+    scope: str = ""
+    examples: list[str] = field(default_factory=list)
+
+
+@dataclass
+class FunctionLink:
+    name: str  # fully qualified, e.g. "system.tag.readBlocking"
+    path: str  # URL path of the function's page
+
+
+@dataclass
+class Module:
+    slug: str  # URL slug, e.g. "system-tag"
+    path: str  # URL path of the module's page
+    functions: list[FunctionLink] = field(default_factory=list)
+
+    @property
+    def name(self) -> str:
+        """Fully qualified name, e.g. "system.tag"."""
+        return self.slug.replace("-", ".", 1)
+
+    @property
+    def short_name(self) -> str:
+        """Name without the "system." prefix, e.g. "tag"."""
+        return self.slug.removeprefix("system-")
+
+
+# ---------------------------------------------------------------------------
+# Logging and HTTP
+# ---------------------------------------------------------------------------
+
 _print_lock = threading.Lock()
+_thread_local = threading.local()
+_verbose = False
 
 
 def log(msg: str) -> None:
+    """Thread-safe print."""
     with _print_lock:
         print(msg)
 
 
 def get_session() -> requests.Session:
-    if not hasattr(_local, "session"):
-        s = requests.Session()
-        s.headers["User-Agent"] = "ignition-docs.nvim scraper/1.0"
-        _local.session = s
-    return _local.session
+    """Return this thread's HTTP session (sessions aren't safe to share)."""
+    if not hasattr(_thread_local, "session"):
+        session = requests.Session()
+        session.headers["User-Agent"] = "ignition-docs.nvim scraper/1.0"
+        _thread_local.session = session
+    return _thread_local.session
 
-
-# ---------------------------------------------------------------------------
-# HTTP helpers
-# ---------------------------------------------------------------------------
 
 def fetch(path: str) -> BeautifulSoup:
     url = BASE_URL + path
-    log(f"  GET {url}")
-    resp = get_session().get(url, timeout=30)
+    if _verbose:
+        log(f"  GET {url}")
+    resp = get_session().get(url, timeout=REQUEST_TIMEOUT)
     resp.raise_for_status()
     # The site serves minified HTML that omits optional end tags (</td>, </tr>);
     # html.parser doesn't infer them and nests cells, so use lxml.
@@ -53,484 +132,395 @@ def fetch(path: str) -> BeautifulSoup:
 
 
 # ---------------------------------------------------------------------------
-# Vim help formatting helpers
+# Text helpers
 # ---------------------------------------------------------------------------
 
-SEP = "-" * 78
-WRAP = 78
 
-
-def tag_anchor(name: str, prefix_len: int = 0) -> str:
-    """Pad then append *tag* so the line reaches column WRAP."""
-    tag = f"*{name}*"
-    pad = max(1, WRAP - prefix_len - len(tag))
-    return " " * pad + tag
-
-
-def wrap_text(text: str, indent: int = 2) -> str:
-    """Wrap and indent a block of plain text."""
-    words = text.split()
-    if not words:
+def text_of(element: Tag | None) -> str:
+    """Element text with all whitespace runs collapsed to single spaces."""
+    if element is None:
         return ""
-    lines = []
-    prefix = " " * indent
-    line = prefix
-    for word in words:
-        if len(line) + len(word) + 1 > WRAP:
-            lines.append(line.rstrip())
-            line = prefix + word + " "
-        else:
-            line += word + " "
-    lines.append(line.rstrip())
-    return "\n".join(lines)
-
-
-def clean(text: str) -> str:
+    text = element.get_text(" ", strip=True).replace("​", "")  # zero-width space
     return " ".join(text.split())
 
 
-def text_of(element) -> str:
-    if element is None:
-        return ""
-    return clean(element.get_text(" ", strip=True))
+def wrap(text: str, indent: int | str = 2) -> list[str]:
+    """
+    Word-wrap text to the help file width.
+
+    `indent` is a number of spaces or a literal prefix for the first line;
+    continuation lines are indented to the same width.
+    """
+    first = " " * indent if isinstance(indent, int) else indent
+    return textwrap.wrap(
+        text,
+        # One column short of WIDTH, matching the existing generated docs.
+        width=WIDTH - 1,
+        initial_indent=first,
+        subsequent_indent=" " * len(first),
+        break_long_words=False,
+        break_on_hyphens=False,
+    )
 
 
-# ---------------------------------------------------------------------------
-# Page parsing
-# ---------------------------------------------------------------------------
-
-def heading_text(element) -> str:
-    """Get heading text, stripping zero-width spaces and normalizing."""
-    return element.get_text(" ", strip=True).replace("​", "").strip()
+def right_align(left: str, right: str) -> str:
+    """Pad between left and right so that right ends at column WIDTH."""
+    return left + " " * max(1, WIDTH - len(left) - len(right)) + right
 
 
-def parse_function_page(soup: BeautifulSoup, qualified_name: str) -> dict:
-    """Extract structured data from a function detail page."""
-    main = soup.find("article") or soup.find("main") or soup.body
-
-    result = {
-        "name": qualified_name,
-        "description": "",
-        "syntaxes": [],   # list of {"signature": str, "params": [...], "returns": str}
-        "scope": "",
-        "examples": [],
-    }
-
-    if main is None:
-        return result
-
-    # State machine over flattened element list
-    # Sections are introduced by h1/h2/h3 headings.
-    current_section = None  # "description" | "syntax" | "params" | "returns" | "scope" | "examples"
-    current_syntax = None
-
-    for element in main.find_all(["h1", "h2", "h3", "h4", "table", "pre", "p", "code"]):
-        if not isinstance(element, Tag):
-            continue
-
-        tag = element.name
-        txt_raw = heading_text(element)
-        txt = txt_raw.lower()
-
-        # --- Heading: update section state ---
-        if tag in ("h1", "h2", "h3", "h4"):
-            if "description" in txt:
-                current_section = "description"
-            elif "syntax" in txt:
-                current_section = "syntax"
-                current_syntax = {"signature": "", "params": [], "returns": ""}
-                result["syntaxes"].append(current_syntax)
-            elif "parameter" in txt:
-                current_section = "params"
-            elif "return" in txt:
-                current_section = "returns"
-            elif "scope" in txt:
-                current_section = "scope"
-            elif "example" in txt:
-                current_section = "examples"
-            elif tag == "h1":
-                # The page title — skip, we already have qualified_name
-                pass
-            else:
-                # Unknown heading (e.g. "Client Permission Restrictions") — leave section alone
-                pass
-            continue
-
-        # --- Signature: standalone <code> block in syntax section ---
-        if tag == "code" and current_section == "syntax" and current_syntax is not None:
-            code_text = clean(element.get_text(" ", strip=True))
-            # Signature looks like "system.something(..." — skip inline param names
-            if "system." in code_text and "(" in code_text and not current_syntax["signature"]:
-                current_syntax["signature"] = code_text
-            continue
-
-        # --- Parameters table ---
-        if tag == "table" and current_section == "params" and current_syntax is not None:
-            rows = element.find_all("tr")
-            for row in rows[1:]:  # skip header row
-                cells = row.find_all(["td", "th"])
-                if len(cells) >= 3:
-                    param_type = clean(cells[0].get_text(" ", strip=True))
-                    param_name = clean(cells[1].get_text(" ", strip=True))
-                    param_desc = clean(cells[2].get_text(" ", strip=True))
-                    current_syntax["params"].append({
-                        "type": param_type,
-                        "name": param_name,
-                        "description": param_desc,
-                    })
-                elif len(cells) == 2:
-                    param_name = clean(cells[0].get_text(" ", strip=True))
-                    param_desc = clean(cells[1].get_text(" ", strip=True))
-                    current_syntax["params"].append({
-                        "type": "",
-                        "name": param_name,
-                        "description": param_desc,
-                    })
-            continue
-
-        # --- Code examples: <pre> blocks ---
-        if tag == "pre" and current_section == "examples":
-            # Lines are in <span class="token-line"> elements; extract each line's text.
-            token_lines = element.find_all("span", class_="token-line")
-            if token_lines:
-                code = "\n".join(
-                    span.get_text("", strip=False).rstrip() for span in token_lines
-                )
-            else:
-                # Fallback: replace <br> with newlines manually
-                for br in element.find_all("br"):
-                    br.replace_with("\n")
-                code = element.get_text("", strip=False)
-            result["examples"].append(code)
-            continue
-
-        # --- Paragraph content ---
-        if tag == "p":
-            para_text = clean(element.get_text(" ", strip=True))
-            if not para_text:
-                continue
-            if current_section == "description" and not result["description"]:
-                result["description"] = para_text
-            elif current_section == "scope" and not result["scope"]:
-                result["scope"] = para_text
-            elif current_section == "returns" and current_syntax is not None and not current_syntax["returns"]:
-                current_syntax["returns"] = para_text
-
-    return result
+def help_tag(name: str) -> str:
+    """A tag definition: `:help name` jumps here."""
+    return f"*{name}*"
 
 
-# ---------------------------------------------------------------------------
-# Vim help file rendering
-# ---------------------------------------------------------------------------
-
-def render_function(data: dict) -> str:
-    lines = []
-    name = data["name"]
-    tag_name = f"ignition-{name}"
-
-    lines.append(SEP)
-    # Function heading with tag right-aligned
-    heading = f"{name}()"
-    tag = f"*{tag_name}*"
-    pad = WRAP - len(heading) - len(tag)
-    lines.append(f"{heading}{' ' * max(1, pad)}{tag}")
-    lines.append("")
-
-    if data["description"]:
-        lines.append(wrap_text(data["description"], indent=2))
-        lines.append("")
-
-    for syntax in data["syntaxes"]:
-        if syntax["signature"]:
-            lines.append(f"  Syntax: >")
-            lines.append(f"    {syntax['signature']}")
-            lines.append(f"<")
-            lines.append("")
-
-        if syntax["params"]:
-            lines.append(f"  Parameters: ~")
-            max_name = max((len(p["name"]) for p in syntax["params"]), default=8)
-            max_type = max((len(p["type"]) for p in syntax["params"]), default=6)
-            for p in syntax["params"]:
-                name_col = f"{{{p['name']}}}".ljust(max_name + 2)
-                type_col = (f"({p['type']})".ljust(max_type + 2)) if p["type"] else " " * (max_type + 3)
-                prefix = f"    {name_col}  {type_col}  "
-                desc_words = p["description"].split()
-                desc_lines = []
-                current = ""
-                for word in desc_words:
-                    if len(prefix if not desc_lines else " " * len(prefix)) + len(current) + len(word) + 1 > WRAP:
-                        desc_lines.append(current.rstrip())
-                        current = word + " "
-                    else:
-                        current += word + " "
-                if current.strip():
-                    desc_lines.append(current.rstrip())
-                if desc_lines:
-                    lines.append(f"{prefix}{desc_lines[0]}")
-                    cont = " " * len(prefix)
-                    for dl in desc_lines[1:]:
-                        lines.append(f"{cont}{dl}")
-                else:
-                    lines.append(prefix)
-            lines.append("")
-
-        if syntax["returns"]:
-            lines.append(f"  Returns: ~")
-            lines.append(wrap_text(syntax["returns"], indent=4))
-            lines.append("")
-
-    if data["scope"]:
-        lines.append(f"  Scope: {data['scope']}")
-        lines.append("")
-
-    if data["examples"]:
-        lines.append(f"  Example: >")
-        for ex in data["examples"][:1]:  # include first example only
-            for ex_line in ex.splitlines():
-                lines.append(f"    {ex_line}")
-        lines.append("<")
-        lines.append("")
-
-    return "\n".join(lines)
-
-
-def render_module_file(module_slug: str, qualified_module: str, functions: list[dict]) -> str:
-    """Render a complete vim help file for one module."""
-    short = module_slug  # e.g. "tag"
-    file_tag = f"ignition-{short}.txt"
-    module_tag = f"ignition-{qualified_module}"
-
-    lines = []
-
-    # File header
-    header_left = f"*{file_tag}*"
-    header_right = f"Ignition {qualified_module} functions"
-    pad = WRAP - len(header_left) - len(header_right)
-    lines.append(f"{header_left}{' ' * max(1, pad)}{header_right}")
-    lines.append("")
-
-    # Module section heading
-    section_title = qualified_module.upper()
-    lines.append(f"{section_title}{tag_anchor(module_tag, len(section_title))}")
-    lines.append("")
-
-    # Function index
-    for fn in functions:
-        fn_tag = f"|ignition-{fn['name']}|"
-        lines.append(f"  {fn_tag}")
-    lines.append("")
-
-    # Function entries
-    for fn in functions:
-        lines.append(render_function(fn))
-
-    lines.append("")
-    lines.append("vim:tw=78:ft=help:norl:")
-
-    return "\n".join(lines)
-
-
-def render_index(modules: list[dict]) -> str:
-    """Render doc/ignition.txt — the main index file."""
-    lines = []
-
-    header_left = "*ignition.txt*"
-    header_right = "Ignition 8.3 Scripting Functions"
-    pad = WRAP - len(header_left) - len(header_right)
-    lines.append(f"{header_left}{' ' * max(1, pad)}{header_right}")
-    lines.append("")
-
-    title = "IGNITION SCRIPTING FUNCTIONS"
-    lines.append(f"{title}{tag_anchor('ignition', len(title))}")
-    lines.append("")
-    lines.append(wrap_text(
-        "Vim help reference for Ignition 8.3 system scripting functions. "
-        "Generated from https://docs.inductiveautomation.com/docs/8.3/appendix/scripting-functions",
-        indent=0,
-    ))
-    lines.append("")
-
-    mod_heading = "MODULES"
-    lines.append(f"{mod_heading}{tag_anchor('ignition-modules', len(mod_heading))}")
-    lines.append("")
-
-    for mod in modules:
-        link = f"|ignition-{mod['qualified']}|"
-        desc = mod["qualified"]
-        lines.append(f"  {link:<45}  {desc}")
-
-    lines.append("")
-    lines.append("vim:tw=78:ft=help:norl:")
-
-    return "\n".join(lines)
+def help_link(name: str) -> str:
+    """A link to a tag."""
+    return f"|{name}|"
 
 
 # ---------------------------------------------------------------------------
 # Discovery
 # ---------------------------------------------------------------------------
 
-def discover_modules(soup: BeautifulSoup) -> list[dict]:
-    """
-    Find all module links on the main scripting-functions page.
-    Returns list of {"slug": "system-tag", "qualified": "system.tag", "path": "/docs/..."}
-    """
-    modules = []
-    seen = set()
+MODULE_HREF = re.compile(rf"^{re.escape(ROOT_PATH)}/(system-\w+)$")
 
+
+def normalize_href(href: str) -> str:
+    return href.split("?")[0].rstrip("/")
+
+
+def discover_modules(soup: BeautifulSoup) -> list[Module]:
+    """Find the module links on the scripting-functions index page, in page order."""
+    modules: dict[str, Module] = {}
     for a in soup.find_all("a", href=True):
-        href = a["href"]
-        # Match links that are direct children of the scripting-functions path
-        m = re.match(
-            r"^(/docs/8\.3/appendix/scripting-functions/)(system-[\w]+)$",
-            href.split("?")[0].rstrip("/"),
-        )
-        if m and m.group(2) not in seen:
-            slug = m.group(2)  # e.g. "system-tag"
-            qualified = slug.replace("-", ".", 1)  # e.g. "system.tag"
-            # Handle multi-word: system-opchda → system.opchda (only first dash → dot)
-            seen.add(slug)
-            modules.append({"slug": slug, "qualified": qualified, "path": m.group(0)})
-
-    return modules
+        href = normalize_href(a["href"])
+        match = MODULE_HREF.match(href)
+        if match and match.group(1) not in modules:
+            modules[match.group(1)] = Module(slug=match.group(1), path=href)
+    return list(modules.values())
 
 
-def discover_functions(soup: BeautifulSoup, module_path: str) -> list[dict]:
+def discover_functions(soup: BeautifulSoup, module: Module) -> list[FunctionLink]:
     """
-    Find all function links on a module index page.
-    Returns list of {"name": "readBlocking", "qualified": "system.tag.readBlocking", "path": "..."}
+    Find the function links on a module page.
+
+    Function pages live under the module page and repeat its slug, e.g.
+    .../system-tag/system-tag-readBlocking for system.tag.readBlocking.
     """
-    functions = []
-    seen = set()
-    module_slug = module_path.rstrip("/").split("/")[-1]  # e.g. "system-tag"
-    module_qualified = module_slug.replace("-", ".", 1)   # e.g. "system.tag"
-
-    prefix = f"{module_path.rstrip('/')}/{module_slug}-"
-
+    prefix = f"{module.path}/{module.slug}-"
+    functions: dict[str, FunctionLink] = {}
     for a in soup.find_all("a", href=True):
-        href = a["href"].split("?")[0].rstrip("/")
-        if href.startswith(prefix) and href not in seen:
-            seen.add(href)
-            fn_name = href[len(prefix):]  # e.g. "readBlocking"
-            qualified = f"{module_qualified}.{fn_name}"
-            functions.append({
-                "name": fn_name,
-                "qualified": qualified,
-                "path": href,
-            })
-
-    return functions
+        href = normalize_href(a["href"])
+        if href.startswith(prefix) and href not in functions:
+            name = f"{module.name}.{href.removeprefix(prefix)}"
+            functions[href] = FunctionLink(name=name, path=href)
+    return list(functions.values())
 
 
 # ---------------------------------------------------------------------------
-# Parallel workers
+# Function page parsing
 # ---------------------------------------------------------------------------
 
-def _discover_module(mod: dict) -> tuple[dict, list] | None:
-    """Fetch a module index page and return (mod, fn_links), or None on error."""
-    try:
-        soup = fetch(mod["path"])
-        fn_links = discover_functions(soup, mod["path"])
-        if not fn_links:
-            log(f"  WARNING: no functions found for {mod['qualified']}, skipping")
-            return None
-        log(f"  {mod['qualified']}: {len(fn_links)} functions")
-        return mod, fn_links
-    except requests.HTTPError as e:
-        log(f"  WARNING: {e} — skipping module {mod['qualified']}")
-        return None
+# Heading keyword -> section. Checked in order and the first match wins, so a
+# heading like "Syntax - Parameters" counts as a syntax section.
+SECTION_KEYWORDS = [
+    ("description", "description"),
+    ("syntax", "syntax"),
+    ("parameter", "params"),
+    ("return", "returns"),
+    ("scope", "scope"),
+    ("example", "examples"),
+]
 
 
-def _scrape_function(fn: dict) -> dict | None:
-    """Fetch and parse one function page, or None on error."""
-    try:
-        soup = fetch(fn["path"])
-        return parse_function_page(soup, fn["qualified"])
-    except requests.HTTPError as e:
-        log(f"  WARNING: {e} — skipping {fn['qualified']}")
-        return None
+def section_for_heading(heading: str) -> str | None:
+    heading = heading.lower()
+    for keyword, section in SECTION_KEYWORDS:
+        if keyword in heading:
+            return section
+    return None
+
+
+def parse_params_table(table: Tag) -> list[Param]:
+    """Parse a parameters table: (type, name, description) or (name, description)."""
+    params = []
+    for row in table.find_all("tr")[1:]:  # skip header row
+        cells = [text_of(cell) for cell in row.find_all(["td", "th"])]
+        if len(cells) >= 3:
+            params.append(Param(type=cells[0], name=cells[1], description=cells[2]))
+        elif len(cells) == 2:
+            params.append(Param(type="", name=cells[0], description=cells[1]))
+    return params
+
+
+def parse_code_block(pre: Tag) -> str:
+    """Extract source code from a <pre>, preserving line breaks."""
+    # The syntax highlighter puts each line in its own <span class="token-line">.
+    lines = pre.find_all("span", class_="token-line")
+    if lines:
+        return "\n".join(line.get_text().rstrip() for line in lines)
+    for br in pre.find_all("br"):
+        br.replace_with("\n")
+    return pre.get_text()
+
+
+def parse_function_page(soup: BeautifulSoup, name: str) -> Function:
+    """
+    Extract a function's docs from its page.
+
+    Walks the page's headings and content elements in document order. Each
+    heading switches the current section (see SECTION_KEYWORDS); content is
+    then attributed to that section. Each "Syntax" heading starts a new
+    `Syntax`, so the parameters and returns that follow belong to it.
+    Unrecognized headings (e.g. "Client Permission Restrictions") leave the
+    current section unchanged.
+    """
+    function = Function(name=name)
+    main = soup.find("article") or soup.find("main") or soup.body
+    if main is None:
+        return function
+
+    section = None
+    syntax = None  # the Syntax currently being filled in
+
+    for element in main.find_all(["h1", "h2", "h3", "h4", "table", "pre", "p", "code"]):
+        tag = element.name
+
+        if tag in ("h1", "h2", "h3", "h4"):
+            new_section = section_for_heading(text_of(element))
+            if new_section == "syntax":
+                syntax = Syntax()
+                function.syntaxes.append(syntax)
+            if new_section:
+                section = new_section
+
+        elif tag == "code" and section == "syntax" and syntax is not None:
+            # The signature is the first <code> that looks like a call; other
+            # <code> elements in this section are inline parameter names.
+            text = text_of(element)
+            if not syntax.signature and "system." in text and "(" in text:
+                syntax.signature = text
+
+        elif tag == "table" and section == "params" and syntax is not None:
+            syntax.params.extend(parse_params_table(element))
+
+        elif tag == "pre" and section == "examples":
+            function.examples.append(parse_code_block(element))
+
+        elif tag == "p":
+            # Only the first paragraph of each section is kept.
+            text = text_of(element)
+            if not text:
+                continue
+            if section == "description" and not function.description:
+                function.description = text
+            elif section == "scope" and not function.scope:
+                function.scope = text
+            elif section == "returns" and syntax is not None and not syntax.returns:
+                syntax.returns = text
+
+    return function
 
 
 # ---------------------------------------------------------------------------
-# Main
+# Rendering
 # ---------------------------------------------------------------------------
 
-def main():
-    OUT_DIR.mkdir(parents=True, exist_ok=True)
 
-    print("Fetching module list...")
-    root_soup = fetch(ROOT_PATH)
-    modules = discover_modules(root_soup)
+def tag_name(qualified_name: str) -> str:
+    """Help tag for a module or function, e.g. "ignition-system.tag"."""
+    return f"ignition-{qualified_name}"
 
-    if not modules:
-        print("ERROR: No modules found. The page structure may have changed.", file=sys.stderr)
-        sys.exit(1)
 
-    print(f"Found {len(modules)} modules\n")
+def render_params(params: list[Param]) -> list[str]:
+    """Render params as aligned columns: {name}  (type)  description."""
+    name_width = max(len(p.name) for p in params) + 2  # +2 for the braces
+    type_width = max(len(p.type) for p in params) + 2  # +2 for the parens
+    lines = []
+    for p in params:
+        name_col = f"{{{p.name}}}".ljust(name_width)
+        type_col = (f"({p.type})" if p.type else "").ljust(type_width)
+        prefix = f"    {name_col}  {type_col}  "
+        lines.extend(wrap(p.description, indent=prefix) or [prefix.rstrip()])
+    return lines
 
-    # Phase 1: discover all module function lists in parallel
-    print("Phase 1: discovering functions across all modules...")
-    module_fn_links: dict[str, tuple[dict, list]] = {}
-    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as pool:
-        futures = {pool.submit(_discover_module, mod): mod for mod in modules}
-        for future in as_completed(futures):
-            result = future.result()
-            if result:
-                mod, fn_links = result
-                module_fn_links[mod["slug"]] = (mod, fn_links)
 
-    total_fns = sum(len(fns) for _, fns in module_fn_links.values())
-    print(f"\nPhase 2: scraping {total_fns} function pages ({MAX_WORKERS} workers)...")
-
-    # Phase 2: scrape all function pages in parallel
-    # fn_results[slug][qualified_name] = parsed data dict
-    fn_results: dict[str, dict[str, dict]] = {slug: {} for slug in module_fn_links}
-
-    all_tasks = [
-        (fn, slug)
-        for slug, (_, fn_links) in module_fn_links.items()
-        for fn in fn_links
+def render_function(function: Function) -> list[str]:
+    lines = [
+        SEPARATOR,
+        right_align(f"{function.name}()", help_tag(tag_name(function.name))),
+        "",
     ]
 
-    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as pool:
-        futures = {pool.submit(_scrape_function, fn): (fn, slug) for fn, slug in all_tasks}
-        done = 0
-        for future in as_completed(futures):
-            fn, slug = futures[future]
-            data = future.result()
-            if data:
-                fn_results[slug][fn["qualified"]] = data
-            done += 1
-            if done % 50 == 0 or done == total_fns:
-                log(f"  {done}/{total_fns} functions scraped")
+    if function.description:
+        lines += [*wrap(function.description), ""]
 
-    # Phase 3: render and write files (sequential; fast)
-    print("\nPhase 3: writing help files...")
+    for syntax in function.syntaxes:
+        if syntax.signature:
+            # ">" ... "<" marks a code block in vim help.
+            lines += ["  Syntax: >", f"    {syntax.signature}", "<", ""]
+        if syntax.params:
+            # A trailing "~" highlights the line as a header.
+            lines += ["  Parameters: ~", *render_params(syntax.params), ""]
+        if syntax.returns:
+            lines += ["  Returns: ~", *wrap(syntax.returns, indent=4), ""]
+
+    if function.scope:
+        lines += [f"  Scope: {function.scope}", ""]
+
+    if function.examples:
+        # Only the first example; the rest are usually variations on it.
+        example = [f"    {line}" for line in function.examples[0].splitlines()]
+        lines += ["  Example: >", *example, "<", ""]
+
+    return lines
+
+
+def render_module_file(module: Module, functions: list[Function]) -> str:
+    """Render doc/ignition-<module>.txt."""
+    title = module.name.upper()
+    lines = [
+        right_align(
+            help_tag(f"ignition-{module.short_name}.txt"),
+            f"Ignition {module.name} functions",
+        ),
+        "",
+        right_align(title, help_tag(tag_name(module.name))),
+        "",
+        *(f"  {help_link(tag_name(fn.name))}" for fn in functions),
+        "",
+    ]
+    for function in functions:
+        lines += render_function(function)
+    lines += ["", MODELINE]
+    return "\n".join(lines)
+
+
+def render_index(modules: list[Module]) -> str:
+    """Render doc/ignition.txt, the entry point for `:help ignition`."""
+    intro = (
+        "Vim help reference for Ignition 8.3 system scripting functions. "
+        f"Generated from {BASE_URL}{ROOT_PATH}"
+    )
+    lines = [
+        right_align(help_tag("ignition.txt"), "Ignition 8.3 Scripting Functions"),
+        "",
+        right_align("IGNITION SCRIPTING FUNCTIONS", help_tag("ignition")),
+        "",
+        *wrap(intro, indent=0),
+        "",
+        right_align("MODULES", help_tag("ignition-modules")),
+        "",
+        *(f"  {help_link(tag_name(m.name)):<45}  {m.name}" for m in modules),
+        "",
+        MODELINE,
+    ]
+    return "\n".join(lines)
+
+
+# ---------------------------------------------------------------------------
+# Pipeline
+# ---------------------------------------------------------------------------
+
+
+def load_module_functions(module: Module) -> Module | None:
+    """Fill in module.functions from its page. Returns None if it can't be used."""
+    try:
+        module.functions = discover_functions(fetch(module.path), module)
+    except requests.RequestException as e:
+        log(f"  WARNING: {e} - skipping module {module.name}")
+        return None
+    if not module.functions:
+        log(f"  WARNING: no functions found for {module.name}, skipping")
+        return None
+    log(f"  {module.name}: {len(module.functions)} functions")
+    return module
+
+
+def scrape_function(link: FunctionLink) -> Function | None:
+    try:
+        return parse_function_page(fetch(link.path), link.name)
+    except requests.RequestException as e:
+        log(f"  WARNING: {e} - skipping {link.name}")
+        return None
+
+
+def scrape_all_functions(
+    pool: ThreadPoolExecutor, links: list[FunctionLink]
+) -> dict[str, Function]:
+    """Scrape every function page, keyed by qualified name. Failures are omitted."""
+    results = {}
+    for done, function in enumerate(pool.map(scrape_function, links), start=1):
+        if function:
+            results[function.name] = function
+        if done % 50 == 0 or done == len(links):
+            log(f"  {done}/{len(links)} functions scraped")
+    return results
+
+
+def write_help_files(
+    out_dir: Path, modules: list[Module], functions: dict[str, Function]
+) -> None:
     index_modules = []
-    for mod in modules:  # preserve original module order
-        slug = mod["slug"]
-        if slug not in module_fn_links:
-            continue
-        _, fn_links = module_fn_links[slug]
-        short = slug.replace("system-", "", 1)
-        qualified = mod["qualified"]
-
-        fn_data_list = [
-            fn_results[slug][fn["qualified"]]
-            for fn in fn_links
-            if fn["qualified"] in fn_results[slug]
+    for module in modules:
+        module_functions = [
+            functions[link.name] for link in module.functions if link.name in functions
         ]
-        if not fn_data_list:
+        if not module_functions:
             continue
+        path = out_dir / f"ignition-{module.short_name}.txt"
+        path.write_text(render_module_file(module, module_functions), encoding="utf-8")
+        log(f"  Wrote {path.name}")
+        index_modules.append(module)
 
-        out_path = OUT_DIR / f"ignition-{short}.txt"
-        out_path.write_text(render_module_file(short, qualified, fn_data_list), encoding="utf-8")
-        print(f"  Wrote {out_path.name}")
-        index_modules.append({"slug": short, "qualified": qualified})
+    index_path = out_dir / "ignition.txt"
+    index_path.write_text(render_index(index_modules), encoding="utf-8")
+    log(f"  Wrote {index_path.name}")
 
-    (OUT_DIR / "ignition.txt").write_text(render_index(index_modules), encoding="utf-8")
-    print("\nWrote doc/ignition.txt")
-    print("Done. Run :helptags doc/ inside Neovim to generate the tags file.")
+
+def parse_args(argv: list[str] | None) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0].strip())
+    parser.add_argument(
+        "--out",
+        type=Path,
+        default=DEFAULT_OUT_DIR,
+        help=f"output directory (default: {DEFAULT_OUT_DIR})",
+    )
+    parser.add_argument(
+        "--workers",
+        type=int,
+        default=DEFAULT_WORKERS,
+        help=f"concurrent requests (default: {DEFAULT_WORKERS})",
+    )
+    parser.add_argument(
+        "-v", "--verbose", action="store_true", help="log every request"
+    )
+    return parser.parse_args(argv)
+
+
+def main(argv: list[str] | None = None) -> None:
+    global _verbose
+    args = parse_args(argv)
+    _verbose = args.verbose
+    args.out.mkdir(parents=True, exist_ok=True)
+
+    log("Fetching module list...")
+    modules = discover_modules(fetch(ROOT_PATH))
+    if not modules:
+        sys.exit("ERROR: No modules found. The page structure may have changed.")
+    log(f"Found {len(modules)} modules\n")
+
+    with ThreadPoolExecutor(max_workers=args.workers) as pool:
+        log("Discovering functions in each module...")
+        modules = [m for m in pool.map(load_module_functions, modules) if m]
+
+        links = [link for module in modules for link in module.functions]
+        log(f"\nScraping {len(links)} function pages ({args.workers} workers)...")
+        functions = scrape_all_functions(pool, links)
+
+    log(f"\nWriting help files to {args.out}...")
+    write_help_files(args.out, modules, functions)
+    log("\nDone. Run :helptags doc/ inside Neovim to generate the tags file.")
 
 
 if __name__ == "__main__":

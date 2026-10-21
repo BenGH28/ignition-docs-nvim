@@ -362,12 +362,12 @@ system.alarm.queryJournal()               *ignition-system.alarm.queryJournal*
                                                           query all
                                                           providers.
                                                           [optional]
-    {ClearUnacked}                                         0
-    {ClearAcked}                                           1
-    {ActiveUnacked}                                        2
-    {ActiveAcked}                                          3
-    {Enabled}                                              4
-    {Disabled}                                             5
+    {ClearUnacked}                                        0
+    {ClearAcked}                                          1
+    {ActiveUnacked}                                       2
+    {ActiveAcked}                                         3
+    {Enabled}                                             4
+    {Disabled}                                            5
 
   Returns: ~
     AlarmQueryResult - The AlarmQueryResult object is a list of PyAlarmEvent
@@ -504,10 +504,10 @@ system.alarm.queryStatus()                 *ignition-system.alarm.queryStatus*
                                                          parameter will query
                                                          all providers.
                                                          [optional]
-    {ClearUnacked}                                        0
-    {ClearAcked}                                          1
-    {ActiveUnacked}                                       2
-    {ActiveAcked}                                         3
+    {ClearUnacked}                                       0
+    {ClearAcked}                                         1
+    {ActiveUnacked}                                      2
+    {ActiveAcked}                                        3
 
   Returns: ~
     AlarmQueryResult - The AlarmQueryResult object is a list of PyAlarmEvent

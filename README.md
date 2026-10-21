@@ -77,7 +77,7 @@ Clone the repo anywhere on your `runtimepath` and run `:helptags ALL`.
 The help files are generated from the [Inductive Automation docs site](https://docs.inductiveautomation.com/docs/8.3/appendix/scripting-functions) by a scraper script.
 
 ```sh
-pip install requests beautifulsoup4
-python scripts/scrape.py
+pip install requests beautifulsoup4 lxml
+python scripts/scrape.py          # --help for options (--out, --workers, --verbose)
 nvim --headless -c "helptags doc/" -c "quit"
 ```

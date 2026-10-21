@@ -1018,8 +1018,7 @@ system.perspective.togglePopup()     *ignition-system.perspective.togglePopup*
 <
 
   Parameters: ~
-    {id}                                                                                        (String)                       
-                                                                                                                               A
+    {id}                                                                                        (String)                       A
                                                                                                                                unique
                                                                                                                                popup
                                                                                                                                string.
@@ -1036,8 +1035,7 @@ system.perspective.togglePopup()     *ignition-system.perspective.togglePopup*
                                                                                                                                or
                                                                                                                                script
                                                                                                                                actions.
-    {view}                                                                                      (String)                       
-                                                                                                                               The
+    {view}                                                                                      (String)                       The
                                                                                                                                path
                                                                                                                                to
                                                                                                                                the
@@ -1047,9 +1045,8 @@ system.perspective.togglePopup()     *ignition-system.perspective.togglePopup*
                                                                                                                                in
                                                                                                                                the
                                                                                                                                popup.
-    {params - Dictionary of key-value pairs to us as input parameters to the View. [optional]}  (Dictionary[String, Any])      
-    {title}                                                                                     (String)                       
-                                                                                                                               Text
+    {params - Dictionary of key-value pairs to us as input parameters to the View. [optional]}  (Dictionary[String, Any])
+    {title}                                                                                     (String)                       Text
                                                                                                                                to
                                                                                                                                display
                                                                                                                                in
@@ -1062,8 +1059,7 @@ system.perspective.togglePopup()     *ignition-system.perspective.togglePopup*
                                                                                                                                empty
                                                                                                                                string.
                                                                                                                                [optional]
-    {position}                                                                                  (Dictionary[String, Integer])  
-                                                                                                                               Dictionary
+    {position}                                                                                  (Dictionary[String, Integer])  Dictionary
                                                                                                                                of
                                                                                                                                key-value
                                                                                                                                pairs
@@ -1089,8 +1085,7 @@ system.perspective.togglePopup()     *ignition-system.perspective.togglePopup*
                                                                                                                                the
                                                                                                                                window.
                                                                                                                                [optional]
-    {showCloseIcon}                                                                             (Boolean)                      
-                                                                                                                               Will
+    {showCloseIcon}                                                                             (Boolean)                      Will
                                                                                                                                show
                                                                                                                                the
                                                                                                                                close
@@ -1101,8 +1096,7 @@ system.perspective.togglePopup()     *ignition-system.perspective.togglePopup*
                                                                                                                                to
                                                                                                                                True.
                                                                                                                                [optional]
-    {draggable}                                                                                 (Boolean)                      
-                                                                                                                               Will
+    {draggable}                                                                                 (Boolean)                      Will
                                                                                                                                allow
                                                                                                                                the
                                                                                                                                popup
@@ -1115,8 +1109,7 @@ system.perspective.togglePopup()     *ignition-system.perspective.togglePopup*
                                                                                                                                to
                                                                                                                                True.
                                                                                                                                [optional]
-    {resizable}                                                                                 (Boolean)                      
-                                                                                                                               Will
+    {resizable}                                                                                 (Boolean)                      Will
                                                                                                                                allow
                                                                                                                                the
                                                                                                                                popup
@@ -1129,8 +1122,7 @@ system.perspective.togglePopup()     *ignition-system.perspective.togglePopup*
                                                                                                                                to
                                                                                                                                False.
                                                                                                                                [optional]
-    {modal}                                                                                     (Boolean)                      
-                                                                                                                               Will
+    {modal}                                                                                     (Boolean)                      Will
                                                                                                                                make
                                                                                                                                the
                                                                                                                                popup
@@ -1153,8 +1145,7 @@ system.perspective.togglePopup()     *ignition-system.perspective.togglePopup*
                                                                                                                                to
                                                                                                                                False.
                                                                                                                                [optional]
-    {overlayDismiss}                                                                            (Boolean)                      
-                                                                                                                               Will
+    {overlayDismiss}                                                                            (Boolean)                      Will
                                                                                                                                allow
                                                                                                                                the
                                                                                                                                user
@@ -1176,8 +1167,7 @@ system.perspective.togglePopup()     *ignition-system.perspective.togglePopup*
                                                                                                                                to
                                                                                                                                False.
                                                                                                                                [optional]
-    {sessionId}                                                                                 (String)                       
-                                                                                                                               Identifier
+    {sessionId}                                                                                 (String)                       Identifier
                                                                                                                                of
                                                                                                                                the
                                                                                                                                Session
@@ -1208,8 +1198,7 @@ system.perspective.togglePopup()     *ignition-system.perspective.togglePopup*
                                                                                                                                the
                                                                                                                                call.
                                                                                                                                [optional]
-    {pageId}                                                                                    (String)                       
-                                                                                                                               Identifier
+    {pageId}                                                                                    (String)                       Identifier
                                                                                                                                of
                                                                                                                                the
                                                                                                                                page
@@ -1225,8 +1214,7 @@ system.perspective.togglePopup()     *ignition-system.perspective.togglePopup*
                                                                                                                                used
                                                                                                                                automatically.
                                                                                                                                [optional]
-    {viewportBound}                                                                             (Boolean)                      
-                                                                                                                               If
+    {viewportBound}                                                                             (Boolean)                      If
                                                                                                                                True,
                                                                                                                                popups
                                                                                                                                will
