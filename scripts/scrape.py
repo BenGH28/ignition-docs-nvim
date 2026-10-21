@@ -206,17 +206,44 @@ def discover_functions(soup: BeautifulSoup, module: Module) -> list[FunctionLink
     """
     Find the function links on a module page.
 
-    Function pages live under the module page and repeat its slug, e.g.
-    .../system-tag/system-tag-readBlocking for system.tag.readBlocking.
+    Function pages live under the module page, and each path segment extends
+    the one before it:
+        .../system-tag/system-tag-readBlocking
+            -> system.tag.readBlocking
+        .../system-perspective/system-perspective-workstation/system-perspective-workstation-exit
+            -> system.perspective.workstation.exit
+
+    Links that break this pattern are ignored (the site links addDevice as
+    .../system-device-addDevice/system-device-addDevice, which 404s), as are
+    sub-module index pages such as .../system-perspective-workstation.
     """
-    prefix = f"{module.path}/{module.slug}-"
     functions: dict[str, FunctionLink] = {}
     for a in soup.find_all("a", href=True):
         href = normalize_href(a["href"])
-        if href.startswith(prefix) and href not in functions:
-            name = f"{module.name}.{href.removeprefix(prefix)}"
+        name = function_name(href, module)
+        if name and href not in functions:
             functions[href] = FunctionLink(name=name, path=href)
-    return list(functions.values())
+
+    # A page that other function pages nest under is a sub-module index.
+    return [
+        link
+        for link in functions.values()
+        if not any(other.startswith(link.path + "/") for other in functions)
+    ]
+
+
+def function_name(href: str, module: Module) -> str | None:
+    """Qualified function name for a link under a module page, or None."""
+    if not href.startswith(module.path + "/"):
+        return None
+    parts = [module.name]
+    parent = module.slug
+    for segment in href.removeprefix(module.path + "/").split("/"):
+        if not segment.startswith(parent + "-"):
+            return None
+        parts.append(segment.removeprefix(parent + "-"))
+        parent = segment
+    return ".".join(parts)
 
 
 # ---------------------------------------------------------------------------

@@ -27,10 +27,9 @@ SYSTEM.PERSPECTIVE                               *ignition-system.perspective*
   |ignition-system.perspective.toggleDock|
   |ignition-system.perspective.togglePopup|
   |ignition-system.perspective.vibrateDevice|
-  |ignition-system.perspective.workstation|
-  |ignition-system.perspective.workstation/system-perspective-workstation-exit|
-  |ignition-system.perspective.workstation/system-perspective-workstation-toKiosk|
-  |ignition-system.perspective.workstation/system-perspective-workstation-toWindowed|
+  |ignition-system.perspective.workstation.exit|
+  |ignition-system.perspective.workstation.toKiosk|
+  |ignition-system.perspective.workstation.toWindowed|
 
 ------------------------------------------------------------------------------
 system.perspective.alterDock()         *ignition-system.perspective.alterDock*
@@ -1127,10 +1126,7 @@ system.perspective.vibrateDevice() *ignition-system.perspective.vibrateDevice*
 <
 
 ------------------------------------------------------------------------------
-system.perspective.workstation()     *ignition-system.perspective.workstation*
-
-------------------------------------------------------------------------------
-system.perspective.workstation/system-perspective-workstation-exit() *ignition-system.perspective.workstation/system-perspective-workstation-exit*
+system.perspective.workstation.exit() *ignition-system.perspective.workstation.exit*
 
   When called from a session running in Workstation, this function will close
   Workstation.
@@ -1150,7 +1146,7 @@ system.perspective.workstation/system-perspective-workstation-exit() *ignition-s
 <
 
 ------------------------------------------------------------------------------
-system.perspective.workstation/system-perspective-workstation-toKiosk() *ignition-system.perspective.workstation/system-perspective-workstation-toKiosk*
+system.perspective.workstation.toKiosk() *ignition-system.perspective.workstation.toKiosk*
 
   When called from a session running in Perspective Workstation , attempts to
   put Workstation into Kiosk mode.
@@ -1171,7 +1167,7 @@ system.perspective.workstation/system-perspective-workstation-toKiosk() *ignitio
 <
 
 ------------------------------------------------------------------------------
-system.perspective.workstation/system-perspective-workstation-toWindowed() *ignition-system.perspective.workstation/system-perspective-workstation-toWindowed*
+system.perspective.workstation.toWindowed() *ignition-system.perspective.workstation.toWindowed*
 
   When called from a Session running in Perspective Workstation , attempts to
   put Workstation into windowed mode.

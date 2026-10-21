@@ -296,10 +296,9 @@ ignition-system.perspective.setTheme	ignition-perspective.txt	/*ignition-system.
 ignition-system.perspective.toggleDock	ignition-perspective.txt	/*ignition-system.perspective.toggleDock*
 ignition-system.perspective.togglePopup	ignition-perspective.txt	/*ignition-system.perspective.togglePopup*
 ignition-system.perspective.vibrateDevice	ignition-perspective.txt	/*ignition-system.perspective.vibrateDevice*
-ignition-system.perspective.workstation	ignition-perspective.txt	/*ignition-system.perspective.workstation*
-ignition-system.perspective.workstation/system-perspective-workstation-exit	ignition-perspective.txt	/*ignition-system.perspective.workstation\/system-perspective-workstation-exit*
-ignition-system.perspective.workstation/system-perspective-workstation-toKiosk	ignition-perspective.txt	/*ignition-system.perspective.workstation\/system-perspective-workstation-toKiosk*
-ignition-system.perspective.workstation/system-perspective-workstation-toWindowed	ignition-perspective.txt	/*ignition-system.perspective.workstation\/system-perspective-workstation-toWindowed*
+ignition-system.perspective.workstation.exit	ignition-perspective.txt	/*ignition-system.perspective.workstation.exit*
+ignition-system.perspective.workstation.toKiosk	ignition-perspective.txt	/*ignition-system.perspective.workstation.toKiosk*
+ignition-system.perspective.workstation.toWindowed	ignition-perspective.txt	/*ignition-system.perspective.workstation.toWindowed*
 ignition-system.print	ignition-print.txt	/*ignition-system.print*
 ignition-system.print.getDefaultPrinterName	ignition-print.txt	/*ignition-system.print.getDefaultPrinterName*
 ignition-system.print.getPrinterNames	ignition-print.txt	/*ignition-system.print.getPrinterNames*
